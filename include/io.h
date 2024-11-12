@@ -1,6 +1,24 @@
 #ifndef IO_H
 #define IO_H
 
-void print_hello();
+#include "global.h"
 
-#endif // IO_H
+void read_config();
+
+void read_args(int argc, char **argv);
+
+void read_lang();
+
+int read_corpus_cache();
+void read_corpus();
+void cache_corpus();
+
+void read_weights();
+
+void read_layout(layout *lt);
+
+void print_layout(layout *lt);
+
+void print_ranking();
+
+#endif
