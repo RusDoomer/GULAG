@@ -1,12 +1,28 @@
 #ifndef GLOBAL_H
 #define GLOBAL_H
 
+#include <wchar.h>
+
+#define row 3
+#define col 12
+#define dim1 row * col
+#define dim2 dim1 * dim1
+#define dim3 dim2 * dim1
+#define dim4 dim3 * dim1
+
 extern int ROW;
 extern int COL;
 extern int DIM1;
 extern int DIM2;
 extern int DIM3;
 extern int DIM4;
+
+extern int MONO_END;
+extern int BI_END;
+extern int TRI_END;
+extern int QUAD_END;
+extern int SKIP_END;
+extern int META_END;
 
 extern char *lang_name;
 extern char *corpus_name;
@@ -20,7 +36,7 @@ extern char output_mode;
 
 extern wchar_t *lang_arr;
 extern int *char_table;
-extern int pins[ROW][COL];
+extern int pins[row][col];
 
 typedef struct layout {
     char name[100];

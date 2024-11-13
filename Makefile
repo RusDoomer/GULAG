@@ -5,51 +5,45 @@ CC := gcc
 SRC_DIR := src
 INCLUDE_DIR := include
 BUILD_DIR := build
-TEST_DIR := tests
 
 # File patterns
 SOURCES := $(wildcard $(SRC_DIR)/*.c $(SRC_DIR)/*/*.c)
-OBJECTS := $(patsubst %.c, $(BUILD_DIR)/%.o, $(notdir $(SOURCES)))
+OBJECTS := $(patsubst $(SRC_DIR)/%.c,$(BUILD_DIR)/%.o,$(SOURCES))
 EXECUTABLE := gulag
 
 # Compiler flags
-CFLAGS := -I$(INCLUDE_DIR) -Wall
-LDFLAGS := 
+CFLAGS := -I$(INCLUDE_DIR) -I$(INCLUDE_DIR)/stats -Wall
+LDFLAGS :=
 OPT_FLAGS := -O3 -march=native
 DEBUG_FLAGS := -g -fsanitize=address
 
 # Default target to build the optimized version
 .PHONY: all
-all: $(EXECUTABLE)
+all: directories $(EXECUTABLE)
 
-$(EXECUTABLE): $(OBJECTS) | $(BUILD_DIR)
-    $(CC) $^ $(LDFLAGS) -o $@ $(OPT_FLAGS)
+# Create all necessary directories
+DIRECTORIES := $(sort $(dir $(OBJECTS)))
 
-$(BUILD_DIR)/%.o: %.c | $(BUILD_DIR)
-    $(CC) $(CFLAGS) $(OPT_FLAGS) -c $< -o $@
+.PHONY: directories
+directories:
+	@for dir in $(DIRECTORIES); do \
+		mkdir -p "$$dir"; \
+	done
+
+# Link object files into the executable
+$(EXECUTABLE): $(OBJECTS)
+	$(CC) $^ $(LDFLAGS) -o $@ $(OPT_FLAGS)
+
+# Pattern rule for compiling source files into object files
+$(BUILD_DIR)/%.o: $(SRC_DIR)/%.c
+	$(CC) $(CFLAGS) $(OPT_FLAGS) -c $< -o $@
 
 # Target for debugging version with AddressSanitizer
 .PHONY: debug
-debug: CFLAGS += $(DEBUG_FLAGS)
-debug: LDFLAGS += $(DEBUG_FLAGS)
-debug: $(EXECUTABLE)
+debug:
+	$(MAKE) all CFLAGS="$(CFLAGS) $(DEBUG_FLAGS)" LDFLAGS="$(LDFLAGS) $(DEBUG_FLAGS)"
 
-# Create build directory if it doesn't exist
-$(BUILD_DIR):
-    mkdir -p $(BUILD_DIR)
-
-# Clean up build files
+# Clean up build files and directories
 .PHONY: clean
 clean:
-    rm -rf $(BUILD_DIR) $(EXECUTABLE)
-
-# Additional target for documentation or tests
-.PHONY: test
-test:
-    @echo "Running tests..."
-    # Add commands to run your tests here
-
-.PHONY: docs
-docs:
-    @echo "Generating documentation..."
-    # Add commands to generate documentation here
+	rm -rf $(BUILD_DIR) $(EXECUTABLE)

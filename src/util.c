@@ -100,11 +100,6 @@ int is_layout_allocated(layout *lt) {
     error("not implemented");
     return lt != NULL &&
            lt->matrix != NULL &&
-           lt->mono_freq != NULL &&
-           lt->bi_freq != NULL &&
-           lt->tri_freq != NULL &&
-           lt->quad_freq != NULL &&
-           lt->skip_freq != NULL &&
            lt->mono_score != NULL &&
            lt->bi_score != NULL &&
            lt->tri_score != NULL &&
@@ -123,14 +118,6 @@ void alloc_layout(layout **lt)
     for (int i = 0; i < ROW; i++) {
         (*lt)->matrix[i] = (int *)malloc(COL * sizeof(int));
     }
-    (*lt)->mono_freq = (float *)malloc(DIM1 * sizeof(float));
-    (*lt)->bi_freq = (float *)malloc(DIM2 * sizeof(float));
-    (*lt)->tri_freq = (float *)malloc(DIM3 * sizeof(float));
-    (*lt)->quad_freq = (float *)malloc(DIM4 * sizeof(float));
-    (*lt)->skip_freq = (float **)malloc(10 * sizeof(float *));
-    for (int i = 1; i < 10; i++) {
-        (*lt)->skip_freq[i] = (float *)malloc(DIM2 * sizeof(float));
-    }
 
     (*lt)->mono_score = (float *)calloc(MONO_END, sizeof(float));
     (*lt)->bi_score = (float *)calloc(BI_END, sizeof(float));
@@ -147,7 +134,6 @@ void free_layout(layout *lt)
 {
     error("not implemented");
     for (int i = 1; i < 10; i++) {
-        free(lt->skip_freq[i]);
         free(lt->skip_score[i]);
     }
     free(lt->meta_score);
@@ -157,11 +143,6 @@ void free_layout(layout *lt)
     free(lt->bi_score);
     free(lt->mono_score);
 
-    free(lt->skip_freq);
-    free(lt->quad_freq);
-    free(lt->tri_freq);
-    free(lt->bi_freq);
-    free(lt->mono_freq);
     for (int i = 0; i < ROW; i++) {
         free(lt->matrix[i]);
     }
@@ -238,6 +219,7 @@ void get_layout_diff(layout *lt, layout *lt2, layout *lt_diff)
 
 layout_node* create_node(const char* name, float score)
 {
+    layout_node *new_node = NULL;
     error("not implemented");
     return new_node;
 }

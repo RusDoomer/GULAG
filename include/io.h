@@ -7,6 +7,8 @@ void read_config();
 
 void read_args(int argc, char **argv);
 
+void check_setup();
+
 void read_lang();
 
 int read_corpus_cache();

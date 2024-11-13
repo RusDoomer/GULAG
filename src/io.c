@@ -7,6 +7,7 @@
 
 #include "io.h"
 #include "io_util.h"
+#include "util.h"
 #include "global.h"
 
 #define UNICODE_MAX 65535
@@ -20,9 +21,9 @@ void read_config()
     char discard[999];
     char buff[999];
 
-    config = fopen("config.txt", "r");
+    config = fopen("config.conf", "r");
     if (config == NULL) {
-        error("Required file config.txt not found.");
+        error("Required file config.conf not found.");
     }
 
     char c;
@@ -43,129 +44,38 @@ void read_config()
     }
 
     fscanf(config, "%s %s", discard, buff);
-    *lang_name = (char *)malloc((sizeof(char) * strlen(buff)) + 1);
-    strcpy(*lang_name, buff);
+    lang_name = (char *)malloc((sizeof(char) * strlen(buff)) + 1);
+    strcpy(lang_name, buff);
 
     fscanf(config, "%s %s", discard, buff);
-    *corpus_name = (char *)malloc((sizeof(char) * strlen(buff)) + 1);
-    strcpy(*corpus_name, buff);
+    corpus_name = (char *)malloc((sizeof(char) * strlen(buff)) + 1);
+    strcpy(corpus_name, buff);
 
     fscanf(config, "%s %s", discard, buff);
-    *layout_name = (char *)malloc((sizeof(char) * strlen(buff)) + 1);
-    strcpy(*layout_name, buff);
+    layout_name = (char *)malloc((sizeof(char) * strlen(buff)) + 1);
+    strcpy(layout_name, buff);
 
     fscanf(config, "%s %s", discard, buff);
-    *layout2_name = (char *)malloc((sizeof(char) * strlen(buff)) + 1);
-    strcpy(*layout2_name, buff);
+    layout2_name = (char *)malloc((sizeof(char) * strlen(buff)) + 1);
+    strcpy(layout2_name, buff);
 
     fscanf(config, "%s %s", discard, buff);
-    *weight_name = (char *)malloc((sizeof(char) * strlen(buff)) + 1);
-    strcpy(*weight_name, buff);
+    weight_name = (char *)malloc((sizeof(char) * strlen(buff)) + 1);
+    strcpy(weight_name, buff);
 
     fscanf(config, "%s %s", discard, buff);
-    if (strcmp(buff, "a") == 0 || strcmp(buff, "analyze") == 0
-        || strcmp(buff, "analysis") == 0) {
-        *run_mode = 'a';
-    } else if (strcmp(buff, "c") == 0 || strcmp(buff, "compare") == 0
-        || strcmp(buff, "comparison") == 0) {
-        *run_mode = 'c';
-    } else if (strcmp(buff, "r") == 0 || strcmp(buff, "rank") == 0
-        || strcmp(buff, "ranking") == 0) {
-        *run_mode = 'r';
-    } else if (strcmp(buff, "g") == 0 || strcmp(buff, "generate") == 0
-        || strcmp(buff, "gen") == 0) {
-        *run_mode = 'g';
-    } else if (strcmp(buff, "i") == 0 || strcmp(buff, "improve") == 0
-        || strcmp(buff, "optimize") == 0) {
-        *run_mode = 'i';
-    } else if (strcmp(buff, "b") == 0 || strcmp(buff, "benchmark") == 0
-        || strcmp(buff, "bench") == 0) {
-        *run_mode = 'b';
-    } else if (strcmp(buff, "h") == 0 || strcmp(buff, "help") == 0) {
-        *run_mode = 'h';
-    } else if (strcmp(buff, "if") == 0 || strcmp(buff, "info") == 0
-        || strcmp(buff, "information") == 0) {
-        *run_mode = 'f';
-    } else {
-        error("Invalid run mode in config.txt.");
-    }
+    run_mode = check_run_mode(buff);
+
     fscanf(config, "%s %s", discard, buff);
-    *repetitions = atoi(buff);
+    repetitions = atoi(buff);
+
     fscanf(config, "%s %s", discard, buff);
-    *threads = atoi(buff);
+    threads = atoi(buff);
+
     fscanf(config, "%s %s", discard, buff);
-    if (strcmp(buff, "q") == 0 || strcmp(buff, "quiet") == 0
-        || strcmp(buff, "SHUTUP") == 0) {
-        *output_mode = 'q';
-    } else if (strcmp(buff, "n") == 0 || strcmp(buff, "normal") == 0
-        || strcmp(buff, "norm") == 0) {
-        *output_mode = 'n';
-    } else if (strcmp(buff, "v") == 0 || strcmp(buff, "verbose") == 0
-        || strcmp(buff, "loud") == 0) {
-        *output_mode = 'v';
-    } else {
-        error("Invalid output mode in config.txt.");
-    }
+    output_mode = check_output_mode(buff);
 
     fclose(config);
-}
-
-char check_run_mode(char *optarg)
-{
-    if (strcmp(optarg, "a") == 0
-        || strcmp(optarg, "analyze") == 0
-        || strcmp(optarg, "analysis") == 0) {
-        return 'a';
-    } else if (strcmp(optarg, "c") == 0
-        || strcmp(optarg, "compare") == 0
-        || strcmp(optarg, "comparison") == 0) {
-        return 'c';
-    } else if (strcmp(optarg, "r") == 0
-        || strcmp(optarg, "rank") == 0
-        || strcmp(optarg, "ranking") == 0) {
-        return 'r';
-    } else if (strcmp(optarg, "g") == 0
-        || strcmp(optarg, "gen") == 0
-        || strcmp(optarg, "generate") == 0) {
-        return 'g';
-    } else if (strcmp(optarg, "i") == 0
-        || strcmp(optarg, "improve") == 0
-        || strcmp(optarg, "optimize") == 0) {
-        return 'i';
-    } else if (strcmp(optarg, "b") == 0
-        || strcmp(optarg, "bench") == 0
-        || strcmp(optarg, "benchmark") == 0) {
-        return 'b';
-    } else if (strcmp(optarg, "h") == 0
-        || strcmp(optarg, "help") == 0) {
-        return 'h';
-    } else if (strcmp(optarg, "if") == 0
-        || strcmp(optarg, "info") == 0
-        || strcmp(optarg, "information") == 0) {
-        return 'f';
-    } else {
-        error("Invalid run mode in arguments.");
-        return 'a';
-    }
-}
-
-char check_output_mode(char *optarg)
-{
-    if (strcmp(optarg, "q") == 0 || strcmp(optarg, "quiet") == 0
-        || strcmp(optarg, "SHUTUP") == 0) {
-        return 'q';
-    } else if (strcmp(optarg, "n") == 0
-        || strcmp(optarg, "norm") == 0
-        || strcmp(optarg, "normal") == 0) {
-        return 'n';
-    } else if (strcmp(optarg, "v") == 0
-        || strcmp(optarg, "loud") == 0
-        || strcmp(optarg, "verbose") == 0) {
-        return 'v';
-    } else {
-        error("Invalid output mode in arguments.");
-        return 'n';
-    }
 }
 
 void read_args(int argc, char **argv)
@@ -174,36 +84,36 @@ void read_args(int argc, char **argv)
     while ((opt = getopt(argc, argv, "l:c:1:2:w:r:t:m:o:")) != -1) {
     switch (opt) {
         case 'l':
-            free(*lang_name);
-            *lang_name = strdup(optarg);
+            free(lang_name);
+            lang_name = strdup(optarg);
             break;
         case 'c':
-            free(*corpus_name);
-            *corpus_name = strdup(optarg);
+            free(corpus_name);
+            corpus_name = strdup(optarg);
             break;
         case '1':
-            free(*layout_name);
-            *layout_name = strdup(optarg);
+            free(layout_name);
+            layout_name = strdup(optarg);
             break;
         case '2':
-            free(*layout2_name);
-            *layout2_name = strdup(optarg);
+            free(layout2_name);
+            layout2_name = strdup(optarg);
             break;
         case 'w':
-            free(*weight_name);
-            *weight_name = strdup(optarg);
+            free(weight_name);
+            weight_name = strdup(optarg);
             break;
         case 'r':
-            *repetitions = atoi(optarg);
+            repetitions = atoi(optarg);
             break;
         case 't':
-            *threads = atoi(optarg);
+            threads = atoi(optarg);
             break;
         case 'm':
-            *run_mode = check_run_mode(optarg);
+            run_mode = check_run_mode(optarg);
             break;
         case 'o':
-            *output_mode = check_output_mode(optarg);
+            output_mode = check_output_mode(optarg);
             break;
         case '?':
             error("Improper Usage: %s -l lang_name -c corpus_name "
@@ -213,6 +123,26 @@ void read_args(int argc, char **argv)
             abort();
         }
     }
+}
+
+void check_setup()
+{
+    if (lang_name == NULL) {error("no lang selected");}
+    if (corpus_name == NULL) {error("no corpus selected");}
+    if (layout_name == NULL) {error("no layout selected");}
+    if (layout2_name == NULL) {error("no layout2 selected");}
+    if (weight_name == NULL) {error("no weight selected");}
+    if (run_mode != 'a' && run_mode != 'c' && run_mode != 'r' && run_mode != 'g'
+        && run_mode != 'i' && run_mode != 'b' && run_mode != 'h' && run_mode != 'f')
+    {
+        error("invalid run mode selected");
+    }
+    if (output_mode != 'q' && output_mode != 'n' && output_mode != 'v')
+    {
+        error("invalid output mode selected");
+    }
+    if (threads < 1) {error("invalid threads selected");}
+    if (repetitions < 1) {error("invalid repetitions selected");}
 }
 
 void read_lang()
@@ -248,8 +178,8 @@ void read_lang()
         error("Lang file too long (>100 characters)");
     }
 
-    // this allows duplicate characters that are side by side in case
-    // of no shifted pair (and to allow the double space at the start)
+    // this allows duplicate characters that are side by side for
+    // of shifted pair (and to allow the double space at the start)
     if (check_duplicates(lang_arr) != -1) {
         error("Lang file contains duplicate characters.");
     }
@@ -362,12 +292,9 @@ void read_corpus()
         error("Corpus file not found.");
     }
 
-    wchar_t buff[BUFFER_SIZE];
     int mem[] = {-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1};
-    size_t bytes_read;
 
     wchar_t curr;
-    //wprintf(L"start reading\n");
     while ((curr = fgetwc(corpus)) != WEOF) {
         mem[0] = convert_char(curr);
         if (mem[0] > 0 && mem[0] < 51) {
@@ -459,72 +386,7 @@ void read_weights()
         error("Weights file not found.");
     }
 
-    int count = 1;
-    weights_mono[0] = 1;
-    while (count < MONO_END) {
-        if (fwscanf(weight, L"%f", &weights_mono[count]) != 1) {
-            if (feof(weight)) {error("Weights file incomplete");}
-            else {fwscanf(weight, L"%*s");}
-        } else {
-            count++;
-        }
-    }
-
-    count = 1;
-    weights_bi[0] = 1;
-    while (count < BI_END) {
-        if (fwscanf(weight, L"%f", &weights_bi[count]) != 1) {
-            if (feof(weight)) {error("Weights file incomplete");}
-            else {fwscanf(weight, L"%*s");}
-        } else {
-            count++;
-        }
-    }
-
-    count = 1;
-    weights_tri[0] = 1;
-    while (count < TRI_END) {
-        if (fwscanf(weight, L"%f", &weights_tri[count]) != 1) {
-            if (feof(weight)) {error("Weights file incomplete");}
-            else {fwscanf(weight, L"%*s");}
-        } else {
-            count++;
-        }
-    }
-
-    count = 1;
-    weights_quad[0] = 1;
-    while (count < QUAD_END) {
-        if (fwscanf(weight, L"%f", &weights_quad[count]) != 1) {
-            if (feof(weight)) {error("Weights file incomplete");}
-            else {fwscanf(weight, L"%*s");}
-        } else {
-            count++;
-        }
-    }
-
-    for (int i = 1; i < 10; i++) {
-        count = 1;
-        weights_skip[i][0] = 1;
-        while (count < SKIP_END) {
-            if (fwscanf(weight, L"%f", &weights_skip[i][count]) != 1) {
-                if (feof(weight)) {error("Weights file incomplete");}
-                else {fwscanf(weight, L"%*s");}
-            } else {
-                count++;
-            }
-        }
-    }
-
-    count = 0;
-    while (count < META_END) {
-        if (fwscanf(weight, L"%f", &weights_meta[count]) != 1) {
-            if (feof(weight)) {error("Weights file incomplete");}
-            else {fwscanf(weight, L"%*s");}
-        } else {
-            count++;
-        }
-    }
+    error("not implemented");
 
     fclose(weight);
     free(path);
@@ -546,7 +408,6 @@ void read_layout(layout *lt)
     }
 
     wchar_t curr;
-    int temp;
     for (int i = 0; i < ROW; i++) {
         for (int j = 0; j < COL; j++) {
             if (fwscanf(layout_file, L" %lc ", &curr) != 1) {

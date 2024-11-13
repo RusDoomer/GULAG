@@ -1,4 +1,7 @@
+#include <wchar.h>
+
 #include "mode.h"
+#include "util.h"
 
 void analysis() {
     error("not implemented");
