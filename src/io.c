@@ -200,12 +200,13 @@ void read_lang()
 int read_corpus_cache()
 {
     FILE *corpus;
-    char *path = (char*)malloc(strlen("./data//corpora/cache_") +
+    char *path = (char*)malloc(strlen("./data//corpora/.cache") +
         strlen(lang_name) + strlen(corpus_name) + 1);
     strcpy(path, "./data/");
     strcat(path, lang_name);
-    strcat(path, "/corpora/cache_");
+    strcat(path, "/corpora/");
     strcat(path, corpus_name);
+    strcat(path, ".cache");
     corpus = fopen(path, "r");
     if (corpus == NULL) {
         free(path);
@@ -281,15 +282,16 @@ int read_corpus_cache()
 void read_corpus()
 {
     FILE *corpus;
-    char *path = (char*)malloc(strlen("./data//corpora/") +
+    char *path = (char*)malloc(strlen("./data//corpora/.txt") +
         strlen(lang_name) + strlen(corpus_name) + 1);
     strcpy(path, "./data/");
     strcat(path, lang_name);
     strcat(path, "/corpora/");
     strcat(path, corpus_name);
+    strcat(path, ".txt");
     corpus = fopen(path, "r");
     if (corpus == NULL) {
-        error("Corpus file not found.");
+        error("Corpus file not found, make sure the file ends in .txt, but the name in config/parameters does not");
     }
 
     int mem[] = {-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1};
@@ -331,12 +333,13 @@ void read_corpus()
 void cache_corpus()
 {
     FILE *corpus;
-    char *path = (char*)malloc(strlen("./data//corpora/cache_") +
+    char *path = (char*)malloc(strlen("./data//corpora/.cache") +
         strlen(lang_name) + strlen(corpus_name) + 1);
     strcpy(path, "./data/");
     strcat(path, lang_name);
-    strcat(path, "/corpora/cache_");
+    strcat(path, "/corpora/");
     strcat(path, corpus_name);
+    strcat(path, ".cache");
     corpus = fopen(path, "w");
     if (corpus == NULL) {
         error("Corpus cache file failed to be created.");
@@ -378,9 +381,10 @@ void cache_corpus()
 void read_weights()
 {
     FILE *weight;
-    char *path = (char*)malloc(strlen("./data/weights/") + strlen(weight_name) + 1);
+    char *path = (char*)malloc(strlen("./data/weights/.wght") + strlen(weight_name) + 1);
     strcpy(path, "./data/weights/");
     strcat(path, weight_name);
+    strcat(path, ".wght");
     weight = fopen(path, "r");
     if (weight == NULL) {
         error("Weights file not found.");

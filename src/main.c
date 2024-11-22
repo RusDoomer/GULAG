@@ -139,15 +139,17 @@ int main(int argc, char **argv) {
     wprintf(L"threads: %d | ", threads);
     wprintf(L"out mode: %c |\n", output_mode);
 
-    error("stop early");
-
     read_lang(lang_name); /* io.c */
+
     int corpus_cache = 0;
     corpus_cache = read_corpus_cache();
     if (!corpus_cache) {
         read_corpus();    /* io.c */
         cache_corpus();   /* io.c */
     }
+
+    error("need to implement stat caching before reading weights");
+
     read_weights();       /* io.c */
 
     switch(run_mode) {       /* all in mode.c */
