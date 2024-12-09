@@ -45,6 +45,14 @@ int ***corpus_tri;
 int ****corpus_quad;
 int ***corpus_skip;
 
+// linked lists
+stat *mono_head;
+stat *bi_head;
+stat *tri_head;
+stat *quad_head;
+stat *skip_head;
+
+// arrays
 stat *stats_mono;
 stat *stats_bi;
 stat *stats_tri;

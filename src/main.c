@@ -7,6 +7,7 @@
 #include "global.h"
 #include "util.h"
 #include "mode.h"
+#include "stats.h"
 
 #define UNICODE_MAX 65535
 #define LANG_FILE_LENGTH 100
@@ -73,6 +74,8 @@ void start_up()
             corpus_skip[i][j] = (int *)calloc(LANG_LENGTH, sizeof(int));
         }
     }
+
+    initialize_stats();
 }
 
 void shut_down()
@@ -115,6 +118,8 @@ void shut_down()
         free(corpus_skip[i]);
     }
     free(corpus_skip);
+
+    free_stats();
 }
 
 int main(int argc, char **argv) {

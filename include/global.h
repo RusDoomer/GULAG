@@ -61,7 +61,9 @@ typedef struct stat {
     char name[100];
     char type;
     int *ngrams;
+    int length;
     float weight;
+    struct stat *next;
 } stat;
 
 extern int *corpus_mono;
@@ -69,6 +71,12 @@ extern int **corpus_bi;
 extern int ***corpus_tri;
 extern int ****corpus_quad;
 extern int ***corpus_skip;
+
+extern stat *mono_head;
+extern stat *bi_head;
+extern stat *tri_head;
+extern stat *quad_head;
+extern stat *skip_head;
 
 extern stat *stats_mono;
 extern stat *stats_bi;

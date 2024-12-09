@@ -54,3 +54,6 @@ dkms.conf
 # ignoring corpora files
 *.cache
 *.txt
+
+# geany project file
+*.geany
