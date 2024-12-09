@@ -8,11 +8,16 @@
 void initialize_stats()
 {
     initialize_mono_stats();
-    clean_mono_stats();
+    trim_mono_stats();
     initialize_bi_stats();
     initialize_tri_stats();
     initialize_quad_stats();
     initialize_skip_stats();
+}
+
+void clean_stats()
+{
+    clean_mono_stats();
 }
 
 void free_stats()

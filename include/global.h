@@ -78,10 +78,10 @@ extern stat *tri_head;
 extern stat *quad_head;
 extern stat *skip_head;
 
-extern stat *stats_mono;
-extern stat *stats_bi;
-extern stat *stats_tri;
-extern stat *stats_quad;
-extern stat *stats_skip;
+extern stat **stats_mono;
+extern stat **stats_bi;
+extern stat **stats_tri;
+extern stat **stats_quad;
+extern stat **stats_skip;
 
 #endif

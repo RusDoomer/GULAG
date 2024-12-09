@@ -156,6 +156,7 @@ int main(int argc, char **argv) {
     error("need to implement stat caching before reading weights");
 
     read_weights();       /* io.c */
+    clean_stats();        /* stats.c */
 
     switch(run_mode) {       /* all in mode.c */
         case 'a':

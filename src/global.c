@@ -52,9 +52,9 @@ stat *tri_head;
 stat *quad_head;
 stat *skip_head;
 
-// arrays
-stat *stats_mono;
-stat *stats_bi;
-stat *stats_tri;
-stat *stats_quad;
-stat *stats_skip;
+// arrays to back linked list
+stat **stats_mono;
+stat **stats_bi;
+stat **stats_tri;
+stat **stats_quad;
+stat **stats_skip;

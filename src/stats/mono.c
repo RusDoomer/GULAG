@@ -44,7 +44,7 @@ void initialize_mono_stats()
     }
 }
 
-void clean_mono_stats()
+void trim_mono_stats()
 {
     stat *current = mono_head;
     while (current != NULL)
@@ -65,18 +65,37 @@ void clean_mono_stats()
     }
 }
 
+void clean_mono_stats()
+{
+    if (mono_head == NULL) {return;}
+    while (mono_head != NULL && (mono_head->weight == 0 || mono_head->length == 0)) {
+        stat *temp = mono_head;
+        mono_head = mono_head->next;
+        free(temp->ngrams);
+        free(temp);
+    }
+
+    stat *current = mono_head;
+    while (current != NULL && current->next != NULL) {
+        if (current->next->weight == 0 || current->next->length == 0) {
+            stat *temp = current->next;
+            current->next = current->next->next;
+            free(temp->ngrams);
+            free(temp);
+        } else {
+            current = current->next;
+        }
+    }
+}
+
 void free_mono_stats()
 {
     if (mono_head == NULL) {return;}
-    stat *current = mono_head;
-    stat *next = mono_head->next;
-    while (next != NULL)
+    while (mono_head != NULL)
     {
-        free(current->ngrams);
-        free(current);
-        current = next;
-        next = current->next;
+        stat *temp = mono_head;
+        mono_head = mono_head->next;
+        free(temp->ngrams);
+        free(temp);
     }
-    free(current->ngrams);
-    free(current);
 }
