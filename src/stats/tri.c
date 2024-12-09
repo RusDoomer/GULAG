@@ -3,7 +3,7 @@
 
 void initialize_tri_stats()
 {
-    error("not implemented");
+    error("tri stats not implemented");
     return;
 }
 

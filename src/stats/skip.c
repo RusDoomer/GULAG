@@ -3,7 +3,7 @@
 
 void initialize_skip_stats()
 {
-    error("not implemented");
+    error("skip stats not implemented");
     return;
 }
 

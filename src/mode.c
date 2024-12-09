@@ -4,32 +4,32 @@
 #include "util.h"
 
 void analysis() {
-    error("not implemented");
+    error("analysis not implemented");
     return;
 }
 
 void compare() {
-    error("not implemented");
+    error("compare not implemented");
     return;
 }
 
 void rank() {
-    error("not implemented");
+    error("rank not implemented");
     return;
 }
 
 void generate() {
-    error("not implemented");
+    error("generate not implemented");
     return;
 }
 
 void improve() {
-    error("not implemented");
+    error("improve not implemented");
     return;
 }
 
 void gen_benchmark() {
-    error("not implemented");
+    error("gen benchmark not implemented");
     return;
 }
 

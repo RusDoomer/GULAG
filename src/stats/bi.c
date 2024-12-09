@@ -3,7 +3,7 @@
 
 void initialize_bi_stats()
 {
-    error("not implemented");
+    error("bi stats not implemented");
     return;
 }
 

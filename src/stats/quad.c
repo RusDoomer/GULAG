@@ -3,7 +3,7 @@
 
 void initialize_quad_stats()
 {
-    error("not implemented");
+    error("quad stats not implemented");
     return;
 }
 

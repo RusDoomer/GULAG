@@ -97,7 +97,7 @@ void unflat_mono(int i, int *row0, int *col0)
 // Function to check if layout is fully allocated
 int is_layout_allocated(layout *lt) {
 
-    error("not implemented");
+    error("layout allocated not implemented");
     return lt != NULL &&
            lt->matrix != NULL &&
            lt->mono_score != NULL &&
@@ -110,7 +110,7 @@ int is_layout_allocated(layout *lt) {
 
 void alloc_layout(layout **lt)
 {
-    error("not implemented");
+    error("alloca layout not implemented");
     //wprintf(L"allocating layout\n");
     *lt = (layout *)malloc(sizeof(layout));
     if (*lt == NULL) {error("failed to malloc lt");}
@@ -132,7 +132,7 @@ void alloc_layout(layout **lt)
 
 void free_layout(layout *lt)
 {
-    error("not implemented");
+    error("free layout not implemented");
     for (int i = 1; i < 10; i++) {
         free(lt->skip_score[i]);
     }
@@ -153,7 +153,7 @@ void free_layout(layout *lt)
 void get_score(layout *lt)
 {
     lt->score = 0;
-    error("not implemented");
+    error("get score not implemented");
     return;
 }
 
@@ -220,7 +220,7 @@ void get_layout_diff(layout *lt, layout *lt2, layout *lt_diff)
 layout_node* create_node(const char* name, float score)
 {
     layout_node *new_node = NULL;
-    error("not implemented");
+    error("create node not implemented");
     return new_node;
 }
 
@@ -229,7 +229,7 @@ void free_list() {
     layout_node* next_node;
     while (current != NULL) {
         next_node = current->next;
-        error("not implemented");
+        error("free list not implemented");
         current = next_node;
     }
 }
@@ -252,12 +252,12 @@ void shuffle_layout(layout *lt)
 
 void skeleton_copy(layout **lt_dest, layout *lt_src)
 {
-    error("not implemented");
+    error("skeleton copy not implemented");
 }
 
 void gen_swap(int **swaps, int reps, layout **lt)
 {
-    error("not implemented");
+    error("gen swap not implemented");
 }
 
 float random_float() {
@@ -267,15 +267,15 @@ float random_float() {
 void decide_swapbacks(int *swap_back, float *prev_scores, layout **lt,
     float temp, int threads)
 {
-    error("not implemented");
+    error("decide swapbacks not implemented");
 }
 
 void gen_swap_back(int **swaps, int *swap_back, layout **lt)
 {
-    error("not implemented");
+    error("gen swap back not implemented");
 }
 
 void imp_swap(int **swaps, int reps, layout **lt)
 {
-    error("not implemented");
+    error("imp swap not implemented");
 }

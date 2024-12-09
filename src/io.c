@@ -390,7 +390,7 @@ void read_weights()
         error("Weights file not found.");
     }
 
-    error("not implemented");
+    error("reading weights not implemented");
 
     fclose(weight);
     free(path);
