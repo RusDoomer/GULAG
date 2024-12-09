@@ -13,6 +13,7 @@ void initialize_mono_stats()
 
     stat *left_hand = (stat *)malloc(sizeof(stat));
     mono_head = left_hand;
+    left_hand->type = 'm';
     strcpy(left_hand->name, "Left Hand Usage");
     left_hand->weight = 0;
     left_hand->ngrams = (int*)calloc(DIM1, sizeof(int));
@@ -28,6 +29,7 @@ void initialize_mono_stats()
 
     stat *right_hand = (stat *)malloc(sizeof(stat));
     left_hand->next = right_hand;
+    right_hand->type = 'm';
     strcpy(right_hand->name, "Right Hand Usage");
     right_hand->weight = 0;
     right_hand->ngrams = (int*)calloc(DIM1, sizeof(int));
