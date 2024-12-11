@@ -99,6 +99,12 @@ void clean_tri_stats()
             current = current->next;
         }
     }
+
+    current = tri_head;
+    while (current != NULL) {
+        TRI_END++;
+        current = current->next;
+    }
 }
 
 void free_tri_stats()

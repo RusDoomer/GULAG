@@ -97,9 +97,7 @@ void unflat_mono(int i, int *row0, int *col0)
 // Function to check if layout is fully allocated
 int is_layout_allocated(layout *lt) {
 
-    error("layout allocated not implemented");
     return lt != NULL &&
-           lt->matrix != NULL &&
            lt->mono_score != NULL &&
            lt->bi_score != NULL &&
            lt->tri_score != NULL &&
@@ -110,14 +108,10 @@ int is_layout_allocated(layout *lt) {
 
 void alloc_layout(layout **lt)
 {
-    error("alloca layout not implemented");
-    //wprintf(L"allocating layout\n");
     *lt = (layout *)malloc(sizeof(layout));
-    if (*lt == NULL) {error("failed to malloc lt");}
-    (*lt)->matrix = (int **)malloc(ROW * sizeof(int *));
-    for (int i = 0; i < ROW; i++) {
-        (*lt)->matrix[i] = (int *)malloc(COL * sizeof(int));
-    }
+    if (*lt == NULL) {error("failed to malloc layout");}
+
+    (*lt)->score = 0;
 
     (*lt)->mono_score = (float *)calloc(MONO_END, sizeof(float));
     (*lt)->bi_score = (float *)calloc(BI_END, sizeof(float));
@@ -132,7 +126,6 @@ void alloc_layout(layout **lt)
 
 void free_layout(layout *lt)
 {
-    error("free layout not implemented");
     for (int i = 1; i < 10; i++) {
         free(lt->skip_score[i]);
     }
@@ -143,22 +136,44 @@ void free_layout(layout *lt)
     free(lt->bi_score);
     free(lt->mono_score);
 
-    for (int i = 0; i < ROW; i++) {
-        free(lt->matrix[i]);
-    }
-    free(lt->matrix);
     free(lt);
 }
 
 void get_score(layout *lt)
 {
     lt->score = 0;
-    error("get score not implemented");
-    return;
+    for (int i = 0; i < MONO_END; i++)
+    {
+        lt->score += lt->mono_score[i];
+    }
+    for (int i = 0; i < BI_END; i++)
+    {
+        lt->score += lt->bi_score[i];
+    }
+    for (int i = 0; i < TRI_END; i++)
+    {
+        lt->score += lt->tri_score[i];
+    }
+    for (int i = 0; i < QUAD_END; i++)
+    {
+        lt->score += lt->quad_score[i];
+    }
+    for (int i = 0; i > 10; i++)
+    {
+        for (int j = 0; j < SKIP_END; j++)
+        {
+            lt->score += lt->skip_score[i][j];
+        }
+    }
+    for (int i = 0; i < META_END; i++)
+    {
+        lt->score += lt->meta_score[i];
+    }
 }
 
 void get_layout_diff(layout *lt, layout *lt2, layout *lt_diff)
 {
+    error("get layout diff not implemented");
     for (int i = 0; i < ROW; i++) {
         for (int j = 0; j < COL; j++) {
             if (lt->matrix[i][j] == lt2->matrix[i][j]) {
@@ -213,8 +228,6 @@ void get_layout_diff(layout *lt, layout *lt2, layout *lt_diff)
             ((lt->meta_score[i] * 100) / lt->mono_score[0]) -
             ((lt2->meta_score[i] * 100) / lt2->mono_score[0]);
     }
-
-    return;
 }
 
 layout_node* create_node(const char* name, float score)

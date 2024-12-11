@@ -99,6 +99,12 @@ void clean_skip_stats()
             current = current->next;
         }
     }
+
+    current = skip_head;
+    while (current != NULL) {
+        SKIP_END++;
+        current = current->next;
+    }
 }
 
 void free_skip_stats()

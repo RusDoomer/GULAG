@@ -99,6 +99,12 @@ void clean_bi_stats()
             current = current->next;
         }
     }
+
+    current = bi_head;
+    while (current != NULL) {
+        BI_END++;
+        current = current->next;
+    }
 }
 
 void free_bi_stats()

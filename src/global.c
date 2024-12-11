@@ -16,6 +16,8 @@ int DIM2 = dim2;
 int DIM3 = dim3;
 int DIM4 = dim4;
 
+// the name NGRAM_END is a relic of when these were enums
+// I'm not changing it though, this is the number of those stats
 int MONO_END = 0;
 int BI_END = 0;
 int TRI_END = 0;

@@ -99,6 +99,12 @@ void clean_quad_stats()
             current = current->next;
         }
     }
+
+    current = quad_head;
+    while (current != NULL) {
+        QUAD_END++;
+        current = current->next;
+    }
 }
 
 void free_quad_stats()

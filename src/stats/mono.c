@@ -322,6 +322,12 @@ void clean_mono_stats()
             current = current->next;
         }
     }
+
+    current = mono_head;
+    while (current != NULL) {
+        MONO_END++;
+        current = current->next;
+    }
 }
 
 void free_mono_stats()

@@ -17,7 +17,7 @@ void cache_corpus();
 
 void read_weights();
 
-void read_layout(layout *lt);
+void read_layout(layout *lt, int which_layout);
 
 void print_layout(layout *lt);
 

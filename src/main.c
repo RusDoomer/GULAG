@@ -161,7 +161,7 @@ int main(int argc, char **argv) {
             analysis();      /* analyze one layout */
             break;
         case 'c':
-            compare();       /* compare 2 (or more?) layouts */
+            compare();       /* compare 2 layouts */
             break;
         case 'r':
             rank();          /* rank all layouts in directory */
@@ -182,6 +182,7 @@ int main(int argc, char **argv) {
             print_info();    /* print info screen */
             break;
     }
+
 
     free(lang_name);
     free(corpus_name);

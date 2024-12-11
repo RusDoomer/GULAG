@@ -2,9 +2,16 @@
 
 #include "mode.h"
 #include "util.h"
+#include "io.h"
 
 void analysis() {
+    layout *lt;
+    alloc_layout(&lt);
+    read_layout(lt, 1);
     error("analysis not implemented");
+    get_score(lt);
+    print_layout(lt);
+    free_layout(lt);
     return;
 }
 
@@ -73,8 +80,8 @@ void print_help() {
     wprintf(L"    v;loud;verbose       : The most verbose; prints all stats.\n");
     // 80     @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
     wprintf(L"Config:\n");
-    wprintf(L"  All of these options can be set in config.txt but command line arguments will\n");
-    wprintf(L"  be prioritized. config.txt also sets the pins for the improve mode; all\n");
+    wprintf(L"  All of these options can be set in config.conf but command line arguments will\n");
+    wprintf(L"  be prioritized. config.conf also sets the pins for the improve mode; all\n");
     wprintf(L"  positions that are not \'.\' will be pinned.\n");
 }
 

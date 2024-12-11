@@ -17,6 +17,8 @@ extern int DIM2;
 extern int DIM3;
 extern int DIM4;
 
+// the name NGRAM_END is a relic of when these were enums
+// I'm not changing it though, this is the number of those stats
 extern int MONO_END;
 extern int BI_END;
 extern int TRI_END;
@@ -40,7 +42,7 @@ extern int pins[row][col];
 
 typedef struct layout {
     char name[100];
-    int **matrix;
+    int matrix[row][col];
     float *mono_score;
     float *bi_score;
     float *tri_score;

@@ -489,15 +489,18 @@ void read_weights()
     free(path);
 }
 
-void read_layout(layout *lt)
+void read_layout(layout *lt, int which_layout)
 {
     FILE *layout_file;
-    char *path = (char*)malloc(strlen("./data//layouts/") + strlen(lang_name) +
+    char *path = (char*)malloc(strlen("./data//layouts/.glg") + strlen(lang_name) +
         strlen(layout_name) + 1);
     strcpy(path, "./data/");
     strcat(path, lang_name);
     strcat(path, "/layouts/");
-    strcat(path, layout_name);
+    if (which_layout == 1) {strcat(path, layout_name);}
+    else if (which_layout == 2) {strcat(path, layout2_name);}
+    else {error("invalid layout selected to read");}
+    strcat(path, ".glg");
     layout_file = fopen(path, "r");
     if (layout_file == NULL) {
         error("Layout file not found.");
@@ -507,7 +510,7 @@ void read_layout(layout *lt)
     for (int i = 0; i < ROW; i++) {
         for (int j = 0; j < COL; j++) {
             if (fwscanf(layout_file, L" %lc ", &curr) != 1) {
-                error("layout not 3x12 (fill deadspace with @s)");
+                error("layout not 3x12 (fill dead-keys with @'s)");
             }
             lt->matrix[i][j] = convert_char(curr);
         }
