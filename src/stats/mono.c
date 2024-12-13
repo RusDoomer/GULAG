@@ -11,43 +11,237 @@ void initialize_mono_stats()
 {
     int row0, col0;
 
-    stat *left_hand = (stat *)malloc(sizeof(stat) + DIM1 * sizeof(int));
-    mono_head = left_hand;
-    left_hand->type = 'm';
-    strcpy(left_hand->name, "Left Hand Usage");
-    left_hand->weight = 0;
+    stat *left_outer = (stat *)malloc(sizeof(stat) + DIM1 * sizeof(int));
+    mono_head = left_outer;
+    left_outer->type = 'm';
+    strcpy(left_outer->name, "Left Outer Usage");
+    left_outer->weight = 0;
     for (int i = 0; i < DIM1; i++)
     {
         unflat_mono(i, &row0, &col0);
-        if (hand(row0, col0) == 'l')
+        if (col0 == 0)
         {
-            left_hand->ngrams[i] = i;
-            left_hand->length++;
+            left_outer->ngrams[i] = i;
+            left_outer->length++;
         }
         else
         {
-            left_hand->ngrams[i] = -1;
+            left_outer->ngrams[i] = -1;
         }
     }
 
-    stat *right_hand = (stat *)malloc(sizeof(stat) + DIM1 * sizeof(int));
-    left_hand->next = right_hand;
-    right_hand->type = 'm';
-    strcpy(right_hand->name, "Right Hand Usage");
-    right_hand->weight = 0;
+    stat *left_pinky = (stat *)malloc(sizeof(stat) + DIM1 * sizeof(int));
+    left_outer->next = left_pinky;
+    left_pinky->type = 'm';
+    strcpy(left_pinky->name, "Left Pinky Usage");
+    left_pinky->weight = 0;
     for (int i = 0; i < DIM1; i++)
     {
         unflat_mono(i, &row0, &col0);
-        if (hand(row0, col0) == 'r')
+        if (finger(row0, col0) == 0)
         {
-            right_hand->ngrams[i] = i;
-            right_hand->length++;
+            left_pinky->ngrams[i] = i;
+            left_pinky->length++;
         }
         else
         {
-            left_hand->ngrams[i] = -1;
+            left_pinky->ngrams[i] = -1;
         }
     }
+
+    stat *left_ring = (stat *)malloc(sizeof(stat) + DIM1 * sizeof(int));
+    left_pinky->next = left_ring;
+    left_ring->type = 'm';
+    strcpy(left_ring->name, "Left Ring Usage");
+    left_ring->weight = 0;
+    for (int i = 0; i < DIM1; i++)
+    {
+        unflat_mono(i, &row0, &col0);
+        if (finger(row0, col0) == 1)
+        {
+            left_ring->ngrams[i] = i;
+            left_ring->length++;
+        }
+        else
+        {
+            left_ring->ngrams[i] = -1;
+        }
+    }
+
+    stat *left_middle = (stat *)malloc(sizeof(stat) + DIM1 * sizeof(int));
+    left_ring->next = left_middle;
+    left_middle->type = 'm';
+    strcpy(left_middle->name, "Left Middle Usage");
+    left_middle->weight = 0;
+    for (int i = 0; i < DIM1; i++)
+    {
+        unflat_mono(i, &row0, &col0);
+        if (finger(row0, col0) == 2)
+        {
+            left_middle->ngrams[i] = i;
+            left_middle->length++;
+        }
+        else
+        {
+            left_middle->ngrams[i] = -1;
+        }
+    }
+
+    stat *left_index = (stat *)malloc(sizeof(stat) + DIM1 * sizeof(int));
+    left_middle->next = left_index;
+    left_index->type = 'm';
+    strcpy(left_index->name, "Left Index Usage");
+    left_index->weight = 0;
+    for (int i = 0; i < DIM1; i++)
+    {
+        unflat_mono(i, &row0, &col0);
+        if (finger(row0, col0) == 3)
+        {
+            left_index->ngrams[i] = i;
+            left_index->length++;
+        }
+        else
+        {
+            left_index->ngrams[i] = -1;
+        }
+    }
+
+    stat *left_inner = (stat *)malloc(sizeof(stat) + DIM1 * sizeof(int));
+    left_index->next = left_inner;
+    left_inner->type = 'm';
+    strcpy(left_inner->name, "Left Inner Usage");
+    left_inner->weight = 0;
+    for (int i = 0; i < DIM1; i++)
+    {
+        unflat_mono(i, &row0, &col0);
+        if (col0 == 5)
+        {
+            left_inner->ngrams[i] = i;
+            left_inner->length++;
+        }
+        else
+        {
+            left_inner->ngrams[i] = -1;
+        }
+    }
+
+
+    stat *right_inner = (stat *)malloc(sizeof(stat) + DIM1 * sizeof(int));
+    left_inner->next = right_inner;
+    right_inner->type = 'm';
+    strcpy(right_inner->name, "Right Inner Usage");
+    right_inner->weight = 0;
+    for (int i = 0; i < DIM1; i++)
+    {
+        unflat_mono(i, &row0, &col0);
+        if (col0 == 6)
+        {
+            right_inner->ngrams[i] = i;
+            right_inner->length++;
+        }
+        else
+        {
+            right_inner->ngrams[i] = -1;
+        }
+    }
+
+    stat *right_index = (stat *)malloc(sizeof(stat) + DIM1 * sizeof(int));
+    right_inner->next = right_index;
+    right_index->type = 'm';
+    strcpy(right_index->name, "Right Index Usage");
+    right_index->weight = 0;
+    for (int i = 0; i < DIM1; i++)
+    {
+        unflat_mono(i, &row0, &col0);
+        if (finger(row0, col0) == 4)
+        {
+            right_index->ngrams[i] = i;
+            right_index->length++;
+        }
+        else
+        {
+            right_index->ngrams[i] = -1;
+        }
+    }
+
+    stat *right_middle = (stat *)malloc(sizeof(stat) + DIM1 * sizeof(int));
+    right_index->next = right_middle;
+    right_middle->type = 'm';
+    strcpy(right_middle->name, "Right Middle Usage");
+    right_middle->weight = 0;
+    for (int i = 0; i < DIM1; i++)
+    {
+        unflat_mono(i, &row0, &col0);
+        if (finger(row0, col0) == 5)
+        {
+            right_middle->ngrams[i] = i;
+            right_middle->length++;
+        }
+        else
+        {
+            right_middle->ngrams[i] = -1;
+        }
+    }
+
+    stat *right_ring = (stat *)malloc(sizeof(stat) + DIM1 * sizeof(int));
+    right_middle->next = right_ring;
+    right_ring->type = 'm';
+    strcpy(right_ring->name, "Right Ring Usage");
+    right_ring->weight = 0;
+    for (int i = 0; i < DIM1; i++)
+    {
+        unflat_mono(i, &row0, &col0);
+        if (finger(row0, col0) == 6)
+        {
+            right_ring->ngrams[i] = i;
+            right_ring->length++;
+        }
+        else
+        {
+            right_ring->ngrams[i] = -1;
+        }
+    }
+
+    stat *right_pinky = (stat *)malloc(sizeof(stat) + DIM1 * sizeof(int));
+    right_ring->next = right_pinky;
+    right_pinky->type = 'm';
+    strcpy(right_pinky->name, "Right Pinky Usage");
+    right_pinky->weight = 0;
+    for (int i = 0; i < DIM1; i++)
+    {
+        unflat_mono(i, &row0, &col0);
+        if (finger(row0, col0) == 7)
+        {
+            right_pinky->ngrams[i] = i;
+            right_pinky->length++;
+        }
+        else
+        {
+            right_pinky->ngrams[i] = -1;
+        }
+    }
+
+    stat *right_outer = (stat *)malloc(sizeof(stat) + DIM1 * sizeof(int));
+    right_pinky->next = right_outer;
+    right_outer->type = 'm';
+    strcpy(right_outer->name, "Right Outer Usage");
+    right_outer->weight = 0;
+    for (int i = 0; i < DIM1; i++)
+    {
+        unflat_mono(i, &row0, &col0);
+        if (col0 == 11)
+        {
+            right_outer->ngrams[i] = i;
+            right_outer->length++;
+        }
+        else
+        {
+            right_outer->ngrams[i] = -1;
+        }
+    }
+
+
+    right_outer->next = NULL;
 }
 
 void trim_mono_stats()
@@ -68,12 +262,15 @@ void trim_mono_stats()
         new_stat->weight = current->weight;
 
         // Copy valid ngram entries into the new array
-        int iter = 0;
-        for (int i = 0; i < DIM1; i++)
+        if (current->length != 0)
         {
-            if (current->ngrams[i] != -1)
+            int iter = 0;
+            for (int i = 0; i < DIM1; i++)
             {
-                new_stat->ngrams[iter++] = current->ngrams[i];
+                if (current->ngrams[i] != -1)
+                {
+                    new_stat->ngrams[iter++] = current->ngrams[i];
+                }
             }
         }
 

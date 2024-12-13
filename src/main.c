@@ -153,8 +153,6 @@ int main(int argc, char **argv) {
         cache_corpus();   /* io.c */
     }
 
-    error("need to implement stat caching before reading weights");
-
     read_weights();       /* io.c */
     clean_stats();        /* stats.c */
 

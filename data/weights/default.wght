@@ -1,2 +1,18 @@
-hand balance: 0, L:0, R:0
-rows: T:0, H:0, B:0
+Left Outer Usage : -1
+Left Pinky Usage : -1
+Left Ring Usage : -0.5
+Left Middle Usage : 1
+Left Index Usage : 0.5
+Left Inner Usage : -0.5
+
+Right Inner Usage : -0.5
+Right Index Usage : 0.5
+Right Middle Usage : 1
+Right Ring Usage : -0.5
+Right Pinky Usage : -1
+Right Outer Usage : -1
+
+Same Finger Bigram : -10
+Same Finger Skipgram : -2
+Same Finger Trigram : -25
+Same Finger Quadgram : -100
