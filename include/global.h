@@ -60,10 +60,10 @@ extern layout_node *head_node;
 typedef struct stat {
     char name[100];
     char type;
-    int *ngrams;
     int length;
     float weight;
     struct stat *next;
+    int ngrams[];
 } stat;
 
 extern int *corpus_mono;

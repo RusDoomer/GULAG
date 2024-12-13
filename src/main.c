@@ -18,13 +18,13 @@ void start_up()
     // set locale
     const char* locale = setlocale(LC_ALL, "en_US.UTF-8");
     if (locale == NULL) {
-        fwprintf(stderr, L"Failed to set locale.\n");
+        error("Failed to set locale.");
         return;
     }
 
     // Set stdout to wide-oriented
     if (fwide(stdout, 1) <= 0) {
-        fwprintf(stderr, L"Failed to set wide-oriented stream.\n");
+        error("Failed to set wide-oriented stream.");
         return;
     }
 
