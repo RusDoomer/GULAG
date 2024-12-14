@@ -1,6 +1,6 @@
 Left Outer Usage : -1
 Left Pinky Usage : -1
-Left Ring Usage : -0.5
+Left Ring Usage : 0
 Left Middle Usage : 1
 Left Index Usage : 0.5
 Left Inner Usage : -0.5
@@ -8,7 +8,7 @@ Left Inner Usage : -0.5
 Right Inner Usage : -0.5
 Right Index Usage : 0.5
 Right Middle Usage : 1
-Right Ring Usage : -0.5
+Right Ring Usage : 0
 Right Pinky Usage : -1
 Right Outer Usage : -1
 

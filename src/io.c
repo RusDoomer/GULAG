@@ -13,6 +13,7 @@
 #define UNICODE_MAX 65535
 #define BUFFER_SIZE 10000
 
+#include <wctype.h>
 
 void read_config()
 {
@@ -380,21 +381,112 @@ void cache_corpus()
 
 void read_weights()
 {
-    FILE *weight;
+    FILE *weight_file;
     char *path = (char*)malloc(strlen("./data/weights/.wght") + strlen(weight_name) + 1);
     strcpy(path, "./data/weights/");
     strcat(path, weight_name);
     strcat(path, ".wght");
-    weight = fopen(path, "r");
-    if (weight == NULL) {
+    weight_file = fopen(path, "r");
+    if (weight_file == NULL) {
         error("Weights file not found.");
     }
 
-    error("reading weights not implemented");
+    wchar_t line[256];
+    char name_buffer[256];
 
-    fclose(weight);
+    while (fgetws(line, sizeof(line) / sizeof(line[0]), weight_file) != NULL)
+    {
+        // Parse the line: split on ':' to get name and weight
+        wchar_t *delimiter = wcschr(line, L':');
+        if (delimiter == NULL)
+        {
+            continue; // Skip lines that don't have the expected format
+        }
+
+        *delimiter = L'\0';
+        wchar_t *name_part = line;
+        wchar_t *weight_part = delimiter + 1;
+
+        // Trim whitespace around name and weight
+        while (*name_part && iswspace(*name_part))
+            name_part++;
+        while (name_part[wcslen(name_part) - 1] && iswspace(name_part[wcslen(name_part) - 1]))
+            name_part[wcslen(name_part) - 1] = L'\0';
+
+        while (*weight_part && iswspace(*weight_part))
+            weight_part++;
+        while (weight_part[wcslen(weight_part) - 1] && iswspace(weight_part[wcslen(weight_part) - 1]))
+            weight_part[wcslen(weight_part) - 1] = L'\0';
+
+        // Convert wide name to a normal string
+        wcstombs(name_buffer, name_part, sizeof(name_buffer));
+
+        // Convert the weight to a float
+        float weight_value;
+        if (swscanf(weight_part, L"%f", &weight_value) != 1)
+        {
+            continue; // Skip lines with invalid weight format
+        }
+
+        // Find the matching stat in the linked lists and update its weight
+        stat *current = mono_head;
+        while (current != NULL)
+        {
+            if (strcmp(current->name, name_buffer) == 0)
+            {
+                current->weight = weight_value;
+                break;
+            }
+            current = current->next;
+        }
+
+        current = bi_head;
+        while (current != NULL)
+        {
+            if (strcmp(current->name, name_buffer) == 0)
+            {
+                current->weight = weight_value;
+                break;
+            }
+            current = current->next;
+        }
+
+        current = tri_head;
+        while (current != NULL)
+        {
+            if (strcmp(current->name, name_buffer) == 0)
+            {
+                current->weight = weight_value;
+                break;
+            }
+            current = current->next;
+        }
+
+        current = quad_head;
+        while (current != NULL)
+        {
+            if (strcmp(current->name, name_buffer) == 0)
+            {
+                current->weight = weight_value;
+                break;
+            }
+            current = current->next;
+        }
+
+        current = skip_head;
+        while (current != NULL)
+        {
+            if (strcmp(current->name, name_buffer) == 0)
+            {
+                current->weight = weight_value;
+                break;
+            }
+            current = current->next;
+        }
+    }
+
+    fclose(weight_file);
     free(path);
-    return;
 }
 
 void read_layout(layout *lt)

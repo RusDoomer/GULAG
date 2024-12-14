@@ -5,6 +5,12 @@
 #include "quad.h"
 #include "skip.h"
 
+#include "global.h"
+#include <stdio.h>
+#include <stdlib.h>
+#include <locale.h>
+#include <time.h>
+
 void initialize_stats()
 {
     initialize_mono_stats();

@@ -14,6 +14,7 @@ void initialize_quad_stats()
     same_finger->type = 'q';
     strcpy(same_finger->name, "Same Finger Quadgram");
     same_finger->weight = 0;
+    same_finger->length = 0;
     for (int i = 0; i < DIM4; i++)
     {
         unflat_quad(i, &row0, &col0, &row1, &col1, &row2, &col2, &row3, &col3);
@@ -72,6 +73,10 @@ void trim_quad_stats()
         // Move to the next node
         current = next;
         prev = new_stat;
+        if (prev != NULL)
+        {
+            prev->next = NULL;
+        }
     }
 }
 

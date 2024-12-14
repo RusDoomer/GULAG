@@ -16,6 +16,7 @@ void initialize_mono_stats()
     left_outer->type = 'm';
     strcpy(left_outer->name, "Left Outer Usage");
     left_outer->weight = 0;
+    left_outer->length = 0;
     for (int i = 0; i < DIM1; i++)
     {
         unflat_mono(i, &row0, &col0);
@@ -35,6 +36,7 @@ void initialize_mono_stats()
     left_pinky->type = 'm';
     strcpy(left_pinky->name, "Left Pinky Usage");
     left_pinky->weight = 0;
+    left_pinky->length = 0;
     for (int i = 0; i < DIM1; i++)
     {
         unflat_mono(i, &row0, &col0);
@@ -54,6 +56,7 @@ void initialize_mono_stats()
     left_ring->type = 'm';
     strcpy(left_ring->name, "Left Ring Usage");
     left_ring->weight = 0;
+    left_ring->length = 0;
     for (int i = 0; i < DIM1; i++)
     {
         unflat_mono(i, &row0, &col0);
@@ -73,6 +76,7 @@ void initialize_mono_stats()
     left_middle->type = 'm';
     strcpy(left_middle->name, "Left Middle Usage");
     left_middle->weight = 0;
+    left_middle->length = 0;
     for (int i = 0; i < DIM1; i++)
     {
         unflat_mono(i, &row0, &col0);
@@ -92,6 +96,7 @@ void initialize_mono_stats()
     left_index->type = 'm';
     strcpy(left_index->name, "Left Index Usage");
     left_index->weight = 0;
+    left_index->length = 0;
     for (int i = 0; i < DIM1; i++)
     {
         unflat_mono(i, &row0, &col0);
@@ -111,6 +116,7 @@ void initialize_mono_stats()
     left_inner->type = 'm';
     strcpy(left_inner->name, "Left Inner Usage");
     left_inner->weight = 0;
+    left_inner->length = 0;
     for (int i = 0; i < DIM1; i++)
     {
         unflat_mono(i, &row0, &col0);
@@ -131,6 +137,7 @@ void initialize_mono_stats()
     right_inner->type = 'm';
     strcpy(right_inner->name, "Right Inner Usage");
     right_inner->weight = 0;
+    right_inner->length = 0;
     for (int i = 0; i < DIM1; i++)
     {
         unflat_mono(i, &row0, &col0);
@@ -150,6 +157,7 @@ void initialize_mono_stats()
     right_index->type = 'm';
     strcpy(right_index->name, "Right Index Usage");
     right_index->weight = 0;
+    right_index->length = 0;
     for (int i = 0; i < DIM1; i++)
     {
         unflat_mono(i, &row0, &col0);
@@ -169,6 +177,7 @@ void initialize_mono_stats()
     right_middle->type = 'm';
     strcpy(right_middle->name, "Right Middle Usage");
     right_middle->weight = 0;
+    right_middle->length = 0;
     for (int i = 0; i < DIM1; i++)
     {
         unflat_mono(i, &row0, &col0);
@@ -188,6 +197,7 @@ void initialize_mono_stats()
     right_ring->type = 'm';
     strcpy(right_ring->name, "Right Ring Usage");
     right_ring->weight = 0;
+    right_ring->length = 0;
     for (int i = 0; i < DIM1; i++)
     {
         unflat_mono(i, &row0, &col0);
@@ -207,6 +217,7 @@ void initialize_mono_stats()
     right_pinky->type = 'm';
     strcpy(right_pinky->name, "Right Pinky Usage");
     right_pinky->weight = 0;
+    right_pinky->length = 0;
     for (int i = 0; i < DIM1; i++)
     {
         unflat_mono(i, &row0, &col0);
@@ -226,6 +237,7 @@ void initialize_mono_stats()
     right_outer->type = 'm';
     strcpy(right_outer->name, "Right Outer Usage");
     right_outer->weight = 0;
+    right_outer->length = 0;
     for (int i = 0; i < DIM1; i++)
     {
         unflat_mono(i, &row0, &col0);
@@ -239,7 +251,6 @@ void initialize_mono_stats()
             right_outer->ngrams[i] = -1;
         }
     }
-
 
     right_outer->next = NULL;
 }
@@ -285,6 +296,10 @@ void trim_mono_stats()
         // Move to the next node
         current = next;
         prev = new_stat;
+        if (prev != NULL)
+        {
+            prev->next = NULL;
+        }
     }
 }
 

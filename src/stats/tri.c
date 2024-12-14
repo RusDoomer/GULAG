@@ -14,6 +14,7 @@ void initialize_tri_stats()
     same_finger->type = 't';
     strcpy(same_finger->name, "Same Finger Trigram");
     same_finger->weight = 0;
+    same_finger->length = 0;
     for (int i = 0; i < DIM3; i++)
     {
         unflat_tri(i, &row0, &col0, &row1, &col1, &row2, &col2);
@@ -72,6 +73,10 @@ void trim_tri_stats()
         // Move to the next node
         current = next;
         prev = new_stat;
+        if (prev != NULL)
+        {
+            prev->next = NULL;
+        }
     }
 }
 

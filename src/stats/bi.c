@@ -14,6 +14,7 @@ void initialize_bi_stats()
     same_finger->type = 'b';
     strcpy(same_finger->name, "Same Finger Bigram");
     same_finger->weight = 0;
+    same_finger->length = 0;
     for (int i = 0; i < DIM2; i++)
     {
         unflat_bi(i, &row0, &col0, &row1, &col1);
@@ -72,6 +73,10 @@ void trim_bi_stats()
         // Move to the next node
         current = next;
         prev = new_stat;
+        if (prev != NULL)
+        {
+            prev->next = NULL;
+        }
     }
 }
 
