@@ -34,6 +34,15 @@ void clean_stats()
     clean_skip_stats();
 }
 
+void stats_to_array()
+{
+    mono_to_array();
+    bi_to_array();
+    tri_to_array();
+    quad_to_array();
+    skip_to_array();
+}
+
 void free_stats()
 {
     free_mono_stats();

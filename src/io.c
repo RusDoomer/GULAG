@@ -429,59 +429,59 @@ void read_weights()
         }
 
         // Find the matching stat in the linked lists and update its weight
-        stat *current = mono_head;
-        while (current != NULL)
+        mono_stat *current_mono = mono_head;
+        while (current_mono != NULL)
         {
-            if (strcmp(current->name, name_buffer) == 0)
+            if (strcmp(current_mono->name, name_buffer) == 0)
             {
-                current->weight = weight_value;
+                current_mono->weight = weight_value;
                 break;
             }
-            current = current->next;
+            current_mono = current_mono->next;
         }
 
-        current = bi_head;
-        while (current != NULL)
+        bi_stat *current_bi = bi_head;
+        while (current_bi != NULL)
         {
-            if (strcmp(current->name, name_buffer) == 0)
+            if (strcmp(current_bi->name, name_buffer) == 0)
             {
-                current->weight = weight_value;
+                current_bi->weight = weight_value;
                 break;
             }
-            current = current->next;
+            current_bi = current_bi->next;
         }
 
-        current = tri_head;
-        while (current != NULL)
+        tri_stat *current_tri = tri_head;
+        while (current_tri != NULL)
         {
-            if (strcmp(current->name, name_buffer) == 0)
+            if (strcmp(current_tri->name, name_buffer) == 0)
             {
-                current->weight = weight_value;
+                current_tri->weight = weight_value;
                 break;
             }
-            current = current->next;
+            current_tri = current_tri->next;
         }
 
-        current = quad_head;
-        while (current != NULL)
+        quad_stat *current_quad = quad_head;
+        while (current_quad != NULL)
         {
-            if (strcmp(current->name, name_buffer) == 0)
+            if (strcmp(current_quad->name, name_buffer) == 0)
             {
-                current->weight = weight_value;
+                current_quad->weight = weight_value;
                 break;
             }
-            current = current->next;
+            current_quad = current_quad->next;
         }
 
-        current = skip_head;
-        while (current != NULL)
+        bi_stat *current_skip = skip_head;
+        while (current_skip != NULL)
         {
-            if (strcmp(current->name, name_buffer) == 0)
+            if (strcmp(current_skip->name, name_buffer) == 0)
             {
-                current->weight = weight_value;
+                current_skip->weight = weight_value;
                 break;
             }
-            current = current->next;
+            current_skip = current_skip->next;
         }
     }
 

@@ -155,6 +155,7 @@ int main(int argc, char **argv) {
 
     read_weights();       /* io.c */
     clean_stats();        /* stats.c */
+    stats_to_array();     /* stats.c */
 
     switch(run_mode) {       /* all in mode.c */
         case 'a':

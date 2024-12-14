@@ -4,6 +4,7 @@
 void initialize_quad_stats();
 void trim_quad_stats();
 void clean_quad_stats();
+void quad_to_array();
 void free_quad_stats();
 
 #endif
