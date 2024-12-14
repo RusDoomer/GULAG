@@ -9,6 +9,9 @@
 #define dim3 dim2 * dim1
 #define dim4 dim3 * dim1
 
+int LANG_LENGTH = 51;
+int LANG_FILE_LENGTH = 100;
+
 int ROW = row;
 int COL = col;
 int DIM1 = dim1;

@@ -10,6 +10,9 @@
 #define dim3 dim2 * dim1
 #define dim4 dim3 * dim1
 
+extern int LANG_LENGTH;
+extern int LANG_FILE_LENGTH;
+
 extern int ROW;
 extern int COL;
 extern int DIM1;

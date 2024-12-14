@@ -10,8 +10,6 @@
 #include "stats.h"
 
 #define UNICODE_MAX 65535
-#define LANG_FILE_LENGTH 100
-#define LANG_LENGTH 51
 
 void start_up()
 {
