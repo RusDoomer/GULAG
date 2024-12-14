@@ -100,7 +100,13 @@ void clean_bi_stats()
 
 void bi_to_array()
 {
-    error("bi to array not implemented");
+    stats_bi = (bi_stat *)malloc(sizeof(bi_stat) * BI_END);
+    bi_stat *current_bi = bi_head;
+    for (int i = 0; i < BI_END; i++) {
+        memcpy(&stats_bi[i], current_bi, sizeof(bi_stat));
+        stats_bi[i].next = NULL; // Set next pointer to NULL
+        current_bi = current_bi->next;
+    }
 }
 
 void free_bi_stats()

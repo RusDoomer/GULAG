@@ -312,7 +312,13 @@ void clean_mono_stats()
 
 void mono_to_array()
 {
-    error("mono to array not implemented");
+    stats_mono = (mono_stat *)malloc(sizeof(mono_stat) * MONO_END);
+    mono_stat *current_mono = mono_head;
+    for (int i = 0; i < MONO_END; i++) {
+        memcpy(&stats_mono[i], current_mono, sizeof(mono_stat));
+        stats_mono[i].next = NULL; // Set next pointer to NULL
+        current_mono = current_mono->next;
+    }
 }
 
 void free_mono_stats()

@@ -100,7 +100,13 @@ void clean_tri_stats()
 
 void tri_to_array()
 {
-    error("tri to array not implemented");
+    stats_tri = (tri_stat *)malloc(sizeof(tri_stat) * TRI_END);
+    tri_stat *current_tri = tri_head;
+    for (int i = 0; i < TRI_END; i++) {
+        memcpy(&stats_tri[i], current_tri, sizeof(tri_stat));
+        stats_tri[i].next = NULL; // Set next pointer to NULL
+        current_tri = current_tri->next;
+    }
 }
 
 void free_tri_stats()

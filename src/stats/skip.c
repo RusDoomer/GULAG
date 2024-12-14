@@ -100,7 +100,13 @@ void clean_skip_stats()
 
 void skip_to_array()
 {
-    error("skip to array not implemented");
+    stats_skip = (bi_stat *)malloc(sizeof(bi_stat) * SKIP_END);
+    bi_stat *current_skip = skip_head;
+    for (int i = 0; i < SKIP_END; i++) {
+        memcpy(&stats_skip[i], current_skip, sizeof(bi_stat));
+        stats_skip[i].next = NULL; // Set next pointer to NULL
+        current_skip = current_skip->next;
+    }
 }
 
 void free_skip_stats()

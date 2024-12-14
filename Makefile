@@ -12,8 +12,8 @@ OBJECTS := $(patsubst $(SRC_DIR)/%.c,$(BUILD_DIR)/%.o,$(SOURCES))
 EXECUTABLE := gulag
 
 # Compiler flags
-CFLAGS := -I$(INCLUDE_DIR) -I$(INCLUDE_DIR)/stats -Wall
-LDFLAGS :=
+CFLAGS := -I$(INCLUDE_DIR) -I$(INCLUDE_DIR)/stats -Wall -DCL_TARGET_OPENCL_VERSION=300
+LDFLAGS := -lOpenCL
 OPT_FLAGS := -O3 -march=native
 DEBUG_FLAGS := -g -fsanitize=address
 

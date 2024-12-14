@@ -15,3 +15,6 @@ Some notes:
 we want a new datastructure for each type of stat (based on ngram) and initialize a new one for each stat we want, it should hold the name and the position ngrams that count, and also its weight
 
 we want scoring to be proportional, so we need to calculate the maximum and minimum scores possible and then normalize scores
+
+#Dependencies
+install OpenCL with `sudo apt install opencl-headers ocl-icd-opencl-dev ocl-icd-libopencl1 mesa-opencl-icd` or otherwise on other distros, you'll figure it out

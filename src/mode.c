@@ -3,12 +3,16 @@
 #include "mode.h"
 #include "util.h"
 #include "io.h"
+#include "analyze.h"
 
 void analysis() {
     layout *lt;
     alloc_layout(&lt);
     read_layout(lt, 1);
+
+    single_analyze(lt);
     error("analysis not implemented");
+
     get_score(lt);
     print_layout(lt);
     free_layout(lt);

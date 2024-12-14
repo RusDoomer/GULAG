@@ -100,7 +100,13 @@ void clean_quad_stats()
 
 void quad_to_array()
 {
-    error("quad to array not implemented");
+    stats_quad = (quad_stat *)malloc(sizeof(quad_stat) * QUAD_END);
+    quad_stat *current_quad = quad_head;
+    for (int i = 0; i < QUAD_END; i++) {
+        memcpy(&stats_quad[i], current_quad, sizeof(quad_stat));
+        stats_quad[i].next = NULL; // Set next pointer to NULL
+        current_quad = current_quad->next;
+    }
 }
 
 void free_quad_stats()
