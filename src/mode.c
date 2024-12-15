@@ -7,15 +7,29 @@
 
 void analysis() {
     layout *lt;
+    wprintf(L"1/6: Allocating layout... ");
     alloc_layout(&lt);
+    wprintf(L"Done\n\n");
+
+    wprintf(L"2/6: Reading layout... ");
     read_layout(lt, 1);
+    wprintf(L"Done\n\n");
 
+    wprintf(L"3/6: Analyzing layout... ");
     single_analyze(lt);
-    error("analysis not implemented");
+    wprintf(L"Done\n\n");
 
+    wprintf(L"4/6: Calculating Score... ");
     get_score(lt);
+    wprintf(L"Done\n\n");
+
+    wprintf(L"5/6: Printing Output...\n\n");
     print_layout(lt);
+    wprintf(L"Done\n\n");
+
+    wprintf(L"6/6: Freeing layout... ");
     free_layout(lt);
+    wprintf(L"Done\n\n");
     return;
 }
 

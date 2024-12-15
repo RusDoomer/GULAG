@@ -33,5 +33,6 @@ void single_analyze(layout *lt)
     // 3. Create Command Queue
     cl_command_queue command_queue = clCreateCommandQueueWithProperties(context, device_id, 0, &ret);
     if (ret != CL_SUCCESS) {error("OpenCL: clCreateCommandQueueWithProperties failed");}
-}
 
+    error("analysis not implemented");
+}

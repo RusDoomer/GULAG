@@ -10,9 +10,10 @@
 
 void error(const char *msg)
 {
+    fflush(stdout);
     //show cursor
     wprintf(L"\e[?25h");
-    fprintf(stderr, "ERROR: %s\n", msg);
+    fprintf(stderr, "\nERROR: %s\n", msg);
     exit(EXIT_FAILURE);
 }
 

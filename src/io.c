@@ -26,6 +26,7 @@ void read_config()
     if (config == NULL) {
         error("Required file config.conf not found.");
     }
+    wprintf(L"config.conf found... ");
 
     char c;
     int i = 0;
@@ -77,6 +78,7 @@ void read_config()
     output_mode = check_output_mode(buff);
 
     fclose(config);
+    wprintf(L"Done\n\n");
 }
 
 void read_args(int argc, char **argv)
@@ -124,6 +126,7 @@ void read_args(int argc, char **argv)
             abort();
         }
     }
+    wprintf(L"Done\n\n");
 }
 
 void check_setup()
@@ -144,6 +147,7 @@ void check_setup()
     }
     if (threads < 1) {error("invalid threads selected");}
     if (repetitions < 1) {error("invalid repetitions selected");}
+    wprintf(L"Done\n\n");
 }
 
 void read_lang()
@@ -160,7 +164,9 @@ void read_lang()
     if (lang == NULL) {
         error("Lang file not found.");
     }
+    wprintf(L"Lang file found... ");
 
+    wprintf(L"Reading... ");
     wchar_t a;
     for (int i = 0; i < 101; i++) {
         if ((a = fgetwc(lang)) == EOF || a == L'\n') {lang_arr[i] = L'@';}
@@ -170,6 +176,8 @@ void read_lang()
             lang_arr[i] = a;
         }
     }
+
+    wprintf(L"Checking correctness... ");
 
     if (lang_arr[0] != L' ' || lang_arr[1] != L' ') {
         error("Lang file must begin with 2 spaces");
@@ -195,7 +203,7 @@ void read_lang()
         }
     }
 
-    return;
+    wprintf(L"Done\n\n");
 }
 
 int read_corpus_cache()
@@ -211,9 +219,11 @@ int read_corpus_cache()
     corpus = fopen(path, "r");
     if (corpus == NULL) {
         free(path);
+        wprintf(L"Cache not found... ");
         return 0;
     }
-    // wprintf(L"reading from cache\n");
+    wprintf(L"Cache found... ");
+    wprintf(L"Reading from cache... ");
     wchar_t curr;
     int i,j,k,l, value;
     while ((curr = fgetwc(corpus)) != WEOF) {
@@ -277,6 +287,7 @@ int read_corpus_cache()
     }
     fclose(corpus);
     free(path);
+    wprintf(L"Done\n\n");
     return 1;
 }
 
@@ -294,6 +305,7 @@ void read_corpus()
     if (corpus == NULL) {
         error("Corpus file not found, make sure the file ends in .txt, but the name in config/parameters does not");
     }
+    wprintf(L"Corpus file found... ");
 
     int mem[] = {-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1};
 
@@ -328,7 +340,7 @@ void read_corpus()
 
     fclose(corpus);
     free(path);
-    return;
+    wprintf(L"Done\n\n");
 }
 
 void cache_corpus()
@@ -345,6 +357,7 @@ void cache_corpus()
     if (corpus == NULL) {
         error("Corpus cache file failed to be created.");
     }
+    wprintf(L"Created cache file... ");
 
     for (int i = 0; i < 51; i++) {
         for (int j = 0; j < 51; j++) {
@@ -376,7 +389,7 @@ void cache_corpus()
     }
     fclose(corpus);
     free(path);
-    return;
+    wprintf(L"Done\n\n");
 }
 
 void read_weights()
@@ -390,6 +403,7 @@ void read_weights()
     if (weight_file == NULL) {
         error("Weights file not found.");
     }
+    wprintf(L"Weights file found... ");
 
     wchar_t line[256];
     char name_buffer[256];
@@ -487,6 +501,7 @@ void read_weights()
 
     fclose(weight_file);
     free(path);
+    wprintf(L"Done\n\n");
 }
 
 void read_layout(layout *lt, int which_layout)
@@ -505,6 +520,7 @@ void read_layout(layout *lt, int which_layout)
     if (layout_file == NULL) {
         error("Layout file not found.");
     }
+    wprintf(L"Layout file found... ");
 
     wchar_t curr;
     for (int i = 0; i < ROW; i++) {
