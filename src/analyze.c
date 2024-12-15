@@ -6,10 +6,83 @@
 #include "analyze.h"
 #include "global.h"
 #include "util.h"
+#include "io_util.h"
 
 void single_analyze(layout *lt)
 {
+    int row0, col0, row1, col1, row2, col2, row3, col3;
+    for (int i = 0; i < MONO_END; i++)
+    {
+        int length = stats_mono[i].length;
+        for (int j = 0; j < length; j++)
+        {
+            unflat_mono(stats_mono[i].ngrams[j], &row0, &col0);
+            if (lt->matrix[row0][col0] != -1)
+            {
+                size_t index = index_mono(lt->matrix[row0][col0]);
+                lt->mono_score[i] += linear_mono[index];
+            }
+        }
+    }
 
+    for (int i = 0; i < BI_END; i++)
+    {
+        int length = stats_bi[i].length;
+        for (int j = 0; j < length; j++)
+        {
+            unflat_bi(stats_bi[i].ngrams[j], &row0, &col0, &row1, &col1);
+            if (lt->matrix[row0][col0] != -1 && lt->matrix[row1][col1] != -1)
+            {
+                size_t index = index_bi(lt->matrix[row0][col0], lt->matrix[row1][col1]);
+                lt->bi_score[i] += linear_bi[index];
+            }
+        }
+    }
+
+    for (int i = 0; i < TRI_END; i++)
+    {
+        int length = stats_tri[i].length;
+        for (int j = 0; j < length; j++)
+        {
+            unflat_tri(stats_tri[i].ngrams[j], &row0, &col0, &row1, &col1, &row2, &col2);
+            if (lt->matrix[row0][col0] != -1 && lt->matrix[row1][col1] != -1 && lt->matrix[row2][col2] != -1)
+            {
+                size_t index = index_tri(lt->matrix[row0][col0], lt->matrix[row1][col1], lt->matrix[row2][col2]);
+                lt->tri_score[i] += linear_tri[index];
+            }
+        }
+    }
+
+    for (int i = 0; i < QUAD_END; i++)
+    {
+        int length = stats_quad[i].length;
+        for (int j = 0; j < length; j++)
+        {
+            unflat_quad(stats_quad[i].ngrams[j], &row0, &col0, &row1, &col1, &row2, &col2, &row3, &col3);
+            if (lt->matrix[row0][col0] != -1 && lt->matrix[row1][col1] != -1 && lt->matrix[row2][col2] != -1 && lt->matrix[row3][col3] != -1)
+            {
+                size_t index = index_quad(lt->matrix[row0][col0], lt->matrix[row1][col1], lt->matrix[row2][col2], lt->matrix[row3][col3]);
+                lt->quad_score[i] += linear_quad[index];
+            }
+        }
+    }
+
+    for (int i = 0; i < SKIP_END; i++)
+    {
+        int length = stats_bi[i].length;
+        for (int k = 1; k <= 9; k++)
+        {
+            for (int j = 0; j < length; j++)
+            {
+                unflat_bi(stats_bi[i].ngrams[j], &row0, &col0, &row1, &col1);
+                if (lt->matrix[row0][col0] != -1 && lt->matrix[row1][col1] != -1)
+                {
+                    size_t index = index_skip(k, lt->matrix[row0][col0], lt->matrix[row1][col1]);
+                    lt->skip_score[k][i] += linear_skip[index];
+                }
+            }
+        }
+    }
 }
 
 void cl_single_analyze(layout *lt)

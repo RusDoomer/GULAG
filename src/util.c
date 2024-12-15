@@ -122,7 +122,7 @@ void normalize_corpus()
     long long total_bi = 0;
     long long total_tri = 0;
     long long total_quad = 0;
-    long long total_skip = 0;
+    long long total_skip[10] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 
     wprintf(L"Calculating totals... ");
 
@@ -142,7 +142,7 @@ void normalize_corpus()
     for (int i = 1; i <= 9; i++) {
         for (int j = 0; j < LANG_LENGTH; j++) {
             for (int k = 0; k < LANG_LENGTH; k++) {
-                total_skip += corpus_skip[i][j][k];
+                total_skip[i] += corpus_skip[i][j][k];
             }
         }
     }
@@ -188,7 +188,7 @@ void normalize_corpus()
         for (int i = 1; i <= 9; i++) {
             for (int j = 0; j < LANG_LENGTH; j++) {
                 for (int k = 0; k < LANG_LENGTH; k++) {
-                    linear_skip[index_skip(i, j, k)] = (float)corpus_skip[i][j][k] * 100 / total_skip;
+                    linear_skip[index_skip(i, j, k)] = (float)corpus_skip[i][j][k] * 100 / total_skip[i];
                 }
             }
         }
@@ -246,25 +246,25 @@ void get_score(layout *lt)
     lt->score = 0;
     for (int i = 0; i < MONO_END; i++)
     {
-        lt->score += lt->mono_score[i];
+        lt->score += lt->mono_score[i] * stats_mono[i].weight;
     }
     for (int i = 0; i < BI_END; i++)
     {
-        lt->score += lt->bi_score[i];
+        lt->score += lt->bi_score[i] * stats_bi[i].weight;
     }
     for (int i = 0; i < TRI_END; i++)
     {
-        lt->score += lt->tri_score[i];
+        lt->score += lt->tri_score[i] * stats_tri[i].weight;
     }
     for (int i = 0; i < QUAD_END; i++)
     {
-        lt->score += lt->quad_score[i];
+        lt->score += lt->quad_score[i] * stats_quad[i].weight;
     }
     for (int i = 0; i > 10; i++)
     {
         for (int j = 0; j < SKIP_END; j++)
         {
-            lt->score += lt->skip_score[i][j];
+            lt->score += lt->skip_score[i][j] * stats_skip[j].weight;
         }
     }
     for (int i = 0; i < META_END; i++)

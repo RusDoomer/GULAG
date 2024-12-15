@@ -553,6 +553,19 @@ void quiet_print(layout *lt)
 void normal_print(layout *lt)
 {
     quiet_print(lt);
+    wprintf(L"\nMONOGRAM STATS\n");
+    for (int i = 0; i < MONO_END; i++) {wprintf(L"%s : %f\%\n", stats_mono[i].name, lt->mono_score[i]);}
+    wprintf(L"\nBIGRAM STATS\n");
+    for (int i = 0; i < BI_END; i++) {wprintf(L"%s : %f\%\n", stats_bi[i].name, lt->bi_score[i]);}
+    wprintf(L"\nTRIGRAM STATS\n");
+    for (int i = 0; i < TRI_END; i++) {wprintf(L"%s : %f\%\n", stats_tri[i].name, lt->tri_score[i]);}
+    wprintf(L"\nQUADGRAM STATS\n");
+    for (int i = 0; i < QUAD_END; i++) {wprintf(L"%s : %f\%\n", stats_quad[i].name, lt->quad_score[i]);}
+    wprintf(L"\nSKIPGRAM STATS\n");
+    for (int j = 1; j <= 9; j++)
+    {
+        for (int i = 0; i < SKIP_END; i++) {wprintf(L"%s : %f\%\n", stats_skip[i].name, lt->skip_score[j][i]);}
+    }
 }
 
 void verbose_print(layout *lt)

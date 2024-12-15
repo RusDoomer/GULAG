@@ -1,4 +1,9 @@
+#include <stdio.h>
+#include <stdlib.h>
 #include <wchar.h>
+#include <sys/time.h>
+
+#include <pthread.h>
 
 #include "mode.h"
 #include "util.h"
