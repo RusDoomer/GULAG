@@ -87,6 +87,7 @@ void single_analyze(layout *lt)
 
 void cl_single_analyze(layout *lt)
 {
+    /*
     // 1. Get Platform and Device Information
     cl_platform_id platform_id = NULL;
     cl_device_id device_id = NULL;
@@ -111,6 +112,6 @@ void cl_single_analyze(layout *lt)
     // 3. Create Command Queue
     cl_command_queue command_queue = clCreateCommandQueueWithProperties(context, device_id, 0, &ret);
     if (ret != CL_SUCCESS) {error("OpenCL: clCreateCommandQueueWithProperties failed");}
-
+    */
     error("analysis not implemented");
 }
