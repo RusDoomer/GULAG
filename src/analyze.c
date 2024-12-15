@@ -9,6 +9,11 @@
 
 void single_analyze(layout *lt)
 {
+
+}
+
+void cl_single_analyze(layout *lt)
+{
     // 1. Get Platform and Device Information
     cl_platform_id platform_id = NULL;
     cl_device_id device_id = NULL;

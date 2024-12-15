@@ -100,6 +100,12 @@ extern int ***corpus_tri;
 extern int ****corpus_quad;
 extern int ***corpus_skip;
 
+extern float *linear_mono;
+extern float *linear_bi;
+extern float *linear_tri;
+extern float *linear_quad;
+extern float *linear_skip;
+
 extern mono_stat *mono_head;
 extern bi_stat *bi_head;
 extern tri_stat *tri_head;

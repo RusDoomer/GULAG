@@ -7,6 +7,7 @@
 #include "util.h"
 #include "global.h"
 #include "io.h"
+#include "io_util.h"
 
 void error(const char *msg)
 {
@@ -93,6 +94,106 @@ void unflat_mono(int i, int *row0, int *col0)
 {
     *row0 = i / COL;
     *col0 = i % COL;
+}
+
+size_t index_mono(int i) {
+    return i;
+}
+
+size_t index_bi(int i, int j) {
+    return i * LANG_LENGTH + j;
+}
+
+size_t index_tri(int i, int j, int k) {
+    return i * LANG_LENGTH * LANG_LENGTH + j * LANG_LENGTH + k;
+}
+
+size_t index_quad(int i, int j, int k, int l) {
+    return i * LANG_LENGTH * LANG_LENGTH * LANG_LENGTH + j * LANG_LENGTH * LANG_LENGTH + k * LANG_LENGTH + l;
+}
+
+size_t index_skip(int skip_index, int j, int k) {
+    return skip_index * LANG_LENGTH * LANG_LENGTH + j * LANG_LENGTH + k;
+}
+
+void normalize_corpus()
+{
+    long long total_mono = 0;
+    long long total_bi = 0;
+    long long total_tri = 0;
+    long long total_quad = 0;
+    long long total_skip = 0;
+
+    wprintf(L"Calculating totals... ");
+
+    for (int i = 0; i < LANG_LENGTH; i++) {
+        total_mono += corpus_mono[i];
+        for (int j = 0; j < LANG_LENGTH; j++) {
+            total_bi += corpus_bi[i][j];
+            for (int k = 0; k < LANG_LENGTH; k++) {
+                total_tri += corpus_tri[i][j][k];
+                for (int l = 0; l < LANG_LENGTH; l++) {
+                    total_quad += corpus_quad[i][j][k][l];
+                }
+            }
+        }
+    }
+
+    for (int i = 1; i <= 9; i++) {
+        for (int j = 0; j < LANG_LENGTH; j++) {
+            for (int k = 0; k < LANG_LENGTH; k++) {
+                total_skip += corpus_skip[i][j][k];
+            }
+        }
+    }
+
+    wprintf(L"Normalizing... ");
+    if (total_mono > 0) {
+        for (int i = 0; i < LANG_LENGTH; i++) {
+            linear_mono[index_mono(i)] = (float)corpus_mono[i] * 100 / total_mono;
+        }
+    }
+
+    if (total_bi > 0) {
+        for (int i = 0; i < LANG_LENGTH; i++) {
+            for (int j = 0; j < LANG_LENGTH; j++) {
+                linear_bi[index_bi(i, j)] = (float)corpus_bi[i][j] * 100 / total_bi;
+            }
+        }
+    }
+
+    if (total_tri > 0) {
+        for (int i = 0; i < LANG_LENGTH; i++) {
+            for (int j = 0; j < LANG_LENGTH; j++) {
+                for (int k = 0; k < LANG_LENGTH; k++) {
+                    linear_tri[index_tri(i, j, k)] = (float)corpus_tri[i][j][k] * 100 / total_tri;
+                }
+            }
+        }
+    }
+
+    if (total_quad > 0) {
+        for (int i = 0; i < LANG_LENGTH; i++) {
+            for (int j = 0; j < LANG_LENGTH; j++) {
+                for (int k = 0; k < LANG_LENGTH; k++) {
+                    for (int l = 0; l < LANG_LENGTH; l++) {
+                        linear_quad[index_quad(i, j, k, l)] = (float)corpus_quad[i][j][k][l] * 100 / total_quad;
+                    }
+                }
+            }
+        }
+    }
+
+    if (total_skip > 0) {
+        for (int i = 1; i <= 9; i++) {
+            for (int j = 0; j < LANG_LENGTH; j++) {
+                for (int k = 0; k < LANG_LENGTH; k++) {
+                    linear_skip[index_skip(i, j, k)] = (float)corpus_skip[i][j][k] * 100 / total_skip;
+                }
+            }
+        }
+    }
+    wprintf(L"Done\n\n");
 }
 
 // Function to check if layout is fully allocated

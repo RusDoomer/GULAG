@@ -18,6 +18,14 @@ void unflat_bi(int i, int *row0, int *col0, int *row1, int *col1);
 void flat_mono(int row0, int col0, int *i);
 void unflat_mono(int i, int *row0, int *col0);
 
+size_t index_mono(int i);
+size_t index_bi(int i, int j);
+size_t index_tri(int i, int j, int k);
+size_t index_quad(int i, int j, int k, int l);
+size_t index_skip(int skip_index, int j, int k);
+
+void normalize_corpus();
+
 void alloc_layout(layout **lt);
 void free_layout(layout *lt);
 

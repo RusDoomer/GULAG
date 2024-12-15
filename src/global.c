@@ -50,6 +50,12 @@ int ***corpus_tri;
 int ****corpus_quad;
 int ***corpus_skip;
 
+float *linear_mono;
+float *linear_bi;
+float *linear_tri;
+float *linear_quad;
+float *linear_skip;
+
 // linked lists
 mono_stat *mono_head;
 bi_stat *bi_head;

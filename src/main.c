@@ -47,19 +47,23 @@ void start_up()
     wprintf(L"Done\n\n");
 
     wprintf(L"3/4: Allocating corpus arrays...\n");
-    wprintf(L"     Monograms... ");
+    wprintf(L"     Monograms... Integer... ");
     // allocate arrays for ngrams directly from corpus
     corpus_mono = (int *)calloc(LANG_LENGTH, sizeof(int));
+    wprintf(L"Floating Point... ");
+    linear_mono = (float *)calloc(LANG_LENGTH, sizeof(float));
     wprintf(L"Done\n");
 
-    wprintf(L"     Bigrams... ");
+    wprintf(L"     Bigrams... Integer... ");
     corpus_bi = (int **)malloc(LANG_LENGTH * sizeof(int *));
     for (int i = 0; i < LANG_LENGTH; i++) {
         corpus_bi[i] = (int *)calloc(LANG_LENGTH, sizeof(int));
     }
+    wprintf(L"Floating Point... ");
+    linear_bi = (float *)calloc(LANG_LENGTH * LANG_LENGTH, sizeof(float));
     wprintf(L"Done\n");
 
-    wprintf(L"     Trigrams... ");
+    wprintf(L"     Trigrams... Integer... ");
     corpus_tri = (int ***)malloc(LANG_LENGTH * sizeof(int **));
     for (int i = 0; i < LANG_LENGTH; i++) {
         corpus_tri[i] = (int **)malloc(LANG_LENGTH * sizeof(int *));
@@ -67,9 +71,11 @@ void start_up()
             corpus_tri[i][j] = (int *)calloc(LANG_LENGTH, sizeof(int));
         }
     }
+    wprintf(L"Floating Point... ");
+    linear_tri = (float *)calloc(LANG_LENGTH * LANG_LENGTH * LANG_LENGTH, sizeof(float));
     wprintf(L"Done\n");
 
-    wprintf(L"     Quadgrams... ");
+    wprintf(L"     Quadgrams... Integer... ");
     corpus_quad = (int ****)malloc(LANG_LENGTH * sizeof(int ***));
     for (int i = 0; i < LANG_LENGTH; i++) {
         corpus_quad[i] = (int ***)malloc(LANG_LENGTH * sizeof(int **));
@@ -80,19 +86,23 @@ void start_up()
             }
         }
     }
+    wprintf(L"Floating Point... ");
+    linear_quad = (float *)calloc(LANG_LENGTH * LANG_LENGTH * LANG_LENGTH * LANG_LENGTH, sizeof(float));
     wprintf(L"Done\n");
 
     wprintf(L"     Skipgrams...\n");
     corpus_skip = (int ***)malloc(10 * sizeof(int **));
     for (int i = 1; i <= 9; i++) {
-        wprintf(L"       Skip-%d... ", i);
+        wprintf(L"       Skip-%d... Integer... ", i);
         corpus_skip[i] = (int **)malloc(LANG_LENGTH * sizeof(int *));
         for (int j = 0; j < LANG_LENGTH; j++) {
             corpus_skip[i][j] = (int *)calloc(LANG_LENGTH, sizeof(int));
         }
         wprintf(L"Done\n");
     }
-    wprintf(L"       Done\n");
+    wprintf(L"       Floating Point... ");
+    linear_skip = (float *)calloc(10 * LANG_LENGTH * LANG_LENGTH, sizeof(float));
+    wprintf(L"Done\n");
     wprintf(L"     Done\n\n");
 
     wprintf(L"4/4: Initializing stats...\n");
@@ -113,6 +123,7 @@ void shut_down()
     wprintf(L"2/3: Freeing corpus arrays... \n");
     wprintf(L"     Monograms... ");
     free(corpus_mono);
+    free(linear_mono);
     wprintf(L"Done\n");
 
     wprintf(L"     Bigrams... ");
@@ -120,6 +131,7 @@ void shut_down()
         free(corpus_bi[i]);
     }
     free(corpus_bi);
+    free(linear_bi);
     wprintf(L"Done\n");
 
     wprintf(L"     Trigrams... ");
@@ -130,6 +142,7 @@ void shut_down()
         free(corpus_tri[i]);
     }
     free(corpus_tri);
+    free(linear_tri);
     wprintf(L"Done\n");
 
     wprintf(L"     Quadgrams... ");
@@ -143,6 +156,7 @@ void shut_down()
         free(corpus_quad[i]);
     }
     free(corpus_quad);
+    free(linear_quad);
     wprintf(L"Done\n");
 
     wprintf(L"     Skipgrams...\n");
@@ -155,6 +169,7 @@ void shut_down()
         wprintf(L"Done\n");
     }
     free(corpus_skip);
+    free(linear_skip);
     wprintf(L"       Done\n");
     wprintf(L"     Done\n\n");
 
@@ -194,10 +209,10 @@ int main(int argc, char **argv) {
 
     wprintf(L"----- Reading Data -----\n\n");
 
-    wprintf(L"1/3: Reading language... ");
+    wprintf(L"1/4: Reading language... ");
     read_lang(lang_name); /* io.c */
 
-    wprintf(L"2/3: Reading corpus... ");
+    wprintf(L"2/4: Reading corpus... ");
     wprintf(L"Looking for cache... ");
     int corpus_cache = 0;
     corpus_cache = read_corpus_cache();
@@ -207,11 +222,14 @@ int main(int argc, char **argv) {
         // what step they are stuck on
         fflush(stdout);
         read_corpus();    /* io.c */
-        wprintf(L"2.5\3: Creating corpus cache... ");
+        wprintf(L"2.5\4: Creating corpus cache... ");
         cache_corpus();   /* io.c */
     }
 
-    wprintf(L"3/3: Reading stat weights... ");
+    wprintf(L"3/4: Normalize corpus... ");
+    normalize_corpus(); /* util.c */
+
+    wprintf(L"4/4: Reading stat weights... ");
     read_weights();       /* io.c */
 
     wprintf(L"----- Reading Complete -----\n\n");
