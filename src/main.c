@@ -241,6 +241,42 @@ int main(int argc, char **argv) {
     stats_to_array();     /* stats.c */
 
     wprintf(L"----- Clean Up Complete -----\n\n");
+
+    wprintf(L"----- Weights -----\n\n");
+
+    for (int i = 0; i < MONO_END; i++)
+    {
+        wprintf(L"%s : %f\n", stats_mono[i].name, stats_mono[i].weight);
+    }
+    for (int i = 0; i < BI_END; i++)
+    {
+        wprintf(L"%s : %f\n", stats_bi[i].name, stats_bi[i].weight);
+    }
+    for (int i = 0; i < TRI_END; i++)
+    {
+        wprintf(L"%s : %f\n", stats_tri[i].name, stats_tri[i].weight);
+    }
+    for (int i = 0; i < QUAD_END; i++)
+    {
+        wprintf(L"%s : %f\n", stats_quad[i].name, stats_quad[i].weight);
+    }
+    for (int i = 0; i < SKIP_END; i++)
+    {
+        wprintf(L"%s : ", stats_skip[i].name);
+        for (int j = 1; j <= 9; j++)
+        {
+            wprintf(L"%f ", stats_skip[i].weight[j]);
+        }
+        wprintf(L"\n");
+    }
+    for (int i = 0; i < META_END; i++)
+    {
+        wprintf(L"%s : %f\n", stats_meta[i].name, stats_meta[i].weight);
+    }
+    wprintf(L"\n");
+
+    wprintf(L"----- Weights Complete -----\n\n");
+
     wprintf(L"----- Running -----\n\n");
 
     switch(run_mode) {       /* all in mode.c */

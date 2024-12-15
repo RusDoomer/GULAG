@@ -13,6 +13,10 @@ Right Pinky Usage : -1
 Right Outer Usage : -1
 
 Same Finger Bigram : -10
-Same Finger Skipgram : -2
+Same Finger Skipgram : -2 -1 -0.5 -0.25 0 0 0 0 0
 Same Finger Trigram : -25
 Same Finger Quadgram : -100
+
+Left Hand Usage : 0
+Right Hand Usage : 0
+Hand Balance : -0.1

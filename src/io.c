@@ -410,7 +410,7 @@ void read_weights()
 
     while (fgetws(line, sizeof(line) / sizeof(line[0]), weight_file) != NULL)
     {
-        // Parse the line: split on ':' to get name and weight
+        // Parse the line: split on ':' to get name and weight(s)
         wchar_t *delimiter = wcschr(line, L':');
         if (delimiter == NULL)
         {
@@ -435,20 +435,28 @@ void read_weights()
         // Convert wide name to a normal string
         wcstombs(name_buffer, name_part, sizeof(name_buffer));
 
-        // Convert the weight to a float
-        float weight_value;
-        if (swscanf(weight_part, L"%f", &weight_value) != 1)
+        // Parse and process weights
+        float weights[10] = {0}; // Temporary storage for weights
+        int weight_count = 0;
+        wchar_t *state;
+        wchar_t *token = wcstok(weight_part, L" ", &state);
+        while (token != NULL && weight_count < 10)
         {
-            continue; // Skip lines with invalid weight format
+            float value;
+            if (swscanf(token, L"%f", &value) == 1)
+            {
+                weights[weight_count++] = value;
+            }
+            token = wcstok(NULL, L" ", &state);
         }
 
-        // Find the matching stat in the linked lists and update its weight
+        // Find the matching stat in the linked lists and update its weight(s)
         mono_stat *current_mono = mono_head;
         while (current_mono != NULL)
         {
             if (strcmp(current_mono->name, name_buffer) == 0)
             {
-                current_mono->weight = weight_value;
+                current_mono->weight = weights[0];
                 break;
             }
             current_mono = current_mono->next;
@@ -459,7 +467,7 @@ void read_weights()
         {
             if (strcmp(current_bi->name, name_buffer) == 0)
             {
-                current_bi->weight = weight_value;
+                current_bi->weight = weights[0];
                 break;
             }
             current_bi = current_bi->next;
@@ -470,7 +478,7 @@ void read_weights()
         {
             if (strcmp(current_tri->name, name_buffer) == 0)
             {
-                current_tri->weight = weight_value;
+                current_tri->weight = weights[0];
                 break;
             }
             current_tri = current_tri->next;
@@ -481,21 +489,36 @@ void read_weights()
         {
             if (strcmp(current_quad->name, name_buffer) == 0)
             {
-                current_quad->weight = weight_value;
+                current_quad->weight = weights[0];
                 break;
             }
             current_quad = current_quad->next;
         }
 
-        bi_stat *current_skip = skip_head;
+        skip_stat *current_skip = skip_head;
         while (current_skip != NULL)
         {
             if (strcmp(current_skip->name, name_buffer) == 0)
             {
-                current_skip->weight = weight_value;
+                // Update weights array for skip_stat
+                for (int i = 1; i <= 9; i++)
+                {
+                    current_skip->weight[i] = weights[i - 1];
+                }
                 break;
             }
             current_skip = current_skip->next;
+        }
+
+        meta_stat *current_meta = meta_head;
+        while (current_meta != NULL)
+        {
+            if (strcmp(current_meta->name, name_buffer) == 0)
+            {
+                current_meta->weight = weights[0];
+                break;
+            }
+            current_meta = current_meta->next;
         }
     }
 
@@ -503,6 +526,7 @@ void read_weights()
     free(path);
     wprintf(L"Done\n\n");
 }
+
 
 void read_layout(layout *lt, int which_layout)
 {
@@ -566,6 +590,8 @@ void normal_print(layout *lt)
     {
         for (int i = 0; i < SKIP_END; i++) {wprintf(L"%s : %f\%\n", stats_skip[i].name, lt->skip_score[j][i]);}
     }
+    wprintf(L"\nMETA STATS\n");
+    for (int i = 0; i < META_END; i++) {wprintf(L"%s : %f\%\n", stats_meta[i].name, lt->meta_score[i]);}
 }
 
 void verbose_print(layout *lt)

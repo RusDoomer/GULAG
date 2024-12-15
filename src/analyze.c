@@ -7,6 +7,7 @@
 #include "global.h"
 #include "util.h"
 #include "io_util.h"
+#include "meta.h"
 
 void single_analyze(layout *lt)
 {
@@ -69,12 +70,12 @@ void single_analyze(layout *lt)
 
     for (int i = 0; i < SKIP_END; i++)
     {
-        int length = stats_bi[i].length;
+        int length = stats_skip[i].length;
         for (int k = 1; k <= 9; k++)
         {
             for (int j = 0; j < length; j++)
             {
-                unflat_bi(stats_bi[i].ngrams[j], &row0, &col0, &row1, &col1);
+                unflat_bi(stats_skip[i].ngrams[j], &row0, &col0, &row1, &col1);
                 if (lt->matrix[row0][col0] != -1 && lt->matrix[row1][col1] != -1)
                 {
                     size_t index = index_skip(k, lt->matrix[row0][col0], lt->matrix[row1][col1]);
@@ -83,6 +84,8 @@ void single_analyze(layout *lt)
             }
         }
     }
+
+    meta_analysis(lt);
 }
 
 void cl_single_analyze(layout *lt)
@@ -113,5 +116,5 @@ void cl_single_analyze(layout *lt)
     cl_command_queue command_queue = clCreateCommandQueueWithProperties(context, device_id, 0, &ret);
     if (ret != CL_SUCCESS) {error("OpenCL: clCreateCommandQueueWithProperties failed");}
     */
-    error("analysis not implemented");
+    error("opencl analysis not implemented");
 }

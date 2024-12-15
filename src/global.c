@@ -61,11 +61,13 @@ mono_stat *mono_head;
 bi_stat *bi_head;
 tri_stat *tri_head;
 quad_stat *quad_head;
-bi_stat *skip_head;
+skip_stat *skip_head;
+meta_stat *meta_head;
 
 // arrays to back linked list
 mono_stat *stats_mono;
 bi_stat *stats_bi;
 tri_stat *stats_tri;
 quad_stat *stats_quad;
-bi_stat *stats_skip;
+skip_stat *stats_skip;
+meta_stat *stats_meta;

@@ -74,7 +74,7 @@ void trim_quad_stats()
 void clean_quad_stats()
 {
     if (quad_head == NULL) {return;}
-    while (quad_head != NULL && (quad_head->weight == 0 || quad_head->length == 0)) {
+    while (quad_head != NULL && (quad_head->length == 0)) {
         quad_stat *temp = quad_head;
         quad_head = quad_head->next;
         free(temp);
@@ -82,7 +82,7 @@ void clean_quad_stats()
 
     quad_stat *current = quad_head;
     while (current != NULL && current->next != NULL) {
-        if (current->next->weight == 0 || current->next->length == 0) {
+        if (current->next->length == 0) {
             quad_stat *temp = current->next;
             current->next = current->next->next;
             free(temp);

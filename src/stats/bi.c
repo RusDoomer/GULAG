@@ -74,7 +74,7 @@ void trim_bi_stats()
 void clean_bi_stats()
 {
     if (bi_head == NULL) {return;}
-    while (bi_head != NULL && (bi_head->weight == 0 || bi_head->length == 0)) {
+    while (bi_head != NULL && (bi_head->length == 0)) {
         bi_stat *temp = bi_head;
         bi_head = bi_head->next;
         free(temp);
@@ -82,7 +82,7 @@ void clean_bi_stats()
 
     bi_stat *current = bi_head;
     while (current != NULL && current->next != NULL) {
-        if (current->next->weight == 0 || current->next->length == 0) {
+        if (current->next->length == 0) {
             bi_stat *temp = current->next;
             current->next = current->next->next;
             free(temp);

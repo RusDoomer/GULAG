@@ -1,6 +1,10 @@
 #ifndef STATS_UTIL_H
 #define STATS_UTIL_H
 
+#include "global.h"
+
+float find_stat_score(char *stat_name, char type, layout *lt);
+
 char hand(int row0, int col0);
 int finger(int row0, int col0);
 int is_stretch(int row0, int col0);

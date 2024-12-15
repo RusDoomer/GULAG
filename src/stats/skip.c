@@ -9,10 +9,12 @@
 void initialize_skip_stats()
 {
     int row0, col0, row1, col1;
-    bi_stat *same_finger = (bi_stat *)malloc(sizeof(bi_stat));
+    skip_stat *same_finger = (skip_stat *)malloc(sizeof(skip_stat));
     skip_head = same_finger;
     strcpy(same_finger->name, "Same Finger Skipgram");
-    same_finger->weight = 0;
+    for (int i = 0; i < 10; i++) {
+        same_finger->weight[i] = 0;
+    }
     same_finger->length = 0;
     for (int i = 0; i < DIM2; i++)
     {
@@ -33,7 +35,7 @@ void initialize_skip_stats()
 
 void trim_skip_stats()
 {
-    bi_stat *current = skip_head;
+    skip_stat *current = skip_head;
 
     while (current != NULL)
     {
@@ -74,16 +76,16 @@ void trim_skip_stats()
 void clean_skip_stats()
 {
     if (skip_head == NULL) {return;}
-    while (skip_head != NULL && (skip_head->weight == 0 || skip_head->length == 0)) {
-        bi_stat *temp = skip_head;
+    while (skip_head != NULL && (skip_head->length == 0)) {
+        skip_stat *temp = skip_head;
         skip_head = skip_head->next;
         free(temp);
     }
 
-    bi_stat *current = skip_head;
+    skip_stat *current = skip_head;
     while (current != NULL && current->next != NULL) {
-        if (current->next->weight == 0 || current->next->length == 0) {
-            bi_stat *temp = current->next;
+        if (current->next->length == 0) {
+            skip_stat *temp = current->next;
             current->next = current->next->next;
             free(temp);
         } else {
@@ -100,10 +102,10 @@ void clean_skip_stats()
 
 void skip_to_array()
 {
-    stats_skip = (bi_stat *)malloc(sizeof(bi_stat) * SKIP_END);
-    bi_stat *current_skip = skip_head;
+    stats_skip = (skip_stat *)malloc(sizeof(skip_stat) * SKIP_END);
+    skip_stat *current_skip = skip_head;
     for (int i = 0; i < SKIP_END; i++) {
-        memcpy(&stats_skip[i], current_skip, sizeof(bi_stat));
+        memcpy(&stats_skip[i], current_skip, sizeof(skip_stat));
         stats_skip[i].next = NULL; // Set next pointer to NULL
         current_skip = current_skip->next;
     }
@@ -114,7 +116,7 @@ void free_skip_stats()
     if (skip_head == NULL) {return;}
     while (skip_head != NULL)
     {
-        bi_stat *temp = skip_head;
+        skip_stat *temp = skip_head;
         skip_head = skip_head->next;
         free(temp);
     }

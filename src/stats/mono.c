@@ -286,7 +286,7 @@ void trim_mono_stats()
 void clean_mono_stats()
 {
     if (mono_head == NULL) {return;}
-    while (mono_head != NULL && (mono_head->weight == 0 || mono_head->length == 0)) {
+    while (mono_head != NULL && (mono_head->length == 0)) {
         mono_stat *temp = mono_head;
         mono_head = mono_head->next;
         free(temp);
@@ -294,7 +294,7 @@ void clean_mono_stats()
 
     mono_stat *current = mono_head;
     while (current != NULL && current->next != NULL) {
-        if (current->next->weight == 0 || current->next->length == 0) {
+        if (current->next->length == 0) {
             mono_stat *temp = current->next;
             current->next = current->next->next;
             free(temp);

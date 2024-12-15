@@ -260,16 +260,16 @@ void get_score(layout *lt)
     {
         lt->score += lt->quad_score[i] * stats_quad[i].weight;
     }
-    for (int i = 0; i > 10; i++)
+    for (int i = 1; i <= 9; i++)
     {
         for (int j = 0; j < SKIP_END; j++)
         {
-            lt->score += lt->skip_score[i][j] * stats_skip[j].weight;
+            lt->score += lt->skip_score[i][j] * stats_skip[j].weight[i];
         }
     }
     for (int i = 0; i < META_END; i++)
     {
-        lt->score += lt->meta_score[i];
+        lt->score += lt->meta_score[i] * stats_meta[i].weight;
     }
 }
 

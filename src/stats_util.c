@@ -1,5 +1,73 @@
+#include <string.h>
+
 #include "stats_util.h"
 #include "global.h"
+#include "util.h"
+
+
+float find_stat_score(char *stat_name, char type, layout *lt) {
+    int i;
+
+    switch (type) {
+        case 'm':
+            for (i = 0; i < MONO_END; i++) {
+                if (strcmp(stats_mono[i].name, stat_name) == 0) {
+                    return lt->mono_score[i];
+                }
+            }
+            break;
+        case 'b':
+            for (i = 0; i < BI_END; i++) {
+                if (strcmp(stats_bi[i].name, stat_name) == 0) {
+                    return lt->bi_score[i];
+                }
+            }
+            break;
+        case 't':
+            for (i = 0; i < TRI_END; i++) {
+                if (strcmp(stats_tri[i].name, stat_name) == 0) {
+                    return lt->tri_score[i];
+                }
+            }
+            break;
+        case 'q':
+            for (i = 0; i < QUAD_END; i++) {
+                if (strcmp(stats_quad[i].name, stat_name) == 0) {
+                    return lt->quad_score[i];
+                }
+            }
+            break;
+        case '1':
+        case '2':
+        case '3':
+        case '4':
+        case '5':
+        case '6':
+        case '7':
+        case '8':
+        case '9':
+            for (i = 0; i < SKIP_END; i++) {
+                if (strcmp(stats_skip[i].name, stat_name) == 0) {
+                    // Convert char type to int for skipgram index
+                    int skip_index = type - '0';
+                    return lt->skip_score[skip_index][i];
+                }
+            }
+            break;
+        case 'e': // Meta stats
+            for (i = 0; i < META_END; i++) {
+                if (strcmp(stats_meta[i].name, stat_name) == 0) {
+                    return lt->meta_score[i];
+                }
+            }
+            break;
+        default:
+            error("Invalid type specified in find_stat_score");
+    }
+
+    // If stat not found, return 0.0
+    return 0.0;
+}
 
 char hand(int row0, int col0)
 {

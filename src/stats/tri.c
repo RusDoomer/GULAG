@@ -74,7 +74,7 @@ void trim_tri_stats()
 void clean_tri_stats()
 {
     if (tri_head == NULL) {return;}
-    while (tri_head != NULL && (tri_head->weight == 0 || tri_head->length == 0)) {
+    while (tri_head != NULL && (tri_head->length == 0)) {
         tri_stat *temp = tri_head;
         tri_head = tri_head->next;
         free(temp);
@@ -82,7 +82,7 @@ void clean_tri_stats()
 
     tri_stat *current = tri_head;
     while (current != NULL && current->next != NULL) {
-        if (current->next->weight == 0 || current->next->length == 0) {
+        if (current->next->length == 0) {
             tri_stat *temp = current->next;
             current->next = current->next->next;
             free(temp);

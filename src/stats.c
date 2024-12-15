@@ -4,6 +4,7 @@
 #include "tri.h"
 #include "quad.h"
 #include "skip.h"
+#include "meta.h"
 
 #include "global.h"
 #include <stdio.h>
@@ -42,6 +43,12 @@ void initialize_stats()
     wprintf(L"trimming skipgram stats... ");
     trim_skip_stats();
     wprintf(L"Done\n");
+
+    wprintf(L"     Initializing meta stats...     ");
+    initialize_meta_stats();
+    wprintf(L"trimming meta stats...     ");
+    trim_meta_stats();
+    wprintf(L"Done\n");
 }
 
 void clean_stats()
@@ -60,6 +67,9 @@ void clean_stats()
     wprintf(L"Done\n");
     wprintf(L"     Cleaning skipgram stats... ");
     clean_skip_stats();
+    wprintf(L"Done\n");
+    wprintf(L"     Cleaning meta stats... ");
+    clean_meta_stats();
     wprintf(L"Done\n");
 
     wprintf(L"     Done\n\n");
@@ -82,6 +92,9 @@ void stats_to_array()
     wprintf(L"     Converting skipgram stats... ");
     skip_to_array();
     wprintf(L"Done\n");
+    wprintf(L"     Converting meta stats... ");
+    meta_to_array();
+    wprintf(L"Done\n");
 
     wprintf(L"     Done\n\n");
 }
@@ -102,6 +115,9 @@ void free_stats()
     wprintf(L"Done\n");
     wprintf(L"     Freeing skipgram stats... ");
     free_skip_stats();
+    wprintf(L"Done\n");
+    wprintf(L"     Freeing meta stats... ");
+    free_meta_stats();
     wprintf(L"Done\n");
 
     wprintf(L"     Done\n\n");
