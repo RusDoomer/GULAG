@@ -275,11 +275,16 @@ void get_score(layout *lt)
 
 void get_layout_diff(layout *lt, layout *lt2, layout *lt_diff)
 {
-    size_t len1 = strlen(layout_name);
-    size_t len2 = strlen(layout2_name);
-    size_t final_len = len1 + len2 + 3;
-    if (final_len > 99) {error("combined names of layouts are too long");}
-    snprintf(lt_diff->name, sizeof(lt_diff->name), "%s - %s", layout_name, layout2_name);
+    char truncated_layout_name[49];
+    char truncated_layout2_name[49];
+
+    strncpy(truncated_layout_name, layout_name, sizeof(truncated_layout_name) - 1);
+    truncated_layout_name[sizeof(truncated_layout_name) - 1] = '\0';
+
+    strncpy(truncated_layout2_name, layout2_name, sizeof(truncated_layout2_name) - 1);
+    truncated_layout2_name[sizeof(truncated_layout2_name) - 1] = '\0';
+
+    snprintf(lt_diff->name, sizeof(lt_diff->name), "%s - %s", truncated_layout_name, truncated_layout2_name);
 
     for (int i = 0; i < ROW; i++) {
         for (int j = 0; j < COL; j++) {
