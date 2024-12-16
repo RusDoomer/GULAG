@@ -418,27 +418,7 @@ void copy(layout *lt_dest, layout *lt_src)
     }
 }
 
-void gen_swap(int **swaps, int reps, layout **lt)
-{
-    error("gen swap not implemented");
-}
-
 float random_float() {
     return (float)rand() / RAND_MAX;
 }
 
-void decide_swapbacks(int *swap_back, float *prev_scores, layout **lt,
-    float temp, int threads)
-{
-    error("decide swapbacks not implemented");
-}
-
-void gen_swap_back(int **swaps, int *swap_back, layout **lt)
-{
-    error("gen swap back not implemented");
-}
-
-void imp_swap(int **swaps, int reps, layout **lt)
-{
-    error("imp swap not implemented");
-}

@@ -246,7 +246,7 @@ void improve(int shuffle) {
     if (shuffle) {
         wprintf(L"3/8: Shuffling layout... ");
         shuffle_layout(lt);
-        strcpy(lt->name, "generate");
+        strcpy(lt->name, "random shuffle");
         wprintf(L"Done\n\n");
     } else {
         wprintf(L"3/8: Skipping shuffle... ");

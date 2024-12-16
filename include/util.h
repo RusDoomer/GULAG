@@ -40,15 +40,6 @@ void shuffle_layout(layout *lt);
 
 void copy(layout *lt_dest, layout *lt_src);
 
-void gen_swap(int **swaps, int reps, layout **lt);
-
 float random_float();
-
-void decide_swapbacks(int *swap_back, float *max_scores, layout **lt,
-    float temp, int threads);
-
-void gen_swap_back(int **swaps, int *swap_back, layout **lt);
-
-void imp_swap(int **swaps, int reps, layout **lt);
 
 #endif
