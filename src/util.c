@@ -275,7 +275,12 @@ void get_score(layout *lt)
 
 void get_layout_diff(layout *lt, layout *lt2, layout *lt_diff)
 {
-    error("get layout diff not implemented");
+    size_t len1 = strlen(layout_name);
+    size_t len2 = strlen(layout2_name);
+    size_t final_len = len1 + len2 + 3;
+    if (final_len > 99) {error("combined names of layouts are too long");}
+    snprintf(lt_diff->name, sizeof(lt_diff->name), "%s - %s", layout_name, layout2_name);
+
     for (int i = 0; i < ROW; i++) {
         for (int j = 0; j < COL; j++) {
             if (lt->matrix[i][j] == lt2->matrix[i][j]) {
@@ -288,47 +293,30 @@ void get_layout_diff(layout *lt, layout *lt2, layout *lt_diff)
 
     lt_diff->score = lt->score - lt2->score;
 
-    lt_diff->mono_score[0] = 100;
-    for (int i = 1; i < MONO_END; i++) {
-        lt_diff->mono_score[i] =
-            ((lt->mono_score[i] * 100) / lt->mono_score[0]) -
-            ((lt2->mono_score[i] * 100) / lt2->mono_score[0]);
+    for (int i = 0; i < MONO_END; i++) {
+        lt_diff->mono_score[i] = lt->mono_score[i] - lt2->mono_score[i];
     }
 
-    lt_diff->bi_score[0] = 100;
-    for (int i = 1; i < BI_END; i++) {
-        lt_diff->bi_score[i] =
-            ((lt->bi_score[i] * 100) / lt->bi_score[0]) -
-            ((lt2->bi_score[i] * 100) / lt2->bi_score[0]);
+    for (int i = 0; i < BI_END; i++) {
+        lt_diff->bi_score[i] = lt->bi_score[i] - lt2->bi_score[i];
     }
 
-    lt_diff->tri_score[0] = 100;
-    for (int i = 1; i < TRI_END; i++) {
-        lt_diff->tri_score[i] =
-            ((lt->tri_score[i] * 100) / lt->tri_score[0]) -
-            ((lt2->tri_score[i] * 100) / lt2->tri_score[0]);
+    for (int i = 0; i < TRI_END; i++) {
+        lt_diff->tri_score[i] = lt->tri_score[i] - lt2->tri_score[i];
     }
 
-    lt_diff->quad_score[0] = 100;
-    for (int i = 1; i < QUAD_END; i++) {
-        lt_diff->quad_score[i] =
-            ((lt->quad_score[i] * 100) / lt->quad_score[0]) -
-            ((lt2->quad_score[i] * 100) / lt2->quad_score[0]);
+    for (int i = 0; i < QUAD_END; i++) {
+        lt_diff->quad_score[i] = lt->quad_score[i] - lt2->quad_score[i];
     }
 
     for (int h = 1; h < 10; h++) {
-        lt_diff->skip_score[h][0] = 100;
-        for (int i = 1; i < SKIP_END; i++) {
-            lt_diff->skip_score[h][i] =
-                ((lt->skip_score[h][i] * 100) / lt->skip_score[h][0]) -
-                ((lt2->skip_score[h][i] * 100) / lt2->skip_score[h][0]);
+        for (int i = 0; i < SKIP_END; i++) {
+            lt_diff->skip_score[h][i] = lt->skip_score[h][i] - lt2->skip_score[h][i];
         }
     }
 
     for (int i = 0; i < META_END; i++) {
-        lt_diff->meta_score[i] =
-            ((lt->meta_score[i] * 100) / lt->mono_score[0]) -
-            ((lt2->meta_score[i] * 100) / lt2->mono_score[0]);
+        lt_diff->meta_score[i] = lt->meta_score[i] - lt2->meta_score[i];
     }
 }
 

@@ -531,8 +531,12 @@ void read_weights()
 void read_layout(layout *lt, int which_layout)
 {
     FILE *layout_file;
-    char *path = (char*)malloc(strlen("./data//layouts/.glg") + strlen(lang_name) +
-        strlen(layout_name) + 1);
+    char *path = (char*)malloc(strlen("./data//layouts/.glg")
+            + strlen(lang_name) + strlen(layout_name) + 1);
+    if (which_layout == 2) {
+        path = (char*)realloc(path, strlen("./data//layouts/.glg")
+            + strlen(lang_name) + strlen(layout2_name) + 1);
+    }
     strcpy(path, "./data/");
     strcat(path, lang_name);
     strcat(path, "/layouts/");
@@ -563,6 +567,7 @@ void read_layout(layout *lt, int which_layout)
 
 void quiet_print(layout *lt)
 {
+    wprintf(L"%s\n", lt->name);
     for (int i = 0; i < ROW; i++) {
         for (int j = 0; j < COL; j++) {
             wprintf(L"%lc ", convert_back(lt->matrix[i][j]));

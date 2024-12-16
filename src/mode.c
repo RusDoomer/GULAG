@@ -39,7 +39,53 @@ void analysis() {
 }
 
 void compare() {
-    error("compare not implemented");
+    layout *lt1, *lt2, *lt_diff;
+    wprintf(L"1/7: Allocating layouts... ");
+    alloc_layout(&lt1);
+    wprintf(L"%s... ", layout_name);
+    alloc_layout(&lt2);
+    wprintf(L"%s... ", layout2_name);
+    alloc_layout(&lt_diff);
+    wprintf(L"diff... ");
+    wprintf(L"Done\n\n");
+
+    wprintf(L"2/7: Reading layout... ");
+    read_layout(lt1, 1);
+    wprintf(L"%s... ", layout_name);
+    read_layout(lt2, 2);
+    wprintf(L"%s... ", layout2_name);
+    wprintf(L"Done\n\n");
+
+    wprintf(L"3/7: Analyzing layout... ");
+    single_analyze(lt1);
+    wprintf(L"%s... ", layout_name);
+    single_analyze(lt2);
+    wprintf(L"%s... ", layout2_name);
+    wprintf(L"Done\n\n");
+
+    wprintf(L"4/7: Calculating Score... ");
+    get_score(lt1);
+    wprintf(L"%s... ", layout_name);
+    get_score(lt2);
+    wprintf(L"%s... ", layout2_name);
+    wprintf(L"Done\n\n");
+
+    wprintf(L"5/7: Calculating Difference... ");
+    get_layout_diff(lt1, lt2, lt_diff);
+    wprintf(L"Done\n\n");
+
+    wprintf(L"6/7: Printing Output...\n\n");
+    print_layout(lt_diff);
+    wprintf(L"Done\n\n");
+
+    wprintf(L"7/7: Freeing layout... ");
+    free_layout(lt1);
+    wprintf(L"%s... ", layout_name);
+    free_layout(lt2);
+    wprintf(L"%s... ", layout2_name);
+    free_layout(lt_diff);
+    wprintf(L"diff... ");
+    wprintf(L"Done\n\n");
     return;
 }
 
