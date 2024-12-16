@@ -56,7 +56,8 @@ typedef struct layout {
 } layout;
 
 typedef struct layout_node {
-    struct layout *lt;
+    char name[100];
+    float score;
     struct layout_node *next;
 } layout_node;
 

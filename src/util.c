@@ -325,11 +325,31 @@ void get_layout_diff(layout *lt, layout *lt2, layout *lt_diff)
     }
 }
 
-layout_node* create_node(const char* name, float score)
+void create_node(layout *lt)
 {
-    layout_node *new_node = NULL;
-    error("create node not implemented");
-    return new_node;
+    layout_node *new_node = (layout_node *)malloc(sizeof(layout_node));
+
+    // Deep copy the name and score from the layout to the new node
+    strncpy(new_node->name, lt->name, sizeof(lt->name));
+    new_node->score = lt->score;
+
+    // Initialize the next pointer to NULL
+    new_node->next = NULL;
+
+    // If the list is empty or the new node's score is higher than the head node's score
+    if (head_node == NULL || new_node->score > head_node->score) {
+        new_node->next = head_node;
+        head_node = new_node;
+    } else {
+        // Traverse the list to find the correct position
+        layout_node *current = head_node;
+        while (current->next != NULL && current->next->score >= new_node->score) {
+            current = current->next;
+        }
+        // Insert the new node at the correct position
+        new_node->next = current->next;
+        current->next = new_node;
+    }
 }
 
 void free_list() {
@@ -337,7 +357,7 @@ void free_list() {
     layout_node* next_node;
     while (current != NULL) {
         next_node = current->next;
-        error("free list not implemented");
+        free(current);
         current = next_node;
     }
 }

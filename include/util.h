@@ -33,7 +33,7 @@ void get_score(layout *lt);
 
 void get_layout_diff(layout *lt, layout *lt2, layout *lt_diff);
 
-layout_node* create_node(const char* name, float score);
+void create_node(layout *lt);
 void free_list();
 
 void shuffle_layout(layout *lt);

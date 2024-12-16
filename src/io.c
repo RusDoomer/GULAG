@@ -548,7 +548,10 @@ void read_layout(layout *lt, int which_layout)
     if (layout_file == NULL) {
         error("Layout file not found.");
     }
-    wprintf(L"Layout file found... ");
+
+    if (which_layout == 1) {strncpy(lt->name, layout_name, 99);}
+    else if (which_layout == 2) {strncpy(lt->name, layout2_name, 99);}
+
 
     wchar_t curr;
     for (int i = 0; i < ROW; i++) {
@@ -621,9 +624,12 @@ void print_layout(layout *lt)
 
 void print_ranking()
 {
+    wprintf(L"Raking:\n\n");
     layout_node *current = head_node;
+    if (current == NULL) {wprintf(L"no layouts in ranking?\n");}
     while (current != NULL) {
-        wprintf(L"%s -> %f\n", current->lt->name, current->lt->score);
+        wprintf(L"%s -> %f\n", current->name, current->score);
         current = current->next;
     }
+    wprintf(L"\nDone\n\n");
 }

@@ -1,9 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <wchar.h>
-#include <sys/time.h>
-
-#include <pthread.h>
+#include <dirent.h>
+#include <string.h>
 
 #include "mode.h"
 #include "util.h"
@@ -90,8 +89,55 @@ void compare() {
 }
 
 void rank() {
-    error("rank not implemented");
-    return;
+    //error("rank not implemented");
+    char *path = (char*)malloc(strlen("./data//layouts") + strlen(lang_name) + 1);
+    strcpy(path, "./data/");
+    strcat(path, lang_name);
+    strcat(path, "/layouts");
+
+    DIR *dir = opendir(path);
+    if (dir == NULL) {error("Error opening layouts directory");}
+
+    free(layout_name);
+
+    struct dirent *entry;
+    while ((entry = readdir(dir)) != NULL) {
+        if (strstr(entry->d_name, ".glg") != NULL) {
+            int len = strlen(entry->d_name);
+            char temp_name[len - 3];
+            strncpy(temp_name, entry->d_name, len - 4);
+            temp_name[len - 4] = '\0';
+            layout_name = temp_name;
+            wprintf(L"%s: ", layout_name);
+
+            layout *lt;
+            wprintf(L"Allocating... ");
+            alloc_layout(&lt);
+
+            wprintf(L"Reading... ");
+            read_layout(lt, 1);
+
+            wprintf(L"Analyzing... ");
+            single_analyze(lt);
+
+            wprintf(L"Get Score... ");
+            get_score(lt);
+
+            wprintf(L"Ranking...");
+            create_node(lt);
+
+            wprintf(L"Freeing... ");
+            free_layout(lt);
+            wprintf(L"Done\n\n");
+        }
+    }
+
+    print_ranking();
+
+    layout_name = (char *)malloc(1);
+    closedir(dir);
+    free(path);
+    free_list();
 }
 
 void generate() {
