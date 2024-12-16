@@ -378,9 +378,44 @@ void shuffle_layout(layout *lt)
     }
 }
 
-void skeleton_copy(layout **lt_dest, layout *lt_src)
+void copy(layout *lt_dest, layout *lt_src)
 {
-    error("skeleton copy not implemented");
+    strcpy(lt_dest->name, lt_src->name);
+    for (int i = 0; i < ROW; i++)
+    {
+        for (int j = 0; j < COL; j++)
+        {
+            lt_dest->matrix[i][j] = lt_src->matrix[i][j];
+        }
+    }
+    lt_dest->score = lt_src->score;
+    for (int i = 0; i < MONO_END; i++)
+    {
+        lt_dest->mono_score[i] = lt_src->mono_score[i];
+    }
+    for (int i = 0; i < BI_END; i++)
+    {
+        lt_dest->bi_score[i] = lt_src->bi_score[i];
+    }
+    for (int i = 0; i < TRI_END; i++)
+    {
+        lt_dest->tri_score[i] = lt_src->tri_score[i];
+    }
+    for (int i = 0; i < QUAD_END; i++)
+    {
+        lt_dest->quad_score[i] = lt_src->quad_score[i];
+    }
+    for (int i = 0; i < META_END; i++)
+    {
+        lt_dest->meta_score[i] = lt_src->meta_score[i];
+    }
+    for (int j = 1; j <= 9; j++)
+    {
+        for (int i = 0; i < SKIP_END; i++)
+        {
+            lt_dest->skip_score[j][i] = lt_src->skip_score[j][i];
+        }
+    }
 }
 
 void gen_swap(int **swaps, int reps, layout **lt)

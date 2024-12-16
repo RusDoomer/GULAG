@@ -38,9 +38,11 @@ void free_list();
 
 void shuffle_layout(layout *lt);
 
-void skeleton_copy(layout **lt_dest, layout *lt_src);
+void copy(layout *lt_dest, layout *lt_src);
 
 void gen_swap(int **swaps, int reps, layout **lt);
+
+float random_float();
 
 void decide_swapbacks(int *swap_back, float *max_scores, layout **lt,
     float temp, int threads);

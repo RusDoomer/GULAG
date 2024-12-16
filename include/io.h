@@ -23,4 +23,6 @@ void print_layout(layout *lt);
 
 void print_ranking();
 
+void print_pins();
+
 #endif

@@ -14,6 +14,7 @@ void single_analyze(layout *lt)
     int row0, col0, row1, col1, row2, col2, row3, col3;
     for (int i = 0; i < MONO_END; i++)
     {
+        lt->mono_score[i] = 0;
         int length = stats_mono[i].length;
         for (int j = 0; j < length; j++)
         {
@@ -28,6 +29,7 @@ void single_analyze(layout *lt)
 
     for (int i = 0; i < BI_END; i++)
     {
+        lt->bi_score[i] = 0;
         int length = stats_bi[i].length;
         for (int j = 0; j < length; j++)
         {
@@ -42,6 +44,7 @@ void single_analyze(layout *lt)
 
     for (int i = 0; i < TRI_END; i++)
     {
+        lt->tri_score[i] = 0;
         int length = stats_tri[i].length;
         for (int j = 0; j < length; j++)
         {
@@ -56,6 +59,7 @@ void single_analyze(layout *lt)
 
     for (int i = 0; i < QUAD_END; i++)
     {
+        lt->quad_score[i] = 0;
         int length = stats_quad[i].length;
         for (int j = 0; j < length; j++)
         {
@@ -73,6 +77,7 @@ void single_analyze(layout *lt)
         int length = stats_skip[i].length;
         for (int k = 1; k <= 9; k++)
         {
+            lt->skip_score[k][i] = 0;
             for (int j = 0; j < length; j++)
             {
                 unflat_bi(stats_skip[i].ngrams[j], &row0, &col0, &row1, &col1);

@@ -3,9 +3,12 @@
 #include <wchar.h>
 #include <dirent.h>
 #include <string.h>
+#include <pthread.h>
+#include <math.h>
 
 #include "mode.h"
 #include "util.h"
+#include "io_util.h"
 #include "io.h"
 #include "analyze.h"
 
@@ -140,14 +143,179 @@ void rank() {
     free_list();
 }
 
+typedef struct thread_data {
+    layout *lt;
+    layout **best_lt;
+    int iterations;
+} thread_data;
+
+void *thread_function(void *arg) {
+    thread_data *data = (thread_data *)arg;
+    layout *lt = data->lt;
+    int iterations = data->iterations;
+
+    // Allocate max and working layouts
+    layout *max_lt, *working_lt;
+    alloc_layout(&max_lt);
+    alloc_layout(&working_lt);
+
+    // Copy initial layout to working and max
+    copy(working_lt, lt);
+
+    // Set name so we can see if we improved
+    strcat(working_lt->name, " improved");
+
+    // Analyze and score the initial layout
+    single_analyze(working_lt);
+    get_score(working_lt);
+    copy(max_lt, working_lt);
+
+    // Simulated annealing
+    for (int i = 0; i < iterations; i++) {
+        // Swap two characters in working_lt
+        int row1, col1, row2, col2;
+        do {
+            row1 = rand() % ROW;
+            col1 = rand() % COL;
+            row2 = rand() % ROW;
+            col2 = rand() % COL;
+        } while (pins[row1][col1] || pins[row2][col2] || (row1 == row2 && col1 == col2));
+
+        // Perform the swap
+        int temp = working_lt->matrix[row1][col1];
+        working_lt->matrix[row1][col1] = working_lt->matrix[row2][col2];
+        working_lt->matrix[row2][col2] = temp;
+
+        // Analyze and score the new layout
+        single_analyze(working_lt);
+        get_score(working_lt);
+
+        // Simulated annealing acceptance criterion
+        float delta_score = working_lt->score - max_lt->score;
+        if (delta_score > 0 || exp(delta_score / (1000.0 * (1 - (float)i / iterations))) > random_float()) {
+            copy(max_lt, working_lt);
+        } else {
+            // Revert the swap
+            temp = working_lt->matrix[row1][col1];
+            working_lt->matrix[row1][col1] = working_lt->matrix[row2][col2];
+            working_lt->matrix[row2][col2] = temp;
+        }
+    }
+
+    // Allocate memory for best layout and copy max_lt to it
+    layout *best_layout;
+    alloc_layout(&best_layout);
+    copy(best_layout, max_lt);
+    *(data->best_lt) = best_layout;
+
+    // Free layouts
+    free_layout(max_lt);
+    free_layout(working_lt);
+
+    pthread_exit(NULL);
+}
+
 void generate() {
-    error("generate not implemented");
+    for (int i = 0; i < ROW; i++)
+    {
+        for (int j = 0; j < COL; j++)
+        {
+            pins[i][j] = 0;
+        }
+    }
+    improve(1);
     return;
 }
 
-void improve() {
-    error("improve not implemented");
-    return;
+void improve(int shuffle) {
+    layout *lt;
+
+    wprintf(L"Pins: \n");
+    print_pins();
+    wprintf(L"\n");
+
+    wprintf(L"1/8: Allocating layout... ");
+    alloc_layout(&lt);
+    wprintf(L"Done\n\n");
+
+    wprintf(L"2/8: Reading layout... ");
+    read_layout(lt, 1);
+    wprintf(L"Done\n\n");
+
+    // If shuffle is true, shuffle the layout matrix
+    if (shuffle) {
+        wprintf(L"3/8: Shuffling layout... ");
+        shuffle_layout(lt);
+        strcpy(lt->name, "generate");
+        wprintf(L"Done\n\n");
+    } else {
+        wprintf(L"3/8: Skipping shuffle... ");
+        wprintf(L"Done\n\n");
+    }
+
+    wprintf(L"4/8: Analyzing starting point... ");
+    single_analyze(lt);
+    get_score(lt);
+    wprintf(L"Done\n\n");
+
+    print_layout(lt);
+    wprintf(L"\n");
+
+    // Determine the number of iterations per thread
+    int iterations = repetitions / threads;
+
+    // Allocate thread data and pthread_t array
+    thread_data *thread_data_array = (thread_data *)malloc(threads * sizeof(thread_data));
+    pthread_t *thread_ids = (pthread_t *)malloc(threads * sizeof(pthread_t));
+    layout **best_layouts = (layout **)malloc(threads * sizeof(layout *));
+
+    // Initialize thread data and create threads
+    wprintf(L"5/8: Initializing threads... ");
+    for (int i = 0; i < threads; i++) {
+        best_layouts[i] = NULL;
+        thread_data_array[i].lt = lt;
+        thread_data_array[i].best_lt = &best_layouts[i];
+        thread_data_array[i].iterations = iterations;
+        pthread_create(&thread_ids[i], NULL, thread_function, (void *)&thread_data_array[i]);
+    }
+    wprintf(L"Done\n\n");
+
+    // Wait for all threads to complete
+    wprintf(L"6/8: Waiting for threads to complete... ");
+    for (int i = 0; i < threads; i++) {
+        pthread_join(thread_ids[i], NULL);
+    }
+    wprintf(L"Done\n\n");
+
+    // Find the best layout among all threads
+    wprintf(L"7/8: Selecting best layout... ");
+    layout *best_layout = best_layouts[0];
+    for (int i = 1; i < threads; i++) {
+        if (best_layouts[i]->score > best_layout->score) {
+            best_layout = best_layouts[i];
+        }
+    }
+    wprintf(L"Done\n\n");
+
+    // Compare with the original layout and print the better one
+    wprintf(L"8/8: Printing layout...\n\n");
+    if (best_layout->score > lt->score) {
+        print_layout(best_layout);
+    } else {
+        print_layout(lt);
+    }
+    wprintf(L"Done\n\n");
+
+    // Free all allocated layouts and thread data
+    for (int i = 0; i < threads; i++) {
+        if (best_layouts[i] != NULL) {
+            free_layout(best_layouts[i]);
+        }
+    }
+    free_layout(lt);
+    free(thread_data_array);
+    free(thread_ids);
+    free(best_layouts);
 }
 
 void gen_benchmark() {

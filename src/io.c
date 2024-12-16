@@ -38,9 +38,9 @@ void read_config()
 
     while (i < ROW * COL && fscanf(config, " %c", &c) == 1) {
         if (c != '.') {
-            pins[i / COL][i % COL] = 0;
-        } else {
             pins[i / COL][i % COL] = 1;
+        } else {
+            pins[i / COL][i % COL] = 0;
         }
         i++;
     }
@@ -632,4 +632,16 @@ void print_ranking()
         current = current->next;
     }
     wprintf(L"\nDone\n\n");
+}
+
+void print_pins()
+{
+    for (int i = 0; i < ROW; i++)
+    {
+        for (int j = 0; j < COL; j++)
+        {
+            wprintf(L"%d ", pins[i][j]);
+        }
+        wprintf(L"\n");
+    }
 }

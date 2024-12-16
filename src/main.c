@@ -298,7 +298,7 @@ int main(int argc, char **argv) {
             break;
         case 'i':
             wprintf(L"Running optimization\n");
-            improve();       /* improve a layout */
+            improve(0);       /* improve a layout */
             break;
         case 'b':
             wprintf(L"Running benchmark\n");
