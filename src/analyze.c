@@ -96,30 +96,30 @@ void single_analyze(layout *lt)
 void cl_single_analyze(layout *lt)
 {
     /*
-    // 1. Get Platform and Device Information
-    cl_platform_id platform_id = NULL;
-    cl_device_id device_id = NULL;
-    cl_uint ret_num_devices;
-    cl_uint ret_num_platforms;
-    cl_int ret = clGetPlatformIDs(1, &platform_id, &ret_num_platforms);
-    if (ret != CL_SUCCESS) {error("OpenCL: clGetPlatformIDs failed");}
+        // 1. Get Platform and Device Information
+        cl_platform_id platform_id = NULL;
+        cl_device_id device_id = NULL;
+        cl_uint ret_num_devices;
+        cl_uint ret_num_platforms;
+        cl_int ret = clGetPlatformIDs(1, &platform_id, &ret_num_platforms);
+        if (ret != CL_SUCCESS) {error("OpenCL: clGetPlatformIDs failed");}
 
-    // Try to get a GPU device, if not available, fall back to CPU
-    ret = clGetDeviceIDs(platform_id, CL_DEVICE_TYPE_GPU, 1, &device_id, &ret_num_devices);
-    if (ret != CL_SUCCESS)
-    {
-        wprintf(L"OpenCL: GPU not found, attempting CPU\n");
-        ret = clGetDeviceIDs(platform_id, CL_DEVICE_TYPE_CPU, 1, &device_id, &ret_num_devices);
-        if (ret != CL_SUCCESS) {error("OpenCL: clGetDeviceIDs failed");}
-    }
+        // Try to get a GPU device, if not available, fall back to CPU
+        ret = clGetDeviceIDs(platform_id, CL_DEVICE_TYPE_GPU, 1, &device_id, &ret_num_devices);
+        if (ret != CL_SUCCESS)
+        {
+            wprintf(L"OpenCL: GPU not found, attempting CPU\n");
+            ret = clGetDeviceIDs(platform_id, CL_DEVICE_TYPE_CPU, 1, &device_id, &ret_num_devices);
+            if (ret != CL_SUCCESS) {error("OpenCL: clGetDeviceIDs failed");}
+        }
 
-    // 2. Create OpenCL Context
-    cl_context context = clCreateContext(NULL, 1, &device_id, NULL, NULL, &ret);
-    if (ret != CL_SUCCESS) {error("OpenCL: clCreateContext failed");}
+        // 2. Create OpenCL Context
+        cl_context context = clCreateContext(NULL, 1, &device_id, NULL, NULL, &ret);
+        if (ret != CL_SUCCESS) {error("OpenCL: clCreateContext failed");}
 
-    // 3. Create Command Queue
-    cl_command_queue command_queue = clCreateCommandQueueWithProperties(context, device_id, 0, &ret);
-    if (ret != CL_SUCCESS) {error("OpenCL: clCreateCommandQueueWithProperties failed");}
+        // 3. Create Command Queue
+        cl_command_queue command_queue = clCreateCommandQueueWithProperties(context, device_id, 0, &ret);
+        if (ret != CL_SUCCESS) {error("OpenCL: clCreateCommandQueueWithProperties failed");}
     */
     error("opencl analysis not implemented");
 }

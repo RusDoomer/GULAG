@@ -5,6 +5,8 @@
 #include <string.h>
 #include <pthread.h>
 #include <math.h>
+#include <unistd.h>
+#include <time.h>
 
 #include "mode.h"
 #include "util.h"
@@ -318,9 +320,65 @@ void improve(int shuffle) {
     free(best_layouts);
 }
 
-void gen_benchmark() {
-    error("gen benchmark not implemented");
-    return;
+void gen_benchmark()
+{
+    repetitions = 100000;
+    int num_cpus = sysconf(_SC_NPROCESSORS_ONLN);
+    int power_of_2 = 1;
+    int count = 0;
+
+    while (power_of_2 <= num_cpus) {
+        power_of_2 *= 2;
+        count++;
+    }
+
+    int total = count + 3;
+
+    int *thread_array = (int *)calloc(total, sizeof(int));
+    double *results = (double *)calloc(total, sizeof(double));
+
+    thread_array[0] = 1;
+    for (int i = 1; i < count; i++) {thread_array[i] = thread_array[i-1] * 2;}
+    thread_array[count] = num_cpus / 2;
+    thread_array[count + 1] = num_cpus;
+    thread_array[count + 2] = num_cpus * 2;
+
+    for (int i = 0; i < total; i++) {wprintf(L"%d ", thread_array[i]);}
+    wprintf(L"\n\n");
+
+    for (int i = 0; i < total; i++)
+    {
+        wprintf(L"BENCHMARK RUN %d/%d\n\n", i+1, total);
+        threads = thread_array[i];
+
+        struct timespec start, end;
+        clock_gettime(CLOCK_MONOTONIC, &start);
+
+        generate();
+
+        clock_gettime(CLOCK_MONOTONIC, &end);
+        double elapsed = (end.tv_sec - start.tv_sec) +
+                         (end.tv_nsec - start.tv_nsec) / 1e9;
+        double time_per_repetition = elapsed / repetitions;
+        results[i] = 1.0 / time_per_repetition;
+    }
+
+    wprintf(L"BENCHMARK RESULTS:\n\n");
+    wprintf(L"Threads - Layouts/Second:\n\n");
+    wprintf(L"Powers of 2:\n");
+    for (int i = 0; i < count; i++)
+    {
+        wprintf(L"%7d - %lf\n", thread_array[i], results[i]);
+    }
+    wprintf(L"\n");
+    wprintf(L"Based on CPU cores:\n");
+    for (int i = count; i < total; i++)
+    {
+        wprintf(L"%7d - %lf\n", thread_array[i], results[i]);
+    }
+    wprintf(L"\n");
+    wprintf(L"Choose the lowest number of threads with acceptable Layouts/Second for best results.");
+    wprintf(L"\n\n");
 }
 
 void print_help() {
