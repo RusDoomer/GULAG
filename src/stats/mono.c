@@ -240,7 +240,102 @@ void initialize_mono_stats()
         }
     }
 
-    right_outer->next = NULL;
+    mono_stat *left_hand = (mono_stat *)malloc(sizeof(mono_stat));
+    right_outer->next = left_hand;
+    strcpy(left_hand->name, "Left Hand Usage");
+    left_hand->weight = 0;
+    left_hand->length = 0;
+    for (int i = 0; i < DIM1; i++)
+    {
+        unflat_mono(i, &row0, &col0);
+        if (hand(row0, col0) == 'l')
+        {
+            left_hand->ngrams[i] = i;
+            left_hand->length++;
+        }
+        else
+        {
+            left_hand->ngrams[i] = -1;
+        }
+    }
+
+    mono_stat *right_hand = (mono_stat *)malloc(sizeof(mono_stat));
+    left_hand->next = right_hand;
+    strcpy(right_hand->name, "Right Hand Usage");
+    right_hand->weight = 0;
+    right_hand->length = 0;
+    for (int i = 0; i < DIM1; i++)
+    {
+        unflat_mono(i, &row0, &col0);
+        if (hand(row0, col0) == 'r')
+        {
+            right_hand->ngrams[i] = i;
+            right_hand->length++;
+        }
+        else
+        {
+            right_hand->ngrams[i] = -1;
+        }
+    }
+
+    mono_stat *top_row = (mono_stat *)malloc(sizeof(mono_stat));
+    right_hand->next = top_row;
+    strcpy(top_row->name, "Top Row Usage");
+    top_row->weight = 0;
+    top_row->length = 0;
+    for (int i = 0; i < DIM1; i++)
+    {
+        unflat_mono(i, &row0, &col0);
+        if (row0 == 0)
+        {
+            top_row->ngrams[i] = i;
+            top_row->length++;
+        }
+        else
+        {
+            top_row->ngrams[i] = -1;
+        }
+    }
+
+    mono_stat *home_row = (mono_stat *)malloc(sizeof(mono_stat));
+    top_row->next = home_row;
+    strcpy(home_row->name, "Home Row Usage");
+    home_row->weight = 0;
+    home_row->length = 0;
+    for (int i = 0; i < DIM1; i++)
+    {
+        unflat_mono(i, &row0, &col0);
+        if (row0 == 1)
+        {
+            home_row->ngrams[i] = i;
+            home_row->length++;
+        }
+        else
+        {
+            home_row->ngrams[i] = -1;
+        }
+    }
+
+    mono_stat *bottom_row = (mono_stat *)malloc(sizeof(mono_stat));
+    home_row->next = bottom_row;
+    strcpy(bottom_row->name, "Bottom Row Usage");
+    bottom_row->weight = 0;
+    bottom_row->length = 0;
+    for (int i = 0; i < DIM1; i++)
+    {
+        unflat_mono(i, &row0, &col0);
+        if (row0 == 2)
+        {
+            bottom_row->ngrams[i] = i;
+            bottom_row->length++;
+        }
+        else
+        {
+            bottom_row->ngrams[i] = -1;
+        }
+    }
+
+    bottom_row->next = NULL;
 }
 
 void trim_mono_stats()

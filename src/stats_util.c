@@ -108,6 +108,23 @@ int is_stretch(int row0, int col0)
     return col0 == 0 || col0 == 5 || col0 == 6 || col0 == 11;
 }
 
+int is_same_hand_bi(int row0, int col0, int row1, int col1)
+{
+    return hand(row0, col0) == hand(row1, col1);
+}
+
+int is_same_hand_tri(int row0, int col0, int row1, int col1, int row2, int col2)
+{
+    return hand(row0, col0) == hand(row1, col1) && hand(row1, col1) == hand(row2, col2);
+}
+
+int is_same_hand_quad(int row0, int col0, int row1, int col1, int row2, int col2, int row3, int col3)
+{
+    return hand(row0, col0) == hand(row1, col1)
+        && hand(row1, col1) == hand(row2, col2)
+        && hand(row2, col2) == hand(row3, col3);
+}
+
 int is_same_col_bi(int row0, int col0, int row1, int col1)
 {
     return col0 == col1;
@@ -156,6 +173,12 @@ int is_same_pos_quad(int row0, int col0, int row1, int col1, int row2, int col2,
         && is_same_row_quad(row0, col0, row1, col1, row2, col2, row3, col3);
 }
 
+int row_diff(int row0, int col0, int row1, int col1)
+{
+    if (row0 - row1 < 0) {return row1 - row0;}
+    else {return row0 - row1;}
+}
+
 int is_same_finger_bi(int row0, int col0, int row1, int col1)
 {
     return (finger(row0, col0) == finger(row1, col1))
@@ -178,4 +201,81 @@ int is_same_finger_quad(int row0, int col0, int row1, int col1, int row2, int co
         && !is_same_pos_bi(row0, col0, row1, col1)
         && !is_same_pos_bi(row1, col1, row2, col2)
         && !is_same_pos_bi(row2, col2, row3, col3);
+}
+
+int is_bad_same_finger_bi(int row0, int col0, int row1, int col1)
+{
+    return is_same_finger_bi(row0, col0, row1, col1) && (row0 - row1 == 2 || row1 - row0 == 2);
+}
+
+int is_russor_fingers(int row0, int col0, int row1, int col1)
+{
+    return !is_same_finger_bi(row0, col0, row1, col1) && !is_same_pos_bi(row0, col0, row1, col1)
+        && is_same_hand_bi(row0, col0, row1, col1)
+        && !(finger(row0, col0) == 0 && finger(row1, col1) == 3)
+        && !(finger(row0, col0) == 3 && finger(row1, col1) == 0)
+        && !(finger(row0, col0) == 4 && finger(row1, col1) == 7)
+        && !(finger(row0, col0) == 7 && finger(row1, col1) == 4);
+}
+
+int is_full_russor(int row0, int col0, int row1, int col1)
+{
+    return row_diff(row0, col0, row1, col1) == 2
+        && is_russor_fingers(row0, col0, row1, col1);
+}
+
+int is_half_russor(int row0, int col0, int row1, int col1)
+{
+    return row_diff(row0, col0, row1, col1) == 1
+        && is_russor_fingers(row0, col0, row1, col1);
+}
+
+int is_index_stretch_bi(int row0, int col0, int row1, int col1)
+{
+    return (finger(row0, col0) == 2 && col1 == 5)
+        || (finger(row1, col1) == 2 && col0 == 5)
+        || (finger(row0, col0) == 5 && col1 == 6)
+        || (finger(row1, col1) == 5 && col0 == 6);
+}
+
+int is_pinky_stretch_bi(int row0, int col0, int row1, int col1)
+{
+    return (finger(row0, col0) == 1 && col1 == 0)
+        || (finger(row1, col1) == 1 && col0 == 0)
+        || (finger(row0, col0) == 6 && col1 == 11)
+        || (finger(row1, col1) == 6 && col0 == 11);
+}
+
+int is_alt(int row0, int col0, int row1, int col1, int row2, int col2)
+{
+    return !is_same_hand_bi(row0, col0, row1, col1)
+        && !is_same_hand_bi(row1, col1, row2, col2)
+        && !is_same_finger_bi(row0, col0, row2, col2)
+        && !is_same_pos_bi(row0, col0, row2, col2);
+}
+
+int is_redirect(int row0, int col0, int row1, int col1, int row2, int col2)
+{
+    return is_same_hand_tri(row0, col0, row1, col1, row2, col2)
+        && !is_same_finger_bi(row0, col0, row1, col1)
+        && !is_same_finger_bi(row1, col1, row2, col2)
+        && !is_same_finger_bi(row0, col0, row2, col2)
+        && !is_same_pos_bi(row0, col0, row1, col1)
+        && !is_same_pos_bi(row1, col1, row2, col2)
+        && !is_same_pos_bi(row0, col0, row2, col2)
+        && (
+            (finger(row0, col0) < finger(row1, col1)
+            && finger(row1, col1) > finger(row2, col2))
+           ||
+            (finger(row0, col0) > finger(row1, col1)
+            && finger(row1, col1) < finger(row2, col2))
+           );
+}
+
+int is_bad_redirect(int row0, int col0, int row1, int col1, int row2, int col2)
+{
+    return is_redirect(row0, col0, row1, col1, row2, col2)
+        && finger(row0, col0) != 3 && finger(row0, col0) != 4
+        && finger(row1, col1) != 3 && finger(row1, col1) != 4
+        && finger(row2, col2) != 3 && finger(row2, col2) != 4;
 }

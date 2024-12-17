@@ -28,7 +28,64 @@ void initialize_tri_stats()
         }
     }
 
-    same_finger->next = NULL;
+    tri_stat *alt = (tri_stat *)malloc(sizeof(tri_stat));
+    same_finger->next = alt;
+    strcpy(alt->name, "Alternation");
+    alt->weight = 0;
+    alt->length = 0;
+    for (int i = 0; i < DIM3; i++)
+    {
+        unflat_tri(i, &row0, &col0, &row1, &col1, &row2, &col2);
+        if (is_alt(row0, col0, row1, col1, row2, col2))
+        {
+            alt->ngrams[i] = i;
+            alt->length++;
+        }
+        else
+        {
+            alt->ngrams[i] = -1;
+        }
+    }
+
+    tri_stat *redirect = (tri_stat *)malloc(sizeof(tri_stat));
+    alt->next = redirect;
+    strcpy(redirect->name, "Redirect");
+    redirect->weight = 0;
+    redirect->length = 0;
+    for (int i = 0; i < DIM3; i++)
+    {
+        unflat_tri(i, &row0, &col0, &row1, &col1, &row2, &col2);
+        if (is_redirect(row0, col0, row1, col1, row2, col2))
+        {
+            redirect->ngrams[i] = i;
+            redirect->length++;
+        }
+        else
+        {
+            redirect->ngrams[i] = -1;
+        }
+    }
+
+    tri_stat *bad_redirect = (tri_stat *)malloc(sizeof(tri_stat));
+    redirect->next = bad_redirect;
+    strcpy(bad_redirect->name, "Bad Redirect");
+    bad_redirect->weight = 0;
+    bad_redirect->length = 0;
+    for (int i = 0; i < DIM3; i++)
+    {
+        unflat_tri(i, &row0, &col0, &row1, &col1, &row2, &col2);
+        if (is_bad_redirect(row0, col0, row1, col1, row2, col2))
+        {
+            bad_redirect->ngrams[i] = i;
+            bad_redirect->length++;
+        }
+        else
+        {
+            bad_redirect->ngrams[i] = -1;
+        }
+    }
+
+    bad_redirect->next = NULL;
 }
 
 void trim_tri_stats()
