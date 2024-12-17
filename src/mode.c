@@ -325,7 +325,7 @@ void gen_benchmark()
     repetitions = 100000;
     int num_cpus = sysconf(_SC_NPROCESSORS_ONLN);
     int power_of_2 = 1;
-    int count = 0;
+    int count = 1;
 
     while (power_of_2 <= num_cpus) {
         power_of_2 *= 2;
