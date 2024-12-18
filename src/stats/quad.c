@@ -541,9 +541,6 @@ void initialize_quad_stats()
         }
     }
 
-
-
-
     quad_stat *true_roll = (quad_stat *)malloc(sizeof(quad_stat));
     same_row_adjacent_finger_roll_out->next = true_roll;
     strcpy(true_roll->name, "True Roll");
@@ -772,7 +769,311 @@ void initialize_quad_stats()
         }
     }
 
-    same_row_adjacent_finger_true_roll_out->next = NULL;
+    quad_stat *chained_roll = (quad_stat *)malloc(sizeof(quad_stat));
+    same_row_adjacent_finger_true_roll_out->next = chained_roll;
+    strcpy(chained_roll->name, "Chained Roll");
+    chained_roll->weight = 0;
+    chained_roll->length = 0;
+    for (int i = 0; i < DIM4; i++)
+    {
+        unflat_quad(i, &row0, &col0, &row1, &col1, &row2, &col2, &row3, &col3);
+        if (is_chained_roll(row0, col0, row1, col1, row2, col2, row3, col3))
+        {
+            chained_roll->ngrams[i] = i;
+            chained_roll->length++;
+        }
+        else
+        {
+            chained_roll->ngrams[i] = -1;
+        }
+    }
+
+    quad_stat *chained_roll_in = (quad_stat *)malloc(sizeof(quad_stat));
+    chained_roll->next = chained_roll_in;
+    strcpy(chained_roll_in->name, "Chained Roll In");
+    chained_roll_in->weight = 0;
+    chained_roll_in->length = 0;
+    for (int i = 0; i < DIM4; i++)
+    {
+        unflat_quad(i, &row0, &col0, &row1, &col1, &row2, &col2, &row3, &col3);
+        if (is_chained_roll_in(row0, col0, row1, col1, row2, col2, row3, col3))
+        {
+            chained_roll_in->ngrams[i] = i;
+            chained_roll_in->length++;
+        }
+        else
+        {
+            chained_roll_in->ngrams[i] = -1;
+        }
+    }
+
+    quad_stat *chained_roll_out = (quad_stat *)malloc(sizeof(quad_stat));
+    chained_roll_in->next = chained_roll_out;
+    strcpy(chained_roll_out->name, "Chained Roll Out");
+    chained_roll_out->weight = 0;
+    chained_roll_out->length = 0;
+    for (int i = 0; i < DIM4; i++)
+    {
+        unflat_quad(i, &row0, &col0, &row1, &col1, &row2, &col2, &row3, &col3);
+        if (is_chained_roll_out(row0, col0, row1, col1, row2, col2, row3, col3))
+        {
+            chained_roll_out->ngrams[i] = i;
+            chained_roll_out->length++;
+        }
+        else
+        {
+            chained_roll_out->ngrams[i] = -1;
+        }
+    }
+
+    quad_stat *chained_roll_mix = (quad_stat *)malloc(sizeof(quad_stat));
+    chained_roll_out->next = chained_roll_mix;
+    strcpy(chained_roll_mix->name, "Chained Roll Mix");
+    chained_roll_mix->weight = 0;
+    chained_roll_mix->length = 0;
+    for (int i = 0; i < DIM4; i++)
+    {
+        unflat_quad(i, &row0, &col0, &row1, &col1, &row2, &col2, &row3, &col3);
+        if (is_chained_roll_mix(row0, col0, row1, col1, row2, col2, row3, col3))
+        {
+            chained_roll_mix->ngrams[i] = i;
+            chained_roll_mix->length++;
+        }
+        else
+        {
+            chained_roll_mix->ngrams[i] = -1;
+        }
+    }
+
+    quad_stat *same_row_chained_roll = (quad_stat *)malloc(sizeof(quad_stat));
+    chained_roll_mix->next = same_row_chained_roll;
+    strcpy(same_row_chained_roll->name, "Same Row Chained Roll");
+    same_row_chained_roll->weight = 0;
+    same_row_chained_roll->length = 0;
+    for (int i = 0; i < DIM4; i++)
+    {
+        unflat_quad(i, &row0, &col0, &row1, &col1, &row2, &col2, &row3, &col3);
+        if (is_same_row_chained_roll(row0, col0, row1, col1, row2, col2, row3, col3))
+        {
+            same_row_chained_roll->ngrams[i] = i;
+            same_row_chained_roll->length++;
+        }
+        else
+        {
+            same_row_chained_roll->ngrams[i] = -1;
+        }
+    }
+
+    quad_stat *same_row_chained_roll_in = (quad_stat *)malloc(sizeof(quad_stat));
+    same_row_chained_roll->next = same_row_chained_roll_in;
+    strcpy(same_row_chained_roll_in->name, "Same Row Chained Roll In");
+    same_row_chained_roll_in->weight = 0;
+    same_row_chained_roll_in->length = 0;
+    for (int i = 0; i < DIM4; i++)
+    {
+        unflat_quad(i, &row0, &col0, &row1, &col1, &row2, &col2, &row3, &col3);
+        if (is_same_row_chained_roll_in(row0, col0, row1, col1, row2, col2, row3, col3))
+        {
+            same_row_chained_roll_in->ngrams[i] = i;
+            same_row_chained_roll_in->length++;
+        }
+        else
+        {
+            same_row_chained_roll_in->ngrams[i] = -1;
+        }
+    }
+
+    quad_stat *same_row_chained_roll_out = (quad_stat *)malloc(sizeof(quad_stat));
+    same_row_chained_roll_in->next = same_row_chained_roll_out;
+    strcpy(same_row_chained_roll_out->name, "Same Row Chained Roll Out");
+    same_row_chained_roll_out->weight = 0;
+    same_row_chained_roll_out->length = 0;
+    for (int i = 0; i < DIM4; i++)
+    {
+        unflat_quad(i, &row0, &col0, &row1, &col1, &row2, &col2, &row3, &col3);
+        if (is_same_row_chained_roll_out(row0, col0, row1, col1, row2, col2, row3, col3))
+        {
+            same_row_chained_roll_out->ngrams[i] = i;
+            same_row_chained_roll_out->length++;
+        }
+        else
+        {
+            same_row_chained_roll_out->ngrams[i] = -1;
+        }
+    }
+
+    quad_stat *same_row_chained_roll_mix = (quad_stat *)malloc(sizeof(quad_stat));
+    same_row_chained_roll_out->next = same_row_chained_roll_mix;
+    strcpy(same_row_chained_roll_mix->name, "Same Row Chained Roll Mix");
+    same_row_chained_roll_mix->weight = 0;
+    same_row_chained_roll_mix->length = 0;
+    for (int i = 0; i < DIM4; i++)
+    {
+        unflat_quad(i, &row0, &col0, &row1, &col1, &row2, &col2, &row3, &col3);
+        if (is_same_row_chained_roll_mix(row0, col0, row1, col1, row2, col2, row3, col3))
+        {
+            same_row_chained_roll_mix->ngrams[i] = i;
+            same_row_chained_roll_mix->length++;
+        }
+        else
+        {
+            same_row_chained_roll_mix->ngrams[i] = -1;
+        }
+    }
+
+    quad_stat *adjacent_finger_chained_roll = (quad_stat *)malloc(sizeof(quad_stat));
+    same_row_chained_roll_mix->next = adjacent_finger_chained_roll;
+    strcpy(adjacent_finger_chained_roll->name, "Adjacent Finger Chained Roll");
+    adjacent_finger_chained_roll->weight = 0;
+    adjacent_finger_chained_roll->length = 0;
+    for (int i = 0; i < DIM4; i++)
+    {
+        unflat_quad(i, &row0, &col0, &row1, &col1, &row2, &col2, &row3, &col3);
+        if (is_adjacent_finger_chained_roll(row0, col0, row1, col1, row2, col2, row3, col3))
+        {
+            adjacent_finger_chained_roll->ngrams[i] = i;
+            adjacent_finger_chained_roll->length++;
+        }
+        else
+        {
+            adjacent_finger_chained_roll->ngrams[i] = -1;
+        }
+    }
+
+    quad_stat *adjacent_finger_chained_roll_in = (quad_stat *)malloc(sizeof(quad_stat));
+    adjacent_finger_chained_roll->next = adjacent_finger_chained_roll_in;
+    strcpy(adjacent_finger_chained_roll_in->name, "Adjacent Finger Chained Roll In");
+    adjacent_finger_chained_roll_in->weight = 0;
+    adjacent_finger_chained_roll_in->length = 0;
+    for (int i = 0; i < DIM4; i++)
+    {
+        unflat_quad(i, &row0, &col0, &row1, &col1, &row2, &col2, &row3, &col3);
+        if (is_adjacent_finger_chained_roll_in(row0, col0, row1, col1, row2, col2, row3, col3))
+        {
+            adjacent_finger_chained_roll_in->ngrams[i] = i;
+            adjacent_finger_chained_roll_in->length++;
+        }
+        else
+        {
+            adjacent_finger_chained_roll_in->ngrams[i] = -1;
+        }
+    }
+
+    quad_stat *adjacent_finger_chained_roll_out = (quad_stat *)malloc(sizeof(quad_stat));
+    adjacent_finger_chained_roll_in->next = adjacent_finger_chained_roll_out;
+    strcpy(adjacent_finger_chained_roll_out->name, "Adjacent Finger Chained Roll Out");
+    adjacent_finger_chained_roll_out->weight = 0;
+    adjacent_finger_chained_roll_out->length = 0;
+    for (int i = 0; i < DIM4; i++)
+    {
+        unflat_quad(i, &row0, &col0, &row1, &col1, &row2, &col2, &row3, &col3);
+        if (is_adjacent_finger_chained_roll_out(row0, col0, row1, col1, row2, col2, row3, col3))
+        {
+            adjacent_finger_chained_roll_out->ngrams[i] = i;
+            adjacent_finger_chained_roll_out->length++;
+        }
+        else
+        {
+            adjacent_finger_chained_roll_out->ngrams[i] = -1;
+        }
+    }
+
+    quad_stat *adjacent_finger_chained_roll_mix = (quad_stat *)malloc(sizeof(quad_stat));
+    adjacent_finger_chained_roll_out->next = adjacent_finger_chained_roll_mix;
+    strcpy(adjacent_finger_chained_roll_mix->name, "Adjacent Finger Chained Roll Mix");
+    adjacent_finger_chained_roll_mix->weight = 0;
+    adjacent_finger_chained_roll_mix->length = 0;
+    for (int i = 0; i < DIM4; i++)
+    {
+        unflat_quad(i, &row0, &col0, &row1, &col1, &row2, &col2, &row3, &col3);
+        if (is_adjacent_finger_chained_roll_mix(row0, col0, row1, col1, row2, col2, row3, col3))
+        {
+            adjacent_finger_chained_roll_mix->ngrams[i] = i;
+            adjacent_finger_chained_roll_mix->length++;
+        }
+        else
+        {
+            adjacent_finger_chained_roll_mix->ngrams[i] = -1;
+        }
+    }
+
+    quad_stat *same_row_adjacent_finger_chained_roll = (quad_stat *)malloc(sizeof(quad_stat));
+    adjacent_finger_chained_roll_mix->next = same_row_adjacent_finger_chained_roll;
+    strcpy(same_row_adjacent_finger_chained_roll->name, "Same Row Adjacent Finger Chained Roll");
+    same_row_adjacent_finger_chained_roll->weight = 0;
+    same_row_adjacent_finger_chained_roll->length = 0;
+    for (int i = 0; i < DIM4; i++)
+    {
+        unflat_quad(i, &row0, &col0, &row1, &col1, &row2, &col2, &row3, &col3);
+        if (is_same_row_adjacent_finger_chained_roll(row0, col0, row1, col1, row2, col2, row3, col3))
+        {
+            same_row_adjacent_finger_chained_roll->ngrams[i] = i;
+            same_row_adjacent_finger_chained_roll->length++;
+        }
+        else
+        {
+            same_row_adjacent_finger_chained_roll->ngrams[i] = -1;
+        }
+    }
+
+    quad_stat *same_row_adjacent_finger_chained_roll_in = (quad_stat *)malloc(sizeof(quad_stat));
+    same_row_adjacent_finger_chained_roll->next = same_row_adjacent_finger_chained_roll_in;
+    strcpy(same_row_adjacent_finger_chained_roll_in->name, "Same Row Adjacent Finger Chained Roll In");
+    same_row_adjacent_finger_chained_roll_in->weight = 0;
+    same_row_adjacent_finger_chained_roll_in->length = 0;
+    for (int i = 0; i < DIM4; i++)
+    {
+        unflat_quad(i, &row0, &col0, &row1, &col1, &row2, &col2, &row3, &col3);
+        if (is_same_row_adjacent_finger_chained_roll_in(row0, col0, row1, col1, row2, col2, row3, col3))
+        {
+            same_row_adjacent_finger_chained_roll_in->ngrams[i] = i;
+            same_row_adjacent_finger_chained_roll_in->length++;
+        }
+        else
+        {
+            same_row_adjacent_finger_chained_roll_in->ngrams[i] = -1;
+        }
+    }
+
+    quad_stat *same_row_adjacent_finger_chained_roll_out = (quad_stat *)malloc(sizeof(quad_stat));
+    same_row_adjacent_finger_chained_roll_in->next = same_row_adjacent_finger_chained_roll_out;
+    strcpy(same_row_adjacent_finger_chained_roll_out->name, "Same Row Adjacent Finger Chained Roll Out");
+    same_row_adjacent_finger_chained_roll_out->weight = 0;
+    same_row_adjacent_finger_chained_roll_out->length = 0;
+    for (int i = 0; i < DIM4; i++)
+    {
+        unflat_quad(i, &row0, &col0, &row1, &col1, &row2, &col2, &row3, &col3);
+        if (is_same_row_adjacent_finger_chained_roll_out(row0, col0, row1, col1, row2, col2, row3, col3))
+        {
+            same_row_adjacent_finger_chained_roll_out->ngrams[i] = i;
+            same_row_adjacent_finger_chained_roll_out->length++;
+        }
+        else
+        {
+            same_row_adjacent_finger_chained_roll_out->ngrams[i] = -1;
+        }
+    }
+
+    quad_stat *same_row_adjacent_finger_chained_roll_mix = (quad_stat *)malloc(sizeof(quad_stat));
+    same_row_adjacent_finger_chained_roll_out->next = same_row_adjacent_finger_chained_roll_mix;
+    strcpy(same_row_adjacent_finger_chained_roll_mix->name, "Same Row Adjacent Finger Chained Roll Mix");
+    same_row_adjacent_finger_chained_roll_mix->weight = 0;
+    same_row_adjacent_finger_chained_roll_mix->length = 0;
+    for (int i = 0; i < DIM4; i++)
+    {
+        unflat_quad(i, &row0, &col0, &row1, &col1, &row2, &col2, &row3, &col3);
+        if (is_same_row_adjacent_finger_chained_roll_mix(row0, col0, row1, col1, row2, col2, row3, col3))
+        {
+            same_row_adjacent_finger_chained_roll_mix->ngrams[i] = i;
+            same_row_adjacent_finger_chained_roll_mix->length++;
+        }
+        else
+        {
+            same_row_adjacent_finger_chained_roll_mix->ngrams[i] = -1;
+        }
+    }
+
+    same_row_adjacent_finger_chained_roll_mix->next = NULL;
 }
 
 void trim_quad_stats()
