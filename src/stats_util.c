@@ -495,3 +495,200 @@ int is_same_row_adjacent_finger_roll_out(int row0, int col0, int row1, int col1,
     return is_roll_out(row0, col0, row1, col1, row2, col2)
         && is_same_row_adjacent_finger_roll(row0, col0, row1, col1, row2, col2);
 }
+
+
+int is_chained_alt(int row0, int col0, int row1, int col1, int row2, int col2, int row3, int col3)
+{
+    return 1;
+}
+
+int is_chained_redirect(int row0, int col0, int row1, int col1, int row2, int col2, int row3, int col3)
+{
+    return 1;
+}
+
+int is_bad_chained_redirect(int row0, int col0, int row1, int col1, int row2, int col2, int row3, int col3)
+{
+    return 1;
+}
+
+int is_onehand_quad(int row0, int col0, int row1, int col1, int row2, int col2, int row3, int col3)
+{
+    return 1;
+}
+
+int is_onehand_quad_in(int row0, int col0, int row1, int col1, int row2, int col2, int row3, int col3)
+{
+    return 1;
+}
+
+int is_onehand_quad_out(int row0, int col0, int row1, int col1, int row2, int col2, int row3, int col3)
+{
+    return 1;
+}
+
+int is_same_row_onehand_quad(int row0, int col0, int row1, int col1, int row2, int col2, int row3, int col3)
+{
+    return 1;
+}
+
+int is_same_row_onehand_quad_in(int row0, int col0, int row1, int col1, int row2, int col2, int row3, int col3)
+{
+    return 1;
+}
+
+int is_same_row_onehand_quad_out(int row0, int col0, int row1, int col1, int row2, int col2, int row3, int col3)
+{
+    return 1;
+}
+
+int is_adjacent_finger_onehand_quad(int row0, int col0, int row1, int col1, int row2, int col2, int row3, int col3)
+{
+    return 1;
+}
+
+int is_adjacent_finger_onehand_quad_in(int row0, int col0, int row1, int col1, int row2, int col2, int row3, int col3)
+{
+    return 1;
+}
+
+int is_adjacent_finger_onehand_quad_out(int row0, int col0, int row1, int col1, int row2, int col2, int row3, int col3)
+{
+    return 1;
+}
+
+int is_same_row_adjacent_finger_onehand_quad(int row0, int col0, int row1, int col1, int row2, int col2, int row3, int col3)
+{
+    return 1;
+}
+
+int is_same_row_adjacent_finger_onehand_quad_in(int row0, int col0, int row1, int col1, int row2, int col2, int row3, int col3)
+{
+    return 1;
+}
+
+int is_same_row_adjacent_finger_onehand_quad_out(int row0, int col0, int row1, int col1, int row2, int col2, int row3, int col3)
+{
+    return 1;
+}
+
+int is_roll_quad(int row0, int col0, int row1, int col1, int row2, int col2, int row3, int col3)
+{
+    return 1;
+}
+
+int is_roll_quad_in(int row0, int col0, int row1, int col1, int row2, int col2, int row3, int col3)
+{
+    return 1;
+}
+
+int is_roll_quad_out(int row0, int col0, int row1, int col1, int row2, int col2, int row3, int col3)
+{
+    return 1;
+}
+
+int is_same_row_roll_quad(int row0, int col0, int row1, int col1, int row2, int col2, int row3, int col3)
+{
+    return 1;
+}
+
+int is_same_row_roll_quad_in(int row0, int col0, int row1, int col1, int row2, int col2, int row3, int col3)
+{
+    return 1;
+}
+
+int is_same_row_roll_quad_out(int row0, int col0, int row1, int col1, int row2, int col2, int row3, int col3)
+{
+    return 1;
+}
+
+int is_adjacent_finger_roll_quad(int row0, int col0, int row1, int col1, int row2, int col2, int row3, int col3)
+{
+    return 1;
+}
+
+int is_adjacent_finger_roll_quad_in(int row0, int col0, int row1, int col1, int row2, int col2, int row3, int col3)
+{
+    return 1;
+}
+
+int is_adjacent_finger_roll_quad_out(int row0, int col0, int row1, int col1, int row2, int col2, int row3, int col3)
+{
+    return 1;
+}
+
+int is_same_row_adjacent_finger_roll_quad(int row0, int col0, int row1, int col1, int row2, int col2, int row3, int col3)
+{
+    return 1;
+}
+
+int is_same_row_adjacent_finger_roll_quad_in(int row0, int col0, int row1, int col1, int row2, int col2, int row3, int col3)
+{
+    return 1;
+}
+
+int is_same_row_adjacent_finger_roll_quad_out(int row0, int col0, int row1, int col1, int row2, int col2, int row3, int col3)
+{
+    return 1;
+}
+
+int is_true_roll(int row0, int col0, int row1, int col1, int row2, int col2, int row3, int col3)
+{
+    return 1;
+}
+
+int is_true_roll_in(int row0, int col0, int row1, int col1, int row2, int col2, int row3, int col3)
+{
+    return 1;
+}
+
+int is_true_roll_out(int row0, int col0, int row1, int col1, int row2, int col2, int row3, int col3)
+{
+    return 1;
+}
+
+int is_same_row_true_roll(int row0, int col0, int row1, int col1, int row2, int col2, int row3, int col3)
+{
+    return 1;
+}
+
+int is_same_row_true_roll_in(int row0, int col0, int row1, int col1, int row2, int col2, int row3, int col3)
+{
+    return 1;
+}
+
+int is_same_row_true_roll_out(int row0, int col0, int row1, int col1, int row2, int col2, int row3, int col3)
+{
+    return 1;
+}
+
+int is_adjacent_finger_true_roll(int row0, int col0, int row1, int col1, int row2, int col2, int row3, int col3)
+{
+    return 1;
+}
+
+int is_adjacent_finger_true_roll_in(int row0, int col0, int row1, int col1, int row2, int col2, int row3, int col3)
+{
+    return 1;
+}
+
+int is_adjacent_finger_true_roll_out(int row0, int col0, int row1, int col1, int row2, int col2, int row3, int col3)
+{
+    return 1;
+}
+
+int is_same_row_adjacent_finger_true_roll(int row0, int col0, int row1, int col1, int row2, int col2, int row3, int col3)
+{
+    return 1;
+}
+
+int is_same_row_adjacent_finger_true_roll_in(int row0, int col0, int row1, int col1, int row2, int col2, int row3, int col3)
+{
+    return 1;
+}
+
+int is_same_row_adjacent_finger_true_roll_out(int row0, int col0, int row1, int col1, int row2, int col2, int row3, int col3)
+{
+    return 1;
+}
+

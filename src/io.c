@@ -594,9 +594,15 @@ void normal_print(layout *lt)
     wprintf(L"\nQUADGRAM STATS\n");
     for (int i = 0; i < QUAD_END; i++) {wprintf(L"%s : %f\%\n", stats_quad[i].name, lt->quad_score[i]);}
     wprintf(L"\nSKIPGRAM STATS\n");
-    for (int j = 1; j <= 9; j++)
+    for (int i = 0; i < SKIP_END; i++)
     {
-        for (int i = 0; i < SKIP_END; i++) {wprintf(L"%s : %f\%\n", stats_skip[i].name, lt->skip_score[j][i]);}
+        wprintf(L"%s : ", stats_skip[i].name);
+        for (int j = 1; j <= 9; j++)
+        {
+            wprintf(L"%f", lt->skip_score[j][i]);
+            wprintf(L"%|");
+        }
+        wprintf(L"\n");
     }
     wprintf(L"\nMETA STATS\n");
     for (int i = 0; i < META_END; i++) {wprintf(L"%s : %f\%\n", stats_meta[i].name, lt->meta_score[i]);}
