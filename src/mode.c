@@ -322,7 +322,7 @@ void improve(int shuffle) {
 
 void gen_benchmark()
 {
-    repetitions = 100000;
+    repetitions = 10000;
     int num_cpus = sysconf(_SC_NPROCESSORS_ONLN);
     int power_of_2 = 1;
     int count = 1;
