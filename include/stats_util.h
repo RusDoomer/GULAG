@@ -36,4 +36,38 @@ int is_pinky_stretch_bi(int row0, int col0, int row1, int col1);
 int is_alt(int row0, int col0, int row1, int col1, int row2, int col2);
 int is_redirect(int row0, int col0, int row1, int col1, int row2, int col2);
 int is_bad_redirect(int row0, int col0, int row1, int col1, int row2, int col2);
+
+
+int is_onehand(int row0, int col0, int row1, int col1, int row2, int col2);
+int is_onehand_in(int row0, int col0, int row1, int col1, int row2, int col2);
+int is_onehand_out(int row0, int col0, int row1, int col1, int row2, int col2);
+
+int is_same_row_onehand(int row0, int col0, int row1, int col1, int row2, int col2);
+int is_same_row_onehand_in(int row0, int col0, int row1, int col1, int row2, int col2);
+int is_same_row_onehand_out(int row0, int col0, int row1, int col1, int row2, int col2);
+
+int is_adjacent_finger_onehand(int row0, int col0, int row1, int col1, int row2, int col2);
+int is_adjacent_finger_onehand_in(int row0, int col0, int row1, int col1, int row2, int col2);
+int is_adjacent_finger_onehand_out(int row0, int col0, int row1, int col1, int row2, int col2);
+
+int is_same_row_adjacent_finger_onehand(int row0, int col0, int row1, int col1, int row2, int col2);
+int is_same_row_adjacent_finger_onehand_in(int row0, int col0, int row1, int col1, int row2, int col2);
+int is_same_row_adjacent_finger_onehand_out(int row0, int col0, int row1, int col1, int row2, int col2);
+
+
+int is_roll(int row0, int col0, int row1, int col1, int row2, int col2);
+int is_roll_in(int row0, int col0, int row1, int col1, int row2, int col2);
+int is_roll_out(int row0, int col0, int row1, int col1, int row2, int col2);
+
+int is_same_row_roll(int row0, int col0, int row1, int col1, int row2, int col2);
+int is_same_row_roll_in(int row0, int col0, int row1, int col1, int row2, int col2);
+int is_same_row_roll_out(int row0, int col0, int row1, int col1, int row2, int col2);
+
+int is_adjacent_finger_roll(int row0, int col0, int row1, int col1, int row2, int col2);
+int is_adjacent_finger_roll_in(int row0, int col0, int row1, int col1, int row2, int col2);
+int is_adjacent_finger_roll_out(int row0, int col0, int row1, int col1, int row2, int col2);
+
+int is_same_row_adjacent_finger_roll(int row0, int col0, int row1, int col1, int row2, int col2);
+int is_same_row_adjacent_finger_roll_in(int row0, int col0, int row1, int col1, int row2, int col2);
+int is_same_row_adjacent_finger_roll_out(int row0, int col0, int row1, int col1, int row2, int col2);
 #endif

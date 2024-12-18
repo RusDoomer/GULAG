@@ -155,6 +155,43 @@ int is_same_row_quad(int row0, int col0, int row1, int col1, int row2, int col2,
     return row0 == row1 && row1 == row2 && row2 == row3;
 }
 
+int is_adjacent_finger_bi(int row0, int col0, int row1, int col1)
+{
+    return col0 != 0 && col0 != 5 && col0 != 6 && col0 != 11
+        && col1 != 0 && col1 != 5 && col1 != 6 && col1 != 11
+        && (finger(row0, col0) - finger(row1, col1) == 1
+            || finger(row0, col0) - finger(row1, col1) == -1);
+}
+
+int is_adjacent_finger_tri(int row0, int col0, int row1, int col1, int row2, int col2)
+{
+    return col0 != 0 && col0 != 5 && col0 != 6 && col0 != 11
+        && col1 != 0 && col1 != 5 && col1 != 6 && col1 != 11
+        && col2 != 0 && col2 != 5 && col2 != 6 && col2 != 11
+        && (finger(row0, col0) - finger(row1, col1) == 1
+            || finger(row0, col0) - finger(row1, col1) == -1)
+        && (finger(row1, col1) - finger(row2, col2) == 1
+            || finger(row1, col1) - finger(row2, col2) == -1)
+        && (finger(row0, col0) != finger(row1, col1));
+}
+
+int is_adjacent_finger_quad(int row0, int col0, int row1, int col1, int row2, int col2, int row3, int col3)
+{
+    return col0 != 0 && col0 != 5 && col0 != 6 && col0 != 11
+        && col1 != 0 && col1 != 5 && col1 != 6 && col1 != 11
+        && col2 != 0 && col2 != 5 && col2 != 6 && col2 != 11
+        && col3 != 0 && col3 != 5 && col3 != 6 && col3 != 11
+        && (finger(row0, col0) - finger(row1, col1) == 1
+            || finger(row0, col0) - finger(row1, col1) == -1)
+        && (finger(row1, col1) - finger(row2, col2) == 1
+            || finger(row1, col1) - finger(row2, col2) == -1)
+        && (finger(row2, col2) - finger(row3, col3) == 1
+            || finger(row2, col2) - finger(row3, col3) == -1)
+        && (finger(row0, col0) != finger(row1, col1))
+        && (finger(row1, col1) != finger(row2, col2))
+        && (finger(row0, col0) != finger(row2, col2));
+}
+
 int is_same_pos_bi(int row0, int col0, int row1, int col1)
 {
     return is_same_col_bi(row0, col0, row1, col1)
@@ -257,11 +294,7 @@ int is_alt(int row0, int col0, int row1, int col1, int row2, int col2)
 int is_redirect(int row0, int col0, int row1, int col1, int row2, int col2)
 {
     return is_same_hand_tri(row0, col0, row1, col1, row2, col2)
-        && !is_same_finger_bi(row0, col0, row1, col1)
-        && !is_same_finger_bi(row1, col1, row2, col2)
         && !is_same_finger_bi(row0, col0, row2, col2)
-        && !is_same_pos_bi(row0, col0, row1, col1)
-        && !is_same_pos_bi(row1, col1, row2, col2)
         && !is_same_pos_bi(row0, col0, row2, col2)
         && (
             (finger(row0, col0) < finger(row1, col1)
@@ -278,4 +311,187 @@ int is_bad_redirect(int row0, int col0, int row1, int col1, int row2, int col2)
         && finger(row0, col0) != 3 && finger(row0, col0) != 4
         && finger(row1, col1) != 3 && finger(row1, col1) != 4
         && finger(row2, col2) != 3 && finger(row2, col2) != 4;
+}
+
+int is_onehand(int row0, int col0, int row1, int col1, int row2, int col2)
+{
+    return is_same_hand_tri(row0, col0, row1, col1, row2, col2)
+        && (
+             (finger(row0, col0) < finger(row1, col1)
+             && finger(row1, col1) < finger(row2, col2))
+            ||
+             (finger(row0, col0) > finger(row1, col1)
+             && finger(row1, col1) > finger(row2, col2))
+           );
+}
+
+int is_onehand_in(int row0, int col0, int row1, int col1, int row2, int col2)
+{
+    return is_onehand(row0, col0, row1, col1, row2, col2)
+        && (
+             (hand(row0, col0) == 'l'
+              && finger(row0, col0) < finger(row1, col1)
+              && finger(row1, col1) < finger(row2, col2)
+             )
+            ||
+             (hand(row0, col0) == 'r'
+              && finger(row0, col0) > finger(row1, col1)
+              && finger(row1, col1) > finger(row2, col2)
+             )
+           );
+}
+
+int is_onehand_out(int row0, int col0, int row1, int col1, int row2, int col2)
+{
+    return is_onehand(row0, col0, row1, col1, row2, col2)
+        && !is_onehand_in(row0, col0, row1, col1, row2, col2);
+}
+
+int is_same_row_onehand(int row0, int col0, int row1, int col1, int row2, int col2)
+{
+    return is_onehand(row0, col0, row1, col1, row2, col2)
+        && is_same_row_tri(row0, col0, row1, col1, row2, col2);
+}
+
+int is_same_row_onehand_in(int row0, int col0, int row1, int col1, int row2, int col2)
+{
+    return is_onehand_in(row0, col0, row1, col1, row2, col2)
+        && is_same_row_tri(row0, col0, row1, col1, row2, col2);
+}
+
+int is_same_row_onehand_out(int row0, int col0, int row1, int col1, int row2, int col2)
+{
+    return is_onehand_out(row0, col0, row1, col1, row2, col2)
+        && is_same_row_tri(row0, col0, row1, col1, row2, col2);
+}
+
+int is_adjacent_finger_onehand(int row0, int col0, int row1, int col1, int row2, int col2)
+{
+    return is_onehand(row0, col0, row1, col1, row2, col2)
+        && is_adjacent_finger_tri(row0, col0, row1, col1, row2, col2);
+}
+
+int is_adjacent_finger_onehand_in(int row0, int col0, int row1, int col1, int row2, int col2)
+{
+    return is_onehand_in(row0, col0, row1, col1, row2, col2)
+        && is_adjacent_finger_tri(row0, col0, row1, col1, row2, col2);
+}
+
+int is_adjacent_finger_onehand_out(int row0, int col0, int row1, int col1, int row2, int col2)
+{
+    return is_onehand_out(row0, col0, row1, col1, row2, col2)
+        && is_adjacent_finger_tri(row0, col0, row1, col1, row2, col2);
+}
+
+int is_same_row_adjacent_finger_onehand(int row0, int col0, int row1, int col1, int row2, int col2)
+{
+    return is_onehand(row0, col0, row1, col1, row2, col2)
+        && is_same_row_tri(row0, col0, row1, col1, row2, col2)
+        && is_adjacent_finger_tri(row0, col0, row1, col1, row2, col2);
+}
+
+int is_same_row_adjacent_finger_onehand_in(int row0, int col0, int row1, int col1, int row2, int col2)
+{
+    return is_onehand_in(row0, col0, row1, col1, row2, col2)
+        && is_same_row_tri(row0, col0, row1, col1, row2, col2)
+        && is_adjacent_finger_tri(row0, col0, row1, col1, row2, col2);
+}
+
+int is_same_row_adjacent_finger_onehand_out(int row0, int col0, int row1, int col1, int row2, int col2)
+{
+    return is_onehand_out(row0, col0, row1, col1, row2, col2)
+        && is_same_row_tri(row0, col0, row1, col1, row2, col2)
+        && is_adjacent_finger_tri(row0, col0, row1, col1, row2, col2);
+}
+
+
+
+int is_roll(int row0, int col0, int row1, int col1, int row2, int col2)
+{
+    return (
+            is_same_hand_bi(row0, col0, row1, col1) && !is_same_hand_bi(row1, col1, row2, col2)
+            && !is_same_finger_bi(row0, col0, row1, col1) && !is_same_pos_bi(row0, col0, row1, col1)
+           )
+        ||
+           (
+            !is_same_hand_bi(row0, col0, row1, col1) && is_same_hand_bi(row1, col1, row2, col2)
+            && !is_same_finger_bi(row1, col1, row2, col2) && !is_same_pos_bi(row1, col1, row2, col2)
+           );
+}
+
+int is_roll_in(int row0, int col0, int row1, int col1, int row2, int col2)
+{
+    return is_roll(row0, col0, row1, col1, row2, col2)
+        && (
+               (is_same_hand_bi(row0, col0, row1, col1) && hand(row1, col1) == 'l' && finger(row0, col0) < finger(row1,col1))
+            || (is_same_hand_bi(row1, col1, row2, col2) && hand(row1, col1) == 'l' && finger(row1, col1) < finger(row2,col2))
+            || (is_same_hand_bi(row0, col0, row1, col1) && hand(row1, col1) == 'r' && finger(row0, col0) > finger(row1,col1))
+            || (is_same_hand_bi(row1, col1, row2, col2) && hand(row1, col1) == 'r' && finger(row1, col1) > finger(row2,col2))
+           );
+}
+
+int is_roll_out(int row0, int col0, int row1, int col1, int row2, int col2)
+{
+    return is_roll(row0, col0, row1, col1, row2, col2)
+        && !is_roll_in(row0, col0, row1, col1, row2, col2);
+}
+
+int is_same_row_roll(int row0, int col0, int row1, int col1, int row2, int col2)
+{
+    return is_roll(row0, col0, row1, col1, row2, col2)
+        && (
+               (is_same_hand_bi(row0, col0, row1, col1) && is_same_row_bi(row0, col0, row1, col1))
+            || (is_same_hand_bi(row1, col1, row2, col2) && is_same_row_bi(row1, col1, row2, col2))
+           );
+}
+
+int is_same_row_roll_in(int row0, int col0, int row1, int col1, int row2, int col2)
+{
+    return is_roll_in(row0, col0, row1, col1, row2, col2)
+        && is_same_row_roll(row0, col0, row1, col1, row2, col2);
+}
+
+int is_same_row_roll_out(int row0, int col0, int row1, int col1, int row2, int col2)
+{
+    return is_roll_out(row0, col0, row1, col1, row2, col2)
+        && is_same_row_roll(row0, col0, row1, col1, row2, col2);
+}
+
+int is_adjacent_finger_roll(int row0, int col0, int row1, int col1, int row2, int col2)
+{
+    return is_roll(row0, col0, row1, col1, row2, col2)
+        && (
+               (is_same_hand_bi(row0, col0, row1, col1) && is_adjacent_finger_bi(row0, col0, row1, col1))
+            || (is_same_hand_bi(row1, col1, row2, col2) && is_adjacent_finger_bi(row1, col1, row2, col2))
+           );
+}
+
+int is_adjacent_finger_roll_in(int row0, int col0, int row1, int col1, int row2, int col2)
+{
+    return is_roll_in(row0, col0, row1, col1, row2, col2)
+        && is_adjacent_finger_roll(row0, col0, row1, col1, row2, col2);
+}
+
+int is_adjacent_finger_roll_out(int row0, int col0, int row1, int col1, int row2, int col2)
+{
+    return is_roll_out(row0, col0, row1, col1, row2, col2)
+        && is_adjacent_finger_roll(row0, col0, row1, col1, row2, col2);
+}
+
+int is_same_row_adjacent_finger_roll(int row0, int col0, int row1, int col1, int row2, int col2)
+{
+    return is_same_row_roll(row0, col0, row1, col1, row2, col2)
+        && is_adjacent_finger_roll(row0, col0, row1, col1, row2, col2);
+}
+
+int is_same_row_adjacent_finger_roll_in(int row0, int col0, int row1, int col1, int row2, int col2)
+{
+    return is_roll_in(row0, col0, row1, col1, row2, col2)
+        && is_same_row_adjacent_finger_roll(row0, col0, row1, col1, row2, col2);
+}
+
+int is_same_row_adjacent_finger_roll_out(int row0, int col0, int row1, int col1, int row2, int col2)
+{
+    return is_roll_out(row0, col0, row1, col1, row2, col2)
+        && is_same_row_adjacent_finger_roll(row0, col0, row1, col1, row2, col2);
 }
