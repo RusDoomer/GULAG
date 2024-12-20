@@ -13,7 +13,7 @@
 
 void start_up()
 {
-    wprintf(L"1/4: Setting Locale, ");
+    log_print('n',L"1/4: Setting Locale... ");
     // set locale
     const char* locale = setlocale(LC_ALL, "en_US.UTF-8");
     if (locale == NULL) {
@@ -21,49 +21,49 @@ void start_up()
         return;
     }
 
-    wprintf(L"Setting error stream, ");
+    log_print('n',L"Setting error stream... ");
     // Set stdout to wide-oriented
     if (fwide(stdout, 1) <= 0) {
         error("Failed to set wide-oriented stream.");
         return;
     }
 
-    wprintf(L"Hiding cursor, ");
+    log_print('n',L"Hiding cursor... ");
     // hide cursor
     wprintf(L"\e[?25l");
 
-    wprintf(L"Seeding RNG... ");
+    log_print('n',L"Seeding RNG... ");
     //seed random number
     srand(time(NULL));
-    wprintf(L"Done\n\n");
+    log_print('n',L"Done\n\n");
 
-    wprintf(L"2/4: Allocating language array, ");
+    log_print('n',L"2/4: Allocating language array, ");
     // allocate lang array
     lang_arr = (wchar_t *)calloc(101, sizeof(wchar_t));
 
-    wprintf(L"Allocating character hashmap... ");
+    log_print('n',L"Allocating character hashmap... ");
     // allocate char table array
     char_table = (int *)calloc(UNICODE_MAX+1, sizeof(int));
-    wprintf(L"Done\n\n");
+    log_print('n',L"Done\n\n");
 
-    wprintf(L"3/4: Allocating corpus arrays...\n");
-    wprintf(L"     Monograms... Integer... ");
+    log_print('n',L"3/4: Allocating corpus arrays...\n");
+    log_print('v',L"     Monograms... Integer... ");
     // allocate arrays for ngrams directly from corpus
     corpus_mono = (int *)calloc(LANG_LENGTH, sizeof(int));
-    wprintf(L"Floating Point... ");
+    log_print('v',L"Floating Point... ");
     linear_mono = (float *)calloc(LANG_LENGTH, sizeof(float));
-    wprintf(L"Done\n");
+    log_print('v',L"Done\n");
 
-    wprintf(L"     Bigrams... Integer... ");
+    log_print('v',L"     Bigrams... Integer... ");
     corpus_bi = (int **)malloc(LANG_LENGTH * sizeof(int *));
     for (int i = 0; i < LANG_LENGTH; i++) {
         corpus_bi[i] = (int *)calloc(LANG_LENGTH, sizeof(int));
     }
-    wprintf(L"Floating Point... ");
+    log_print('v',L"Floating Point... ");
     linear_bi = (float *)calloc(LANG_LENGTH * LANG_LENGTH, sizeof(float));
-    wprintf(L"Done\n");
+    log_print('v',L"Done\n");
 
-    wprintf(L"     Trigrams... Integer... ");
+    log_print('v',L"     Trigrams... Integer... ");
     corpus_tri = (int ***)malloc(LANG_LENGTH * sizeof(int **));
     for (int i = 0; i < LANG_LENGTH; i++) {
         corpus_tri[i] = (int **)malloc(LANG_LENGTH * sizeof(int *));
@@ -71,11 +71,11 @@ void start_up()
             corpus_tri[i][j] = (int *)calloc(LANG_LENGTH, sizeof(int));
         }
     }
-    wprintf(L"Floating Point... ");
+    log_print('v',L"Floating Point... ");
     linear_tri = (float *)calloc(LANG_LENGTH * LANG_LENGTH * LANG_LENGTH, sizeof(float));
-    wprintf(L"Done\n");
+    log_print('v',L"Done\n");
 
-    wprintf(L"     Quadgrams... Integer... ");
+    log_print('v',L"     Quadgrams... Integer... ");
     corpus_quad = (int ****)malloc(LANG_LENGTH * sizeof(int ***));
     for (int i = 0; i < LANG_LENGTH; i++) {
         corpus_quad[i] = (int ***)malloc(LANG_LENGTH * sizeof(int **));
@@ -86,55 +86,55 @@ void start_up()
             }
         }
     }
-    wprintf(L"Floating Point... ");
+    log_print('v',L"Floating Point... ");
     linear_quad = (float *)calloc(LANG_LENGTH * LANG_LENGTH * LANG_LENGTH * LANG_LENGTH, sizeof(float));
-    wprintf(L"Done\n");
+    log_print('v',L"Done\n");
 
-    wprintf(L"     Skipgrams...\n");
+    log_print('v',L"     Skipgrams...\n");
     corpus_skip = (int ***)malloc(10 * sizeof(int **));
     for (int i = 1; i <= 9; i++) {
-        wprintf(L"       Skip-%d... Integer... ", i);
+        log_print('v',L"       Skip-%d... Integer... ", i);
         corpus_skip[i] = (int **)malloc(LANG_LENGTH * sizeof(int *));
         for (int j = 0; j < LANG_LENGTH; j++) {
             corpus_skip[i][j] = (int *)calloc(LANG_LENGTH, sizeof(int));
         }
-        wprintf(L"Done\n");
+        log_print('v',L"Done\n");
     }
-    wprintf(L"       Floating Point... ");
+    log_print('v',L"       Floating Point... ");
     linear_skip = (float *)calloc(10 * LANG_LENGTH * LANG_LENGTH, sizeof(float));
-    wprintf(L"Done\n");
-    wprintf(L"     Done\n\n");
+    log_print('v',L"Done\n");
+    log_print('n',L"     Done\n\n");
 
-    wprintf(L"4/4: Initializing stats...\n");
+    log_print('n',L"4/4: Initializing stats...\n");
     initialize_stats();
-    wprintf(L"     Done\n\n");
+    log_print('n',L"     Done\n\n");
 }
 
 void shut_down()
 {
-    wprintf(L"1/3: Showing cursor... ");
+    log_print('n',L"1/3: Showing cursor... ");
     //show cursor
     wprintf(L"\e[?25h");
 
-    wprintf(L"Freeing character hashmap... ");
+    log_print('n',L"Freeing character hashmap... ");
     free(char_table);
-    wprintf(L"Done\n\n");
+    log_print('n',L"Done\n\n");
 
-    wprintf(L"2/3: Freeing corpus arrays... \n");
-    wprintf(L"     Monograms... ");
+    log_print('n',L"2/3: Freeing corpus arrays... ");
+    log_print('v',L"\n     Monograms... ");
     free(corpus_mono);
     free(linear_mono);
-    wprintf(L"Done\n");
+    log_print('v',L"Done\n");
 
-    wprintf(L"     Bigrams... ");
+    log_print('v',L"     Bigrams... ");
     for (int i = 0; i < LANG_LENGTH; i++) {
         free(corpus_bi[i]);
     }
     free(corpus_bi);
     free(linear_bi);
-    wprintf(L"Done\n");
+    log_print('v',L"Done\n");
 
-    wprintf(L"     Trigrams... ");
+    log_print('v',L"     Trigrams... ");
     for (int i = 0; i < LANG_LENGTH; i++) {
         for (int j = 0; j < LANG_LENGTH; j++) {
             free(corpus_tri[i][j]);
@@ -143,9 +143,9 @@ void shut_down()
     }
     free(corpus_tri);
     free(linear_tri);
-    wprintf(L"Done\n");
+    log_print('v',L"Done\n");
 
-    wprintf(L"     Quadgrams... ");
+    log_print('v',L"     Quadgrams... ");
     for (int i = 0; i < LANG_LENGTH; i++) {
         for (int j = 0; j < LANG_LENGTH; j++) {
             for (int k = 0; k < LANG_LENGTH; k++) {
@@ -157,165 +157,188 @@ void shut_down()
     }
     free(corpus_quad);
     free(linear_quad);
-    wprintf(L"Done\n");
+    log_print('v',L"Done\n");
 
-    wprintf(L"     Skipgrams...\n");
+    log_print('v',L"     Skipgrams...\n");
     for (int i = 1; i <= 9; i++) {
-        wprintf(L"       Skip-%d... ", i);
+        log_print('v',L"       Skip-%d... ", i);
         for (int j = 0; j < LANG_LENGTH; j++) {
             free(corpus_skip[i][j]);
         }
         free(corpus_skip[i]);
-        wprintf(L"Done\n");
+        log_print('v',L"Done\n");
     }
     free(corpus_skip);
     free(linear_skip);
-    wprintf(L"       Done\n");
-    wprintf(L"     Done\n\n");
+    log_print('v',L"       Done\n");
+    log_print('n',L"     Done\n\n");
 
-    wprintf(L"3/3: Freeing stats... \n");
+    log_print('n',L"3/3: Freeing stats... ");
     free_stats();
+    log_print('n',L"     Done\n\n");
 }
 
 int main(int argc, char **argv) {
-    wprintf(L"\nWelcome to the GULAG\n\n");
-    wprintf(L"----- Starting Up -----\n\n");
+    log_print('q',L"\nWelcome to the GULAG\n\n");
+    log_print('q',L"----- Starting Up -----\n\n");
     start_up();
-    wprintf(L"----- Start Up Complete -----\n\n");
+    log_print('q',L"----- Start Up Complete -----\n\n");
 
-    wprintf(L"----- Setting Up -----\n\n");
-    wprintf(L"1/3: Reading config... ");
+    log_print('q',L"----- Setting Up -----\n\n");
+    log_print('q',L"1/3: Reading config... ");
     /* io.c - holds defaults to be overwritten by args */
     read_config();
+    log_print('q',L"Done\n\n");
 
-    wprintf(L"2/3: Reading command line arguments... ");
+    log_print('q',L"2/3: Reading command line arguments... ");
     /* io.c - overwrites config */
     read_args(argc, argv);
+    log_print('q',L"Done\n\n");
 
-    wprintf(L"3/3: Checking arguments... ");
+    log_print('q',L"3/3: Checking arguments... ");
     /* io.c - final check that all options are correct */
     check_setup();
-    wprintf(L"----- Set Up Complete -----\n\n");
+    log_print('q',L"Done\n\n");
 
-    wprintf(L"| lang: %s | ", lang_name);
-    wprintf(L"corpus: %s | ", corpus_name);
-    wprintf(L"primary: %s | ", layout_name);
-    wprintf(L"secondary: %s | ", layout2_name);
-    wprintf(L"weights: %s | ", weight_name);
-    wprintf(L"run mode: %c | ", run_mode);
-    wprintf(L"reps: %d | ", repetitions);
-    wprintf(L"threads: %d | ", threads);
-    wprintf(L"out mode: %c |\n\n", output_mode);
+    log_print('q',L"----- Set Up Complete -----\n\n");
 
-    wprintf(L"----- Reading Data -----\n\n");
+    log_print('n',L"| lang: %s | ", lang_name);
+    log_print('n',L"corpus: %s | ", corpus_name);
+    log_print('n',L"primary: %s | ", layout_name);
+    log_print('n',L"secondary: %s | ", layout2_name);
+    log_print('n',L"weights: %s | ", weight_name);
+    log_print('n',L"run mode: %c | ", run_mode);
+    log_print('n',L"reps: %d | ", repetitions);
+    log_print('n',L"threads: %d | ", threads);
+    log_print('n',L"out mode: %c |\n\n", output_mode);
 
-    wprintf(L"1/4: Reading language... ");
+    log_print('q',L"----- Reading Data -----\n\n");
+
+    log_print('n',L"1/4: Reading language... ");
     read_lang(lang_name); /* io.c */
+    log_print('n',L"Done\n\n");
 
-    wprintf(L"2/4: Reading corpus... ");
-    wprintf(L"Looking for cache... ");
+    log_print('n',L"2/4: Reading corpus... ");
+    log_print('v',L"Looking for cache... ");
     int corpus_cache = 0;
     corpus_cache = read_corpus_cache();
+    log_print('n',L"Done\n\n");
     if (!corpus_cache) {
-        wprintf(L"Reading raw corpus... ");
+        log_print('v',L"Reading raw corpus... ");
         // the next operation is slow so we want to let the user see
         // what step they are stuck on
         fflush(stdout);
         read_corpus();    /* io.c */
-        wprintf(L"2.5\4: Creating corpus cache... ");
+        log_print('n',L"Done\n\n");
+
+        log_print('n',L"2.5\4: Creating corpus cache... ");
         cache_corpus();   /* io.c */
+        log_print('n',L"Done\n\n");
     }
 
-    wprintf(L"3/4: Normalize corpus... ");
+    log_print('n',L"3/4: Normalize corpus... ");
     normalize_corpus(); /* util.c */
+    log_print('n',L"Done\n\n");
 
-    wprintf(L"4/4: Reading stat weights... ");
+    log_print('n',L"4/4: Reading stat weights... ");
     read_weights();       /* io.c */
+    log_print('n',L"Done\n\n");
 
-    wprintf(L"----- Reading Complete -----\n\n");
-    wprintf(L"----- Cleaning Up -----\n\n");
+    log_print('q',L"----- Reading Complete -----\n\n");
+    log_print('q',L"----- Cleaning Up -----\n\n");
 
-    wprintf(L"1/2: Removing irrelevant stats... \n");
+    log_print('n',L"1/2: Removing irrelevant stats... \n");
     clean_stats();        /* stats.c */
-    wprintf(L"2/2: Converting stats linked list to contiguous array... \n");
+    log_print('n',L"     Done\n\n");
+
+    log_print('n',L"2/2: Converting stats linked list to contiguous array... \n");
     stats_to_array();     /* stats.c */
+    log_print('n',L"     Done\n\n");
 
-    wprintf(L"----- Clean Up Complete -----\n\n");
+    log_print('q',L"----- Clean Up Complete -----\n\n");
 
-    wprintf(L"----- Weights -----\n\n");
+    log_print('q',L"----- Weights -----\n\n");
 
     for (int i = 0; i < MONO_END; i++)
     {
-        wprintf(L"%s : %f\n", stats_mono[i].name, stats_mono[i].weight);
+        log_print('v',L"%s : %f\n", stats_mono[i].name, stats_mono[i].weight);
     }
     for (int i = 0; i < BI_END; i++)
     {
-        wprintf(L"%s : %f\n", stats_bi[i].name, stats_bi[i].weight);
+        log_print('v',L"%s : %f\n", stats_bi[i].name, stats_bi[i].weight);
     }
     for (int i = 0; i < TRI_END; i++)
     {
-        wprintf(L"%s : %f\n", stats_tri[i].name, stats_tri[i].weight);
+        log_print('v',L"%s : %f\n", stats_tri[i].name, stats_tri[i].weight);
     }
     for (int i = 0; i < QUAD_END; i++)
     {
-        wprintf(L"%s : %f\n", stats_quad[i].name, stats_quad[i].weight);
+        log_print('v',L"%s : %f\n", stats_quad[i].name, stats_quad[i].weight);
     }
     for (int i = 0; i < SKIP_END; i++)
     {
-        wprintf(L"%s : ", stats_skip[i].name);
+        log_print('v',L"%s : ", stats_skip[i].name);
         for (int j = 1; j <= 9; j++)
         {
-            wprintf(L"%f ", stats_skip[i].weight[j]);
+            log_print('v',L"%f ", stats_skip[i].weight[j]);
         }
-        wprintf(L"\n");
+        log_print('v',L"\n");
     }
     for (int i = 0; i < META_END; i++)
     {
-        wprintf(L"%s : %f\n", stats_meta[i].name, stats_meta[i].weight);
+        log_print('v',L"%s : %f\n", stats_meta[i].name, stats_meta[i].weight);
     }
-    wprintf(L"\n");
+    log_print('v',L"\n");
 
-    wprintf(L"----- Weights Complete -----\n\n");
+    log_print('q',L"----- Weights Complete -----\n\n");
 
-    wprintf(L"----- Running -----\n\n");
+    log_print('q',L"----- Running -----\n\n");
 
     switch(run_mode) {       /* all in mode.c */
         case 'a':
-            wprintf(L"Running single analysis\n");
+            log_print('n',L"Running single analysis\n");
             analysis();      /* analyze one layout */
+            log_print('n',L"Done\n\n");
             break;
         case 'c':
-            wprintf(L"Running comparison\n");
+            log_print('n',L"Running comparison\n");
             compare();       /* compare 2 layouts */
+            log_print('n',L"Done\n\n");
             break;
         case 'r':
-            wprintf(L"Running ranking\n");
+            log_print('n',L"Running ranking\n");
             rank();          /* rank all layouts in directory */
+            log_print('n',L"\nDone\n\n");
             break;
         case 'g':
-            wprintf(L"Running generation\n");
+            log_print('n',L"Running generation\n");
             generate();      /* generate a new layout */
+            log_print('n',L"Done\n\n");
             break;
         case 'i':
-            wprintf(L"Running optimization\n");
+            log_print('n',L"Running optimization\n");
             improve(0);       /* improve a layout */
+            log_print('n',L"Done\n\n");
             break;
         case 'b':
-            wprintf(L"Running benchmark\n");
+            log_print('n',L"Running benchmark\n");
             gen_benchmark(); /* benchmark to find ideal number of threads */
+            log_print('n',L"Done\n\n");
             break;
         case 'h':
-            wprintf(L"Printing help message\n");
+            log_print('n',L"Printing help message\n");
             print_help();    /* print help info */
+            log_print('n',L"Done\n\n");
             break;
         case 'f':
-            wprintf(L"Printing info message\n");
+            log_print('n',L"Printing info message\n");
             print_info();    /* print info screen */
+            log_print('n',L"Done\n\n");
             break;
     }
 
-    wprintf(L"----- Run Complete -----\n\n");
-    wprintf(L"----- Shutting Down -----\n\n");
+    log_print('q',L"----- Run Complete -----\n\n");
+    log_print('q',L"----- Shutting Down -----\n\n");
 
     free(lang_name);
     free(corpus_name);
@@ -324,8 +347,8 @@ int main(int argc, char **argv) {
     free(weight_name);
     shut_down(); /* reverse start_up */
 
-    wprintf(L"----- Shut Down Complete -----\n\n");
+    log_print('q',L"----- Shut Down Complete -----\n\n");
 
-    wprintf(L"You are free to go.\n");
+    log_print('q',L"You are free to go.\n\n");
     return 0;
 }

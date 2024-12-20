@@ -16,80 +16,80 @@
 
 void analysis() {
     layout *lt;
-    wprintf(L"1/6: Allocating layout... ");
+    log_print('n',L"1/6: Allocating layout... ");
     alloc_layout(&lt);
-    wprintf(L"Done\n\n");
+    log_print('n',L"Done\n\n");
 
-    wprintf(L"2/6: Reading layout... ");
+    log_print('n',L"2/6: Reading layout... ");
     read_layout(lt, 1);
-    wprintf(L"Done\n\n");
+    log_print('n',L"Done\n\n");
 
-    wprintf(L"3/6: Analyzing layout... ");
+    log_print('n',L"3/6: Analyzing layout... ");
     single_analyze(lt);
-    wprintf(L"Done\n\n");
+    log_print('n',L"Done\n\n");
 
-    wprintf(L"4/6: Calculating Score... ");
+    log_print('n',L"4/6: Calculating Score... ");
     get_score(lt);
-    wprintf(L"Done\n\n");
+    log_print('n',L"Done\n\n");
 
-    wprintf(L"5/6: Printing Output...\n\n");
+    log_print('n',L"5/6: Printing Output...\n\n");
     print_layout(lt);
-    wprintf(L"Done\n\n");
+    log_print('n',L"Done\n\n");
 
-    wprintf(L"6/6: Freeing layout... ");
+    log_print('n',L"6/6: Freeing layout... ");
     free_layout(lt);
-    wprintf(L"Done\n\n");
+    log_print('n',L"Done\n\n");
     return;
 }
 
 void compare() {
     layout *lt1, *lt2, *lt_diff;
-    wprintf(L"1/7: Allocating layouts... ");
+    log_print('n',L"1/7: Allocating layouts... ");
     alloc_layout(&lt1);
-    wprintf(L"%s... ", layout_name);
+    log_print('n',L"%s... ", layout_name);
     alloc_layout(&lt2);
-    wprintf(L"%s... ", layout2_name);
+    log_print('n',L"%s... ", layout2_name);
     alloc_layout(&lt_diff);
-    wprintf(L"diff... ");
-    wprintf(L"Done\n\n");
+    log_print('n',L"diff... ");
+    log_print('n',L"Done\n\n");
 
-    wprintf(L"2/7: Reading layout... ");
+    log_print('n',L"2/7: Reading layout... ");
     read_layout(lt1, 1);
-    wprintf(L"%s... ", layout_name);
+    log_print('n',L"%s... ", layout_name);
     read_layout(lt2, 2);
-    wprintf(L"%s... ", layout2_name);
-    wprintf(L"Done\n\n");
+    log_print('n',L"%s... ", layout2_name);
+    log_print('n',L"Done\n\n");
 
-    wprintf(L"3/7: Analyzing layout... ");
+    log_print('n',L"3/7: Analyzing layout... ");
     single_analyze(lt1);
-    wprintf(L"%s... ", layout_name);
+    log_print('n',L"%s... ", layout_name);
     single_analyze(lt2);
-    wprintf(L"%s... ", layout2_name);
-    wprintf(L"Done\n\n");
+    log_print('n',L"%s... ", layout2_name);
+    log_print('n',L"Done\n\n");
 
-    wprintf(L"4/7: Calculating Score... ");
+    log_print('n',L"4/7: Calculating Score... ");
     get_score(lt1);
-    wprintf(L"%s... ", layout_name);
+    log_print('n',L"%s... ", layout_name);
     get_score(lt2);
-    wprintf(L"%s... ", layout2_name);
-    wprintf(L"Done\n\n");
+    log_print('n',L"%s... ", layout2_name);
+    log_print('n',L"Done\n\n");
 
-    wprintf(L"5/7: Calculating Difference... ");
+    log_print('n',L"5/7: Calculating Difference... ");
     get_layout_diff(lt1, lt2, lt_diff);
-    wprintf(L"Done\n\n");
+    log_print('n',L"Done\n\n");
 
-    wprintf(L"6/7: Printing Output...\n\n");
+    log_print('n',L"6/7: Printing Output...\n\n");
     print_layout(lt_diff);
-    wprintf(L"Done\n\n");
+    log_print('n',L"Done\n\n");
 
-    wprintf(L"7/7: Freeing layout... ");
+    log_print('n',L"7/7: Freeing layout... ");
     free_layout(lt1);
-    wprintf(L"%s... ", layout_name);
+    log_print('n',L"%s... ", layout_name);
     free_layout(lt2);
-    wprintf(L"%s... ", layout2_name);
+    log_print('n',L"%s... ", layout2_name);
     free_layout(lt_diff);
-    wprintf(L"diff... ");
-    wprintf(L"Done\n\n");
+    log_print('n',L"diff... ");
+    log_print('n',L"Done\n\n");
     return;
 }
 
@@ -113,27 +113,27 @@ void rank() {
             strncpy(temp_name, entry->d_name, len - 4);
             temp_name[len - 4] = '\0';
             layout_name = temp_name;
-            wprintf(L"%s: ", layout_name);
+            log_print('n',L"%s: ", layout_name);
 
             layout *lt;
-            wprintf(L"Allocating... ");
+            log_print('n',L"Allocating... ");
             alloc_layout(&lt);
 
-            wprintf(L"Reading... ");
+            log_print('n',L"Reading... ");
             read_layout(lt, 1);
 
-            wprintf(L"Analyzing... ");
+            log_print('n',L"Analyzing... ");
             single_analyze(lt);
 
-            wprintf(L"Get Score... ");
+            log_print('n',L"Get Score... ");
             get_score(lt);
 
-            wprintf(L"Ranking...");
+            log_print('n',L"Ranking...");
             create_node(lt);
 
-            wprintf(L"Freeing... ");
+            log_print('n',L"Freeing... ");
             free_layout(lt);
-            wprintf(L"Done\n\n");
+            log_print('n',L"Done\n\n");
         }
     }
 
@@ -232,36 +232,36 @@ void generate() {
 void improve(int shuffle) {
     layout *lt;
 
-    wprintf(L"Pins: \n");
+    log_print('v',L"Pins: \n");
     print_pins();
-    wprintf(L"\n");
+    log_print('v',L"\n");
 
-    wprintf(L"1/8: Allocating layout... ");
+    log_print('n',L"1/8: Allocating layout... ");
     alloc_layout(&lt);
-    wprintf(L"Done\n\n");
+    log_print('n',L"Done\n\n");
 
-    wprintf(L"2/8: Reading layout... ");
+    log_print('n',L"2/8: Reading layout... ");
     read_layout(lt, 1);
-    wprintf(L"Done\n\n");
+    log_print('n',L"Done\n\n");
 
     // If shuffle is true, shuffle the layout matrix
     if (shuffle) {
-        wprintf(L"3/8: Shuffling layout... ");
+        log_print('n',L"3/8: Shuffling layout... ");
         shuffle_layout(lt);
         strcpy(lt->name, "random shuffle");
-        wprintf(L"Done\n\n");
+        log_print('n',L"Done\n\n");
     } else {
-        wprintf(L"3/8: Skipping shuffle... ");
-        wprintf(L"Done\n\n");
+        log_print('n',L"3/8: Skipping shuffle... ");
+        log_print('n',L"Done\n\n");
     }
 
-    wprintf(L"4/8: Analyzing starting point... ");
+    log_print('n',L"4/8: Analyzing starting point... ");
     single_analyze(lt);
     get_score(lt);
-    wprintf(L"Done\n\n");
+    log_print('n',L"Done\n\n");
 
     print_layout(lt);
-    wprintf(L"\n");
+    log_print('n',L"\n");
 
     // Determine the number of iterations per thread
     int iterations = repetitions / threads;
@@ -272,7 +272,7 @@ void improve(int shuffle) {
     layout **best_layouts = (layout **)malloc(threads * sizeof(layout *));
 
     // Initialize thread data and create threads
-    wprintf(L"5/8: Initializing threads... ");
+    log_print('n',L"5/8: Initializing threads... ");
     for (int i = 0; i < threads; i++) {
         best_layouts[i] = NULL;
         thread_data_array[i].lt = lt;
@@ -280,33 +280,33 @@ void improve(int shuffle) {
         thread_data_array[i].iterations = iterations;
         pthread_create(&thread_ids[i], NULL, thread_function, (void *)&thread_data_array[i]);
     }
-    wprintf(L"Done\n\n");
+    log_print('n',L"Done\n\n");
 
     // Wait for all threads to complete
-    wprintf(L"6/8: Waiting for threads to complete... ");
+    log_print('n',L"6/8: Waiting for threads to complete... ");
     for (int i = 0; i < threads; i++) {
         pthread_join(thread_ids[i], NULL);
     }
-    wprintf(L"Done\n\n");
+    log_print('n',L"Done\n\n");
 
     // Find the best layout among all threads
-    wprintf(L"7/8: Selecting best layout... ");
+    log_print('n',L"7/8: Selecting best layout... ");
     layout *best_layout = best_layouts[0];
     for (int i = 1; i < threads; i++) {
         if (best_layouts[i]->score > best_layout->score) {
             best_layout = best_layouts[i];
         }
     }
-    wprintf(L"Done\n\n");
+    log_print('n',L"Done\n\n");
 
     // Compare with the original layout and print the better one
-    wprintf(L"8/8: Printing layout...\n\n");
+    log_print('n',L"8/8: Printing layout...\n\n");
     if (best_layout->score > lt->score) {
         print_layout(best_layout);
     } else {
         print_layout(lt);
     }
-    wprintf(L"Done\n\n");
+    log_print('n',L"Done\n\n");
 
     // Free all allocated layouts and thread data
     for (int i = 0; i < threads; i++) {
@@ -343,12 +343,12 @@ void gen_benchmark()
     thread_array[count + 1] = num_cpus;
     thread_array[count + 2] = num_cpus * 2;
 
-    for (int i = 0; i < total; i++) {wprintf(L"%d ", thread_array[i]);}
-    wprintf(L"\n\n");
+    for (int i = 0; i < total; i++) {log_print('v',L"%d ", thread_array[i]);}
+    log_print('v',L"\n\n");
 
     for (int i = 0; i < total; i++)
     {
-        wprintf(L"BENCHMARK RUN %d/%d\n\n", i+1, total);
+        log_print('q',L"BENCHMARK RUN %d/%d\n\n", i+1, total);
         threads = thread_array[i];
 
         struct timespec start, end;
@@ -363,67 +363,67 @@ void gen_benchmark()
         results[i] = 1.0 / time_per_repetition;
     }
 
-    wprintf(L"BENCHMARK RESULTS:\n\n");
-    wprintf(L"Threads - Layouts/Second:\n\n");
-    wprintf(L"Powers of 2:\n");
+    log_print('q',L"BENCHMARK RESULTS:\n\n");
+    log_print('q',L"Threads - Layouts/Second:\n\n");
+    log_print('q',L"Powers of 2:\n");
     for (int i = 0; i < count; i++)
     {
-        wprintf(L"%7d - %lf\n", thread_array[i], results[i]);
+        log_print('q',L"%7d - %lf\n", thread_array[i], results[i]);
     }
-    wprintf(L"\n");
-    wprintf(L"Based on CPU cores:\n");
+    log_print('q',L"\n");
+    log_print('q',L"Based on CPU cores:\n");
     for (int i = count; i < total; i++)
     {
-        wprintf(L"%7d - %lf\n", thread_array[i], results[i]);
+        log_print('q',L"%7d - %lf\n", thread_array[i], results[i]);
     }
-    wprintf(L"\n");
-    wprintf(L"Choose the lowest number of threads with acceptable Layouts/Second for best results.");
-    wprintf(L"\n\n");
+    log_print('q',L"\n");
+    log_print('q',L"Choose the lowest number of threads with acceptable Layouts/Second for best results.");
+    log_print('q',L"\n\n");
 }
 
 void print_help() {
-    wprintf(L"Arguments:\n");
-    // 80     @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-    wprintf(L"  -l <language> : Chooses the language, the basis of all data in this program.\n");
-    wprintf(L"                  The language chooses which corpora and layouts you can access.\n");
-    wprintf(L"  -c <corpus>   : Chooses the corpus file within the language directory.\n");
-    wprintf(L"  -1 <layout>   : Chooses the primary layout within the language directory.\n");
-    wprintf(L"  -2 <layout>   : Chooses the secondary layout within the language directory.\n");
-    wprintf(L"  -w <weights>  : Chooses the weights file within the weights directory.\n");
-    wprintf(L"  -r <val>      : Chooses the total number of layouts to analyze during\n");
-    wprintf(L"                  generation modes, it is recommended to set this number\n");
-    wprintf(L"                  between 5,000 and 100,000.\n");
-    wprintf(L"  -t <val>      : Chooses the number of layouts to analyze concurrently in the\n");
-    wprintf(L"                  generation modes. It is recommended to set this number based\n");
-    wprintf(L"                  on the benchmark output.\n");
+    log_print('q',L"Arguments:\n");
+    // 80           @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+    log_print('q',L"  -l <language> : Chooses the language, the basis of all data in this program.\n");
+    log_print('q',L"                  The language chooses which corpora and layouts you can access.\n");
+    log_print('q',L"  -c <corpus>   : Chooses the corpus file within the language directory.\n");
+    log_print('q',L"  -1 <layout>   : Chooses the primary layout within the language directory.\n");
+    log_print('q',L"  -2 <layout>   : Chooses the secondary layout within the language directory.\n");
+    log_print('q',L"  -w <weights>  : Chooses the weights file within the weights directory.\n");
+    log_print('q',L"  -r <val>      : Chooses the total number of layouts to analyze during\n");
+    log_print('q',L"                  generation modes, it is recommended to set this number\n");
+    log_print('q',L"                  between 5,000 and 100,000.\n");
+    log_print('q',L"  -t <val>      : Chooses the number of layouts to analyze concurrently in the\n");
+    log_print('q',L"                  generation modes. It is recommended to set this number based\n");
+    log_print('q',L"                  on the benchmark output.\n");
 
 
-    wprintf(L"Modes:\n");
-    // 80     @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-    wprintf(L"  -m <mode>     : Decides what the program does.\n");
-    wprintf(L"    a;analyze;analysis   : Analyzes the primary layout.\n");
-    wprintf(L"    c;compare;comparison : Analyzes the primary and secondary layouts and prints\n");
-    wprintf(L"                           the difference (primary minus secondary).\n");
-    wprintf(L"    r;rank;ranking       : Analyzes every layout in the language and prints them\n");
-    wprintf(L"                           in descending order by score.\n");
-    wprintf(L"    g;gen;generate       : Creates a new layout attempting to optimize score;\n");
-    wprintf(L"                           uses first 36 characters in language.\n");
-    wprintf(L"    i;improve;optimize   : Optimizes an existing layout, won't swap keys pinned\n");
-    wprintf(L"                           in the config.\n");
-    wprintf(L"    b;bench;benchmark    : Prints the optimal number of threads for generation\n");
-    wprintf(L"                           performance on this system.\n");
-    wprintf(L"    h;help               : Prints this message.\n");
-    wprintf(L"    if;info;information  : Prints more in-depth information about this program.\n");
-    // 80     @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-    wprintf(L"  -o <mode>     : decides how verbose the output is.\n");
-    wprintf(L"    q;quiet;SHUTUP       : The most concise; prints only the essential stats.\n");
-    wprintf(L"    n;norm;normal        : Prints most stats; ignores the most pedantic.\n");
-    wprintf(L"    v;loud;verbose       : The most verbose; prints all stats.\n");
-    // 80     @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-    wprintf(L"Config:\n");
-    wprintf(L"  All of these options can be set in config.conf but command line arguments will\n");
-    wprintf(L"  be prioritized. config.conf also sets the pins for the improve mode; all\n");
-    wprintf(L"  positions that are not \'.\' will be pinned.\n");
+    log_print('q',L"Modes:\n");
+    // 80           @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+    log_print('q',L"  -m <mode>     : Decides what the program does.\n");
+    log_print('q',L"    a;analyze;analysis   : Analyzes the primary layout.\n");
+    log_print('q',L"    c;compare;comparison : Analyzes the primary and secondary layouts and prints\n");
+    log_print('q',L"                           the difference (primary minus secondary).\n");
+    log_print('q',L"    r;rank;ranking       : Analyzes every layout in the language and prints them\n");
+    log_print('q',L"                           in descending order by score.\n");
+    log_print('q',L"    g;gen;generate       : Creates a new layout attempting to optimize score;\n");
+    log_print('q',L"                           uses first 36 characters in language.\n");
+    log_print('q',L"    i;improve;optimize   : Optimizes an existing layout, won't swap keys pinned\n");
+    log_print('q',L"                           in the config.\n");
+    log_print('q',L"    b;bench;benchmark    : Prints the optimal number of threads for generation\n");
+    log_print('q',L"                           performance on this system.\n");
+    log_print('q',L"    h;help               : Prints this message.\n");
+    log_print('q',L"    if;info;information  : Prints more in-depth information about this program.\n");
+    // 80           @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+    log_print('q',L"  -o <mode>     : decides how verbose the output is.\n");
+    log_print('q',L"    q;quiet;SHUTUP       : The most concise; prints only the essential stats.\n");
+    log_print('q',L"    n;norm;normal        : Prints most stats; ignores the most pedantic.\n");
+    log_print('q',L"    v;loud;verbose       : The most verbose; prints all stats.\n");
+    // 80           @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+    log_print('q',L"Config:\n");
+    log_print('q',L"  All of these options can be set in config.conf but command line arguments will\n");
+    log_print('q',L"  be prioritized. config.conf also sets the pins for the improve mode; all\n");
+    log_print('q',L"  positions that are not \'.\' will be pinned.\n");
 }
 
 void print_info() {

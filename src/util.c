@@ -124,7 +124,7 @@ void normalize_corpus()
     long long total_quad = 0;
     long long total_skip[10] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 
-    wprintf(L"Calculating totals... ");
+    log_print('n',L"Calculating totals... ");
 
     for (int i = 0; i < LANG_LENGTH; i++) {
         total_mono += corpus_mono[i];
@@ -147,7 +147,7 @@ void normalize_corpus()
         }
     }
 
-    wprintf(L"Normalizing... ");
+    log_print('n',L"Normalizing... ");
     if (total_mono > 0) {
         for (int i = 0; i < LANG_LENGTH; i++) {
             linear_mono[index_mono(i)] = (float)corpus_mono[i] * 100 / total_mono;
@@ -193,7 +193,6 @@ void normalize_corpus()
             }
         }
     }
-    wprintf(L"Done\n\n");
 }
 
 // Function to check if layout is fully allocated

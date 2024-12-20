@@ -7,6 +7,7 @@
 #include "meta.h"
 
 #include "global.h"
+#include "io.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <locale.h>
@@ -14,111 +15,105 @@
 
 void initialize_stats()
 {
-    wprintf(L"     Initializing monogram stats... ");
+    log_print('v',L"     Initializing monogram stats... ");
     initialize_mono_stats();
-    wprintf(L"trimming monogram stats... ");
+    log_print('v',L"trimming monogram stats... ");
     trim_mono_stats();
-    wprintf(L"Done\n");
+    log_print('v',L"Done\n");
 
-    wprintf(L"     Initializing bigram stats...   ");
+    log_print('v',L"     Initializing bigram stats...   ");
     initialize_bi_stats();
-    wprintf(L"trimming bigram stats...   ");
+    log_print('v',L"trimming bigram stats...   ");
     trim_bi_stats();
-    wprintf(L"Done\n");
+    log_print('v',L"Done\n");
 
-    wprintf(L"     Initializing trigram stats...  ");
+    log_print('v',L"     Initializing trigram stats...  ");
     initialize_tri_stats();
-    wprintf(L"trimming trigram stats...  ");
+    log_print('v',L"trimming trigram stats...  ");
     trim_tri_stats();
-    wprintf(L"Done\n");
+    log_print('v',L"Done\n");
 
-    wprintf(L"     Initializing quadgram stats... ");
+    log_print('v',L"     Initializing quadgram stats... ");
     initialize_quad_stats();
-    wprintf(L"trimming quadgram stats... ");
+    log_print('v',L"trimming quadgram stats... ");
     trim_quad_stats();
-    wprintf(L"Done\n");
+    log_print('v',L"Done\n");
 
-    wprintf(L"     Initializing skipgram stats... ");
+    log_print('v',L"     Initializing skipgram stats... ");
     initialize_skip_stats();
-    wprintf(L"trimming skipgram stats... ");
+    log_print('v',L"trimming skipgram stats... ");
     trim_skip_stats();
-    wprintf(L"Done\n");
+    log_print('v',L"Done\n");
 
-    wprintf(L"     Initializing meta stats...     ");
+    log_print('v',L"     Initializing meta stats...     ");
     initialize_meta_stats();
-    wprintf(L"trimming meta stats...     ");
+    log_print('v',L"trimming meta stats...     ");
     trim_meta_stats();
-    wprintf(L"Done\n");
+    log_print('v',L"Done\n");
 }
 
 void clean_stats()
 {
-    wprintf(L"     Cleaning monogram stats... ");
+    log_print('v',L"     Cleaning monogram stats... ");
     clean_mono_stats();
-    wprintf(L"Done\n");
-    wprintf(L"     Cleaning bigram stats... ");
+    log_print('v',L"Done\n");
+    log_print('v',L"     Cleaning bigram stats... ");
     clean_bi_stats();
-    wprintf(L"Done\n");
-    wprintf(L"     Cleaning trigram stats... ");
+    log_print('v',L"Done\n");
+    log_print('v',L"     Cleaning trigram stats... ");
     clean_tri_stats();
-    wprintf(L"Done\n");
-    wprintf(L"     Cleaning quadgram stats... ");
+    log_print('v',L"Done\n");
+    log_print('v',L"     Cleaning quadgram stats... ");
     clean_quad_stats();
-    wprintf(L"Done\n");
-    wprintf(L"     Cleaning skipgram stats... ");
+    log_print('v',L"Done\n");
+    log_print('v',L"     Cleaning skipgram stats... ");
     clean_skip_stats();
-    wprintf(L"Done\n");
-    wprintf(L"     Cleaning meta stats... ");
+    log_print('v',L"Done\n");
+    log_print('v',L"     Cleaning meta stats... ");
     clean_meta_stats();
-    wprintf(L"Done\n");
-
-    wprintf(L"     Done\n\n");
+    log_print('v',L"Done\n");
 }
 
 void stats_to_array()
 {
-    wprintf(L"     Converting monogram stats... ");
+    log_print('v',L"     Converting monogram stats... ");
     mono_to_array();
-    wprintf(L"Done\n");
-    wprintf(L"     Converting bigram stats... ");
+    log_print('v',L"Done\n");
+    log_print('v',L"     Converting bigram stats... ");
     bi_to_array();
-    wprintf(L"Done\n");
-    wprintf(L"     Converting trigram stats... ");
+    log_print('v',L"Done\n");
+    log_print('v',L"     Converting trigram stats... ");
     tri_to_array();
-    wprintf(L"Done\n");
-    wprintf(L"     Converting quadgram stats... ");
+    log_print('v',L"Done\n");
+    log_print('v',L"     Converting quadgram stats... ");
     quad_to_array();
-    wprintf(L"Done\n");
-    wprintf(L"     Converting skipgram stats... ");
+    log_print('v',L"Done\n");
+    log_print('v',L"     Converting skipgram stats... ");
     skip_to_array();
-    wprintf(L"Done\n");
-    wprintf(L"     Converting meta stats... ");
+    log_print('v',L"Done\n");
+    log_print('v',L"     Converting meta stats... ");
     meta_to_array();
-    wprintf(L"Done\n");
-
-    wprintf(L"     Done\n\n");
+    log_print('v',L"Done\n");
 }
 
 void free_stats()
 {
-    wprintf(L"     Freeing monogram stats... ");
+    log_print('v',L"\n     Freeing monogram stats... ");
     free_mono_stats();
-    wprintf(L"Done\n");
-    wprintf(L"     Freeing bigram stats... ");
+    log_print('v',L"Done\n");
+    log_print('v',L"     Freeing bigram stats... ");
     free_bi_stats();
-    wprintf(L"Done\n");
-    wprintf(L"     Freeing trigram stats... ");
+    log_print('v',L"Done\n");
+    log_print('v',L"     Freeing trigram stats... ");
     free_tri_stats();
-    wprintf(L"Done\n");
-    wprintf(L"     Freeing quadgram stats... ");
+    log_print('v',L"Done\n");
+    log_print('v',L"     Freeing quadgram stats... ");
     free_quad_stats();
-    wprintf(L"Done\n");
-    wprintf(L"     Freeing skipgram stats... ");
+    log_print('v',L"Done\n");
+    log_print('v',L"     Freeing skipgram stats... ");
     free_skip_stats();
-    wprintf(L"Done\n");
-    wprintf(L"     Freeing meta stats... ");
+    log_print('v',L"Done\n");
+    log_print('v',L"     Freeing meta stats... ");
     free_meta_stats();
-    wprintf(L"Done\n");
-
-    wprintf(L"     Done\n\n");
+    log_print('v',L"Done\n");
 }

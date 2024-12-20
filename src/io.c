@@ -42,7 +42,7 @@ void read_config()
     if (config == NULL) {
         error("Required file config.conf not found.");
     }
-    wprintf(L"config.conf found... ");
+    log_print('q',L"config.conf found... ");
 
     char c;
     int i = 0;
@@ -94,7 +94,6 @@ void read_config()
     output_mode = check_output_mode(buff);
 
     fclose(config);
-    wprintf(L"Done\n\n");
 }
 
 void read_args(int argc, char **argv)
@@ -142,7 +141,6 @@ void read_args(int argc, char **argv)
             abort();
         }
     }
-    wprintf(L"Done\n\n");
 }
 
 void check_setup()
@@ -163,7 +161,6 @@ void check_setup()
     }
     if (threads < 1) {error("invalid threads selected");}
     if (repetitions < 1) {error("invalid repetitions selected");}
-    wprintf(L"Done\n\n");
 }
 
 void read_lang()
@@ -180,9 +177,9 @@ void read_lang()
     if (lang == NULL) {
         error("Lang file not found.");
     }
-    wprintf(L"Lang file found... ");
+    log_print('v',L"Lang file found... ");
 
-    wprintf(L"Reading... ");
+    log_print('v',L"Reading... ");
     wchar_t a;
     for (int i = 0; i < 101; i++) {
         if ((a = fgetwc(lang)) == EOF || a == L'\n') {lang_arr[i] = L'@';}
@@ -193,7 +190,7 @@ void read_lang()
         }
     }
 
-    wprintf(L"Checking correctness... ");
+    log_print('v',L"Checking correctness... ");
 
     if (lang_arr[0] != L' ' || lang_arr[1] != L' ') {
         error("Lang file must begin with 2 spaces");
@@ -218,8 +215,6 @@ void read_lang()
             error("Lang file contains illegal character not caught before.");
         }
     }
-
-    wprintf(L"Done\n\n");
 }
 
 int read_corpus_cache()
@@ -235,11 +230,11 @@ int read_corpus_cache()
     corpus = fopen(path, "r");
     if (corpus == NULL) {
         free(path);
-        wprintf(L"Cache not found... ");
+        log_print('v',L"Cache not found... ");
         return 0;
     }
-    wprintf(L"Cache found... ");
-    wprintf(L"Reading from cache... ");
+    log_print('v',L"Cache found... ");
+    log_print('v',L"Reading from cache... ");
     wchar_t curr;
     int i,j,k,l, value;
     while ((curr = fgetwc(corpus)) != WEOF) {
@@ -303,7 +298,6 @@ int read_corpus_cache()
     }
     fclose(corpus);
     free(path);
-    wprintf(L"Done\n\n");
     return 1;
 }
 
@@ -321,7 +315,7 @@ void read_corpus()
     if (corpus == NULL) {
         error("Corpus file not found, make sure the file ends in .txt, but the name in config/parameters does not");
     }
-    wprintf(L"Corpus file found... ");
+    log_print('v',L"Corpus file found... ");
 
     int mem[] = {-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1};
 
@@ -356,7 +350,6 @@ void read_corpus()
 
     fclose(corpus);
     free(path);
-    wprintf(L"Done\n\n");
 }
 
 void cache_corpus()
@@ -373,7 +366,7 @@ void cache_corpus()
     if (corpus == NULL) {
         error("Corpus cache file failed to be created.");
     }
-    wprintf(L"Created cache file... ");
+    log_print('n',L"Created cache file... ");
 
     for (int i = 0; i < 51; i++) {
         for (int j = 0; j < 51; j++) {
@@ -405,7 +398,6 @@ void cache_corpus()
     }
     fclose(corpus);
     free(path);
-    wprintf(L"Done\n\n");
 }
 
 void read_weights()
@@ -419,7 +411,7 @@ void read_weights()
     if (weight_file == NULL) {
         error("Weights file not found.");
     }
-    wprintf(L"Weights file found... ");
+    log_print('n',L"Weights file found... ");
 
     wchar_t line[256];
     char name_buffer[256];
@@ -540,7 +532,6 @@ void read_weights()
 
     fclose(weight_file);
     free(path);
-    wprintf(L"Done\n\n");
 }
 
 
@@ -586,42 +577,42 @@ void read_layout(layout *lt, int which_layout)
 
 void quiet_print(layout *lt)
 {
-    wprintf(L"%s\n", lt->name);
+    log_print('q',L"%s\n", lt->name);
     for (int i = 0; i < ROW; i++) {
         for (int j = 0; j < COL; j++) {
-            wprintf(L"%lc ", convert_back(lt->matrix[i][j]));
+            log_print('q',L"%lc ", convert_back(lt->matrix[i][j]));
         }
-        wprintf(L"\n");
+        log_print('q',L"\n");
     }
 
-    wprintf(L"score : %f\n", lt->score);
+    log_print('q',L"score : %f\n", lt->score);
     return;
 }
 
 void normal_print(layout *lt)
 {
     quiet_print(lt);
-    wprintf(L"\nMONOGRAM STATS\n");
-    for (int i = 0; i < MONO_END; i++) {wprintf(L"%s : %f\%\n", stats_mono[i].name, lt->mono_score[i]);}
-    wprintf(L"\nBIGRAM STATS\n");
-    for (int i = 0; i < BI_END; i++) {wprintf(L"%s : %f\%\n", stats_bi[i].name, lt->bi_score[i]);}
-    wprintf(L"\nTRIGRAM STATS\n");
-    for (int i = 0; i < TRI_END; i++) {wprintf(L"%s : %f\%\n", stats_tri[i].name, lt->tri_score[i]);}
-    wprintf(L"\nQUADGRAM STATS\n");
-    for (int i = 0; i < QUAD_END; i++) {wprintf(L"%s : %f\%\n", stats_quad[i].name, lt->quad_score[i]);}
-    wprintf(L"\nSKIPGRAM STATS\n");
+    log_print('n',L"\nMONOGRAM STATS\n");
+    for (int i = 0; i < MONO_END; i++) {log_print('n',L"%s : %f\%\n", stats_mono[i].name, lt->mono_score[i]);}
+    log_print('n',L"\nBIGRAM STATS\n");
+    for (int i = 0; i < BI_END; i++) {log_print('n',L"%s : %f\%\n", stats_bi[i].name, lt->bi_score[i]);}
+    log_print('n',L"\nTRIGRAM STATS\n");
+    for (int i = 0; i < TRI_END; i++) {log_print('n',L"%s : %f\%\n", stats_tri[i].name, lt->tri_score[i]);}
+    log_print('n',L"\nQUADGRAM STATS\n");
+    for (int i = 0; i < QUAD_END; i++) {log_print('n',L"%s : %f\%\n", stats_quad[i].name, lt->quad_score[i]);}
+    log_print('n',L"\nSKIPGRAM STATS\n");
     for (int i = 0; i < SKIP_END; i++)
     {
-        wprintf(L"%s : ", stats_skip[i].name);
+        log_print('n',L"%s : ", stats_skip[i].name);
         for (int j = 1; j <= 9; j++)
         {
-            wprintf(L"%f", lt->skip_score[j][i]);
-            wprintf(L"%|");
+            log_print('n',L"%f", lt->skip_score[j][i]);
+            log_print('n',L"%|");
         }
-        wprintf(L"\n");
+        log_print('n',L"\n");
     }
-    wprintf(L"\nMETA STATS\n");
-    for (int i = 0; i < META_END; i++) {wprintf(L"%s : %f\%\n", stats_meta[i].name, lt->meta_score[i]);}
+    log_print('n',L"\nMETA STATS\n");
+    for (int i = 0; i < META_END; i++) {log_print('n',L"%s : %f\%\n", stats_meta[i].name, lt->meta_score[i]);}
 }
 
 void verbose_print(layout *lt)
@@ -646,14 +637,13 @@ void print_layout(layout *lt)
 
 void print_ranking()
 {
-    wprintf(L"Raking:\n\n");
+    log_print('q',L"Raking:\n\n");
     layout_node *current = head_node;
-    if (current == NULL) {wprintf(L"no layouts in ranking?\n");}
+    if (current == NULL) {log_print('q',L"no layouts in ranking?\n");}
     while (current != NULL) {
-        wprintf(L"%s -> %f\n", current->name, current->score);
+        log_print('q',L"%s -> %f\n", current->name, current->score);
         current = current->next;
     }
-    wprintf(L"\nDone\n\n");
 }
 
 void print_pins()
@@ -662,8 +652,8 @@ void print_pins()
     {
         for (int j = 0; j < COL; j++)
         {
-            wprintf(L"%d ", pins[i][j]);
+            log_print('v',L"%d ", pins[i][j]);
         }
-        wprintf(L"\n");
+        log_print('v',L"\n");
     }
 }
