@@ -54,7 +54,7 @@ void initialize_stats()
 
 void clean_stats()
 {
-    log_print('v',L"     Cleaning monogram stats... ");
+    log_print('v',L"\n     Cleaning monogram stats... ");
     clean_mono_stats();
     log_print('v',L"Done\n");
     log_print('v',L"     Cleaning bigram stats... ");
@@ -76,7 +76,7 @@ void clean_stats()
 
 void stats_to_array()
 {
-    log_print('v',L"     Converting monogram stats... ");
+    log_print('v',L"\n     Converting monogram stats... ");
     mono_to_array();
     log_print('v',L"Done\n");
     log_print('v',L"     Converting bigram stats... ");

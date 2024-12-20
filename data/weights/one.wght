@@ -10,8 +10,8 @@ Right Middle Usage : 0
 Right Ring Usage : 0
 Right Pinky Usage : 0
 Right Outer Usage : 0
-Left Hand Usage : 0
-Right Hand Usage : 0
+Left Hand Usage : 1
+Right Hand Usage : 1
 Top Row Usage : 0
 Home Row Usage : 0
 Bottom Row Usage : 0
@@ -139,4 +139,4 @@ Bad Right Index Skipgram : 0 0 0 0 0 0 0 0 0
 Bad Right Middle Skipgram : 0 0 0 0 0 0 0 0 0
 Bad Right Ring Skipgram : 0 0 0 0 0 0 0 0 0
 Bad Right Pinky Skipgram : 0 0 0 0 0 0 0 0 0
-Hand Balance : 0
+Hand Balance : -1

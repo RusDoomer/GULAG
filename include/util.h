@@ -29,6 +29,8 @@ void normalize_corpus();
 void alloc_layout(layout **lt);
 void free_layout(layout *lt);
 
+void normalize_score();
+
 void get_score(layout *lt);
 
 void get_layout_diff(layout *lt, layout *lt2, layout *lt_diff);

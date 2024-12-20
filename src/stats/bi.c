@@ -474,7 +474,7 @@ void trim_bi_stats()
 void clean_bi_stats()
 {
     if (bi_head == NULL) {return;}
-    while (bi_head != NULL && (bi_head->length == 0 || mono_head->weight == 0)) {
+    while (bi_head != NULL && (bi_head->length == 0 || bi_head->weight == 0)) {
         bi_stat *temp = bi_head;
         bi_head = bi_head->next;
         free(temp);

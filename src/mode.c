@@ -254,16 +254,16 @@ void improve(int shuffle) {
     print_pins();
     log_print('v',L"\n");
 
-    log_print('n',L"1/8: Allocating layout... ");
+    log_print('n',L"1/9: Allocating layout... ");
     alloc_layout(&lt);
     log_print('n',L"Done\n\n");
 
-    log_print('n',L"2/8: Reading layout... ");
+    log_print('n',L"2/9: Reading layout... ");
     read_layout(lt, 1);
     log_print('n',L"Done\n\n");
 
     if (shuffle) {
-        log_print('n',L"3/8: Shuffling layout... ");
+        log_print('n',L"3/9: Shuffling layout... ");
         shuffle_layout(lt);
         strcpy(lt->name, "random shuffle");
         log_print('n',L"Done\n\n");
@@ -272,7 +272,7 @@ void improve(int shuffle) {
         log_print('n',L"Done\n\n");
     }
 
-    log_print('n',L"4/8: Analyzing starting point... ");
+    log_print('n',L"4/9: Analyzing starting point... ");
     single_analyze(lt);
     get_score(lt);
     log_print('n',L"Done\n\n");
@@ -280,13 +280,14 @@ void improve(int shuffle) {
     print_layout(lt);
     log_print('n',L"\n");
 
+    normalize = 1;
     int iterations = repetitions / threads;
 
     thread_data *thread_data_array = (thread_data *)malloc(threads * sizeof(thread_data));
     pthread_t *thread_ids = (pthread_t *)malloc(threads * sizeof(pthread_t));
     layout **best_layouts = (layout **)malloc(threads * sizeof(layout *));
 
-    log_print('n',L"5/8: Initializing threads... ");
+    log_print('n',L"5/9: Initializing threads... ");
     for (int i = 0; i < threads; i++) {
         best_layouts[i] = NULL;
         thread_data_array[i].lt = lt;
@@ -298,14 +299,14 @@ void improve(int shuffle) {
     log_print('n',L"Done\n\n");
 
     // Wait for all threads to complete
-    log_print('n',L"6/8: Waiting for threads to complete... ");
+    log_print('n',L"6/9: Waiting for threads to complete... ");
     for (int i = 0; i < threads; i++) {
         pthread_join(thread_ids[i], NULL);
     }
     log_print('n',L"Done\n\n");
 
     // Find the best layout among all threads
-    log_print('n',L"7/8: Selecting best layout... ");
+    log_print('n',L"7/9: Selecting best layout... ");
     layout *best_layout = best_layouts[0];
     for (int i = 1; i < threads; i++) {
         if (best_layouts[i]->score > best_layout->score) {
@@ -314,8 +315,14 @@ void improve(int shuffle) {
     }
     log_print('n',L"Done\n\n");
 
+    normalize = 0;
+    log_print('n',L"8/9: Analyzing best layout... ");
+    single_analyze(best_layout);
+    get_score(best_layout);
+    log_print('n',L"Done\n\n");
+
     // Compare with the original layout and print the better one
-    log_print('n',L"8/8: Printing layout...\n\n");
+    log_print('n',L"9/9: Printing layout...\n\n");
     if (best_layout->score > lt->score) {
         print_layout(best_layout);
     } else {
@@ -398,6 +405,9 @@ void gen_benchmark()
     log_print('q',L"\n");
     log_print('q',L"Choose the lowest number of threads with acceptable Layouts/Second for best results.");
     log_print('q',L"\n\n");
+
+    free(thread_array);
+    free(results);
 }
 
 void print_help() {
@@ -446,6 +456,6 @@ void print_help() {
 }
 
 void print_info() {
-    error("not implemented");
+    log_print('q',L"Welcome to GULAG v0.1 (AKA CULAG)\n");
     return;
 }

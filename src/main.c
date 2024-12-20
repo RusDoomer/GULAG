@@ -262,13 +262,17 @@ int main(int argc, char **argv) {
     clock_gettime(CLOCK_MONOTONIC, &start);
     log_print('q',L"----- Cleaning Up -----\n\n");
 
-    log_print('n',L"1/2: Removing irrelevant stats... \n");
+    log_print('n',L"1/3: Removing irrelevant stats... ");
     clean_stats();        /* stats.c */
     log_print('n',L"     Done\n\n");
 
-    log_print('n',L"2/2: Converting stats linked list to contiguous array... \n");
+    log_print('n',L"2/3: Converting stats linked list to contiguous array... ");
     stats_to_array();     /* stats.c */
     log_print('n',L"     Done\n\n");
+
+    log_print('n',L"3/3: Normalizing Scores... ");
+    normalize_score();     /* stats.c */
+    log_print('n',L"Done\n\n");
 
     clock_gettime(CLOCK_MONOTONIC, &end);
     elapsed = (end.tv_sec - start.tv_sec) + (end.tv_nsec - start.tv_nsec) / 1e9;

@@ -240,6 +240,46 @@ void free_layout(layout *lt)
     free(lt);
 }
 
+void normalize_score()
+{
+    max_score = 0;
+    min_score = 0;
+    log_print('n',L"Finding raw max/min scores... ");
+    for (int i = 0; i < MONO_END; i++)
+    {
+        if(stats_mono[i].weight > 0) {max_score += 100 * stats_mono[i].weight;}
+        else {min_score += 100 * stats_mono[i].weight;}
+    }
+    for (int i = 0; i < BI_END; i++)
+    {
+        if(stats_bi[i].weight > 0) {max_score += 100 * stats_bi[i].weight;}
+        else {min_score += 100 * stats_bi[i].weight;}
+    }
+    for (int i = 0; i < TRI_END; i++)
+    {
+        if(stats_tri[i].weight > 0) {max_score += 100 * stats_tri[i].weight;}
+        else {min_score += 100 * stats_tri[i].weight;}
+    }
+    for (int i = 0; i < QUAD_END; i++)
+    {
+        if(stats_quad[i].weight > 0) {max_score += 100 * stats_quad[i].weight;}
+        else {min_score += 100 * stats_quad[i].weight;}
+    }
+    for (int i = 1; i <= 9; i++)
+    {
+        for (int j = 0; j < SKIP_END; j++)
+        {
+            if(stats_skip[j].weight[i] > 0) {max_score += 100 * stats_skip[j].weight[i];}
+        else {min_score += 100 * stats_skip[j].weight[i];}
+        }
+    }
+    for (int i = 0; i < META_END; i++)
+    {
+        if(stats_meta[i].weight > 0) {max_score += 100 * stats_meta[i].weight;}
+        else {min_score += 100 * stats_meta[i].weight;}
+    }
+}
+
 void get_score(layout *lt)
 {
     lt->score = 0;
@@ -270,6 +310,8 @@ void get_score(layout *lt)
     {
         lt->score += lt->meta_score[i] * stats_meta[i].weight;
     }
+
+   if (normalize) {lt->score = (lt->score - min_score) / (max_score - min_score);}
 }
 
 void get_layout_diff(layout *lt, layout *lt2, layout *lt_diff)
