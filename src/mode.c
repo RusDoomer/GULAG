@@ -149,12 +149,14 @@ typedef struct thread_data {
     layout *lt;
     layout **best_lt;
     int iterations;
+    int thread_id;
 } thread_data;
 
 void *thread_function(void *arg) {
     thread_data *data = (thread_data *)arg;
     layout *lt = data->lt;
     int iterations = data->iterations;
+    int thread_id = data->thread_id;
 
     // Allocate max and working layouts
     layout *max_lt, *working_lt;
@@ -172,7 +174,9 @@ void *thread_function(void *arg) {
     get_score(working_lt);
     copy(max_lt, working_lt);
 
-    // Simulated annealing
+    // Simulated annealing with percentage completion and estimated time for the first thread
+    struct timespec start, current;
+    clock_gettime(CLOCK_MONOTONIC, &start);
     for (int i = 0; i < iterations; i++) {
         // Swap two characters in working_lt
         int row1, col1, row2, col2;
@@ -202,6 +206,23 @@ void *thread_function(void *arg) {
             working_lt->matrix[row1][col1] = working_lt->matrix[row2][col2];
             working_lt->matrix[row2][col2] = temp;
         }
+
+        // Percentage completion and estimated time for the first thread
+        if (thread_id == 0 && i % 100 == 0) { // Only update every 100 iterations
+            clock_gettime(CLOCK_MONOTONIC, &current);
+            double elapsed = (current.tv_sec - start.tv_sec) + (current.tv_nsec - start.tv_nsec) / 1e9;
+            double progress = (double)i / iterations;
+            double iterationsPerSecond = i / elapsed;
+            double totalIterationsPerSecond = iterationsPerSecond * threads;
+            int estimatedRemaining = (iterations - i) / iterationsPerSecond; // Calculate remaining time for this thread
+
+            log_print('n', L"\r%3d%%  ETA: %5ds, %8.0lf layouts/sec             ",
+                     (int)(progress * 100), estimatedRemaining, totalIterationsPerSecond);
+            fflush(stdout);
+        }
+    }
+    if (thread_id == 0) {
+        log_print('q', L"\n"); // Newline after percentage reaches 100%
     }
 
     // Allocate memory for best layout and copy max_lt to it
@@ -218,15 +239,12 @@ void *thread_function(void *arg) {
 }
 
 void generate() {
-    for (int i = 0; i < ROW; i++)
-    {
-        for (int j = 0; j < COL; j++)
-        {
+    for (int i = 0; i < ROW; i++) {
+        for (int j = 0; j < COL; j++) {
             pins[i][j] = 0;
         }
     }
     improve(1);
-    return;
 }
 
 void improve(int shuffle) {
@@ -244,7 +262,6 @@ void improve(int shuffle) {
     read_layout(lt, 1);
     log_print('n',L"Done\n\n");
 
-    // If shuffle is true, shuffle the layout matrix
     if (shuffle) {
         log_print('n',L"3/8: Shuffling layout... ");
         shuffle_layout(lt);
@@ -263,21 +280,19 @@ void improve(int shuffle) {
     print_layout(lt);
     log_print('n',L"\n");
 
-    // Determine the number of iterations per thread
     int iterations = repetitions / threads;
 
-    // Allocate thread data and pthread_t array
     thread_data *thread_data_array = (thread_data *)malloc(threads * sizeof(thread_data));
     pthread_t *thread_ids = (pthread_t *)malloc(threads * sizeof(pthread_t));
     layout **best_layouts = (layout **)malloc(threads * sizeof(layout *));
 
-    // Initialize thread data and create threads
     log_print('n',L"5/8: Initializing threads... ");
     for (int i = 0; i < threads; i++) {
         best_layouts[i] = NULL;
         thread_data_array[i].lt = lt;
         thread_data_array[i].best_lt = &best_layouts[i];
         thread_data_array[i].iterations = iterations;
+        thread_data_array[i].thread_id = i;
         pthread_create(&thread_ids[i], NULL, thread_function, (void *)&thread_data_array[i]);
     }
     log_print('n',L"Done\n\n");
