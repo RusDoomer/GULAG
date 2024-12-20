@@ -346,8 +346,11 @@ void gen_benchmark()
     for (int i = 0; i < total; i++) {log_print('v',L"%d ", thread_array[i]);}
     log_print('v',L"\n\n");
 
+    char temp = output_mode;
+    output_mode = 'q';
     for (int i = 0; i < total; i++)
     {
+
         log_print('q',L"BENCHMARK RUN %d/%d\n\n", i+1, total);
         threads = thread_array[i];
 
@@ -362,8 +365,9 @@ void gen_benchmark()
         double time_per_repetition = elapsed / repetitions;
         results[i] = 1.0 / time_per_repetition;
     }
+    output_mode = temp;
 
-    log_print('q',L"BENCHMARK RESULTS:\n\n");
+    log_print('q',L"\nBENCHMARK RESULTS:\n\n");
     log_print('q',L"Threads - Layouts/Second:\n\n");
     log_print('q',L"Powers of 2:\n");
     for (int i = 0; i < count; i++)
