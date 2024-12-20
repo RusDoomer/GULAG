@@ -1,5 +1,6 @@
 #include <string.h>
 #include <stdlib.h>
+#include <math.h>
 
 #include "meta.h"
 #include "util.h"
@@ -11,7 +12,7 @@ void initialize_meta_stats()
     meta_stat *hand_balance = (meta_stat *)malloc(sizeof(meta_stat));
     meta_head = hand_balance;
     strcpy(hand_balance->name, "Hand Balance");
-    hand_balance->weight = 0;
+    hand_balance->weight = -INFINITY;
 
     hand_balance->next = NULL;
 }

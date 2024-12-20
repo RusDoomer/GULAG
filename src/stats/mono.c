@@ -1,5 +1,6 @@
 #include <string.h>
 #include <stdlib.h>
+#include <math.h>
 
 #include "mono.h"
 #include "util.h"
@@ -14,7 +15,7 @@ void initialize_mono_stats()
     mono_stat *left_outer = (mono_stat *)malloc(sizeof(mono_stat));
     mono_head = left_outer;
     strcpy(left_outer->name, "Left Outer Usage");
-    left_outer->weight = 0;
+    left_outer->weight = -INFINITY;
     left_outer->length = 0;
     for (int i = 0; i < DIM1; i++)
     {
@@ -33,7 +34,7 @@ void initialize_mono_stats()
     mono_stat *left_pinky = (mono_stat *)malloc(sizeof(mono_stat));
     left_outer->next = left_pinky;
     strcpy(left_pinky->name, "Left Pinky Usage");
-    left_pinky->weight = 0;
+    left_pinky->weight = -INFINITY;
     left_pinky->length = 0;
     for (int i = 0; i < DIM1; i++)
     {
@@ -52,7 +53,7 @@ void initialize_mono_stats()
     mono_stat *left_ring = (mono_stat *)malloc(sizeof(mono_stat));
     left_pinky->next = left_ring;
     strcpy(left_ring->name, "Left Ring Usage");
-    left_ring->weight = 0;
+    left_ring->weight = -INFINITY;
     left_ring->length = 0;
     for (int i = 0; i < DIM1; i++)
     {
@@ -71,7 +72,7 @@ void initialize_mono_stats()
     mono_stat *left_middle = (mono_stat *)malloc(sizeof(mono_stat));
     left_ring->next = left_middle;
     strcpy(left_middle->name, "Left Middle Usage");
-    left_middle->weight = 0;
+    left_middle->weight = -INFINITY;
     left_middle->length = 0;
     for (int i = 0; i < DIM1; i++)
     {
@@ -90,7 +91,7 @@ void initialize_mono_stats()
     mono_stat *left_index = (mono_stat *)malloc(sizeof(mono_stat));
     left_middle->next = left_index;
     strcpy(left_index->name, "Left Index Usage");
-    left_index->weight = 0;
+    left_index->weight = -INFINITY;
     left_index->length = 0;
     for (int i = 0; i < DIM1; i++)
     {
@@ -109,7 +110,7 @@ void initialize_mono_stats()
     mono_stat *left_inner = (mono_stat *)malloc(sizeof(mono_stat));
     left_index->next = left_inner;
     strcpy(left_inner->name, "Left Inner Usage");
-    left_inner->weight = 0;
+    left_inner->weight = -INFINITY;
     left_inner->length = 0;
     for (int i = 0; i < DIM1; i++)
     {
@@ -129,7 +130,7 @@ void initialize_mono_stats()
     mono_stat *right_inner = (mono_stat *)malloc(sizeof(mono_stat));
     left_inner->next = right_inner;
     strcpy(right_inner->name, "Right Inner Usage");
-    right_inner->weight = 0;
+    right_inner->weight = -INFINITY;
     right_inner->length = 0;
     for (int i = 0; i < DIM1; i++)
     {
@@ -148,7 +149,7 @@ void initialize_mono_stats()
     mono_stat *right_index = (mono_stat *)malloc(sizeof(mono_stat));
     right_inner->next = right_index;
     strcpy(right_index->name, "Right Index Usage");
-    right_index->weight = 0;
+    right_index->weight = -INFINITY;
     right_index->length = 0;
     for (int i = 0; i < DIM1; i++)
     {
@@ -167,7 +168,7 @@ void initialize_mono_stats()
     mono_stat *right_middle = (mono_stat *)malloc(sizeof(mono_stat));
     right_index->next = right_middle;
     strcpy(right_middle->name, "Right Middle Usage");
-    right_middle->weight = 0;
+    right_middle->weight = -INFINITY;
     right_middle->length = 0;
     for (int i = 0; i < DIM1; i++)
     {
@@ -186,7 +187,7 @@ void initialize_mono_stats()
     mono_stat *right_ring = (mono_stat *)malloc(sizeof(mono_stat));
     right_middle->next = right_ring;
     strcpy(right_ring->name, "Right Ring Usage");
-    right_ring->weight = 0;
+    right_ring->weight = -INFINITY;
     right_ring->length = 0;
     for (int i = 0; i < DIM1; i++)
     {
@@ -205,7 +206,7 @@ void initialize_mono_stats()
     mono_stat *right_pinky = (mono_stat *)malloc(sizeof(mono_stat));
     right_ring->next = right_pinky;
     strcpy(right_pinky->name, "Right Pinky Usage");
-    right_pinky->weight = 0;
+    right_pinky->weight = -INFINITY;
     right_pinky->length = 0;
     for (int i = 0; i < DIM1; i++)
     {
@@ -224,7 +225,7 @@ void initialize_mono_stats()
     mono_stat *right_outer = (mono_stat *)malloc(sizeof(mono_stat));
     right_pinky->next = right_outer;
     strcpy(right_outer->name, "Right Outer Usage");
-    right_outer->weight = 0;
+    right_outer->weight = -INFINITY;
     right_outer->length = 0;
     for (int i = 0; i < DIM1; i++)
     {
@@ -243,7 +244,7 @@ void initialize_mono_stats()
     mono_stat *left_hand = (mono_stat *)malloc(sizeof(mono_stat));
     right_outer->next = left_hand;
     strcpy(left_hand->name, "Left Hand Usage");
-    left_hand->weight = 0;
+    left_hand->weight = -INFINITY;
     left_hand->length = 0;
     for (int i = 0; i < DIM1; i++)
     {
@@ -262,7 +263,7 @@ void initialize_mono_stats()
     mono_stat *right_hand = (mono_stat *)malloc(sizeof(mono_stat));
     left_hand->next = right_hand;
     strcpy(right_hand->name, "Right Hand Usage");
-    right_hand->weight = 0;
+    right_hand->weight = -INFINITY;
     right_hand->length = 0;
     for (int i = 0; i < DIM1; i++)
     {
@@ -281,7 +282,7 @@ void initialize_mono_stats()
     mono_stat *top_row = (mono_stat *)malloc(sizeof(mono_stat));
     right_hand->next = top_row;
     strcpy(top_row->name, "Top Row Usage");
-    top_row->weight = 0;
+    top_row->weight = -INFINITY;
     top_row->length = 0;
     for (int i = 0; i < DIM1; i++)
     {
@@ -300,7 +301,7 @@ void initialize_mono_stats()
     mono_stat *home_row = (mono_stat *)malloc(sizeof(mono_stat));
     top_row->next = home_row;
     strcpy(home_row->name, "Home Row Usage");
-    home_row->weight = 0;
+    home_row->weight = -INFINITY;
     home_row->length = 0;
     for (int i = 0; i < DIM1; i++)
     {
@@ -319,7 +320,7 @@ void initialize_mono_stats()
     mono_stat *bottom_row = (mono_stat *)malloc(sizeof(mono_stat));
     home_row->next = bottom_row;
     strcpy(bottom_row->name, "Bottom Row Usage");
-    bottom_row->weight = 0;
+    bottom_row->weight = -INFINITY;
     bottom_row->length = 0;
     for (int i = 0; i < DIM1; i++)
     {
@@ -381,7 +382,7 @@ void trim_mono_stats()
 void clean_mono_stats()
 {
     if (mono_head == NULL) {return;}
-    while (mono_head != NULL && (mono_head->length == 0)) {
+    while (mono_head != NULL && (mono_head->length == 0 || mono_head->weight == 0)) {
         mono_stat *temp = mono_head;
         mono_head = mono_head->next;
         free(temp);
@@ -389,7 +390,7 @@ void clean_mono_stats()
 
     mono_stat *current = mono_head;
     while (current != NULL && current->next != NULL) {
-        if (current->next->length == 0) {
+        if (current->next->length == 0 || current->next->weight == 0) {
             mono_stat *temp = current->next;
             current->next = current->next->next;
             free(temp);

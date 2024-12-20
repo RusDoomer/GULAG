@@ -4,6 +4,7 @@
 #include <wchar.h>
 #include <getopt.h>
 #include <unistd.h>
+#include <stdarg.h>
 
 #include "io.h"
 #include "io_util.h"
@@ -14,6 +15,21 @@
 #define BUFFER_SIZE 10000
 
 #include <wctype.h>
+
+void log_print(char required_level, const wchar_t *format, ...) {
+    // Check if the current output mode meets or exceeds the required level
+    if ((required_level == 'q' && (output_mode == 'q' || output_mode == 'n' || output_mode == 'v')) ||
+        (required_level == 'n' && (output_mode == 'n' || output_mode == 'v')) ||
+        (required_level == 'v' && output_mode == 'v')) {
+
+        va_list args;
+        va_start(args, format);
+        vwprintf(format, args);
+        va_end(args);
+
+        fflush(stdout);
+    }
+}
 
 void read_config()
 {

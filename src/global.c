@@ -36,7 +36,7 @@ char *weight_name = NULL;
 char run_mode = 'a';
 int repetitions = 10000;
 int threads = 8;
-char output_mode = 'n';
+char output_mode = 'v';
 
 wchar_t *lang_arr;
 int *char_table;

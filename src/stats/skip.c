@@ -1,5 +1,6 @@
 #include <string.h>
 #include <stdlib.h>
+#include <math.h>
 
 #include "skip.h"
 #include "util.h"
@@ -13,7 +14,7 @@ void initialize_skip_stats()
     skip_head = same_finger;
     strcpy(same_finger->name, "Same Finger Skipgram");
     for (int i = 0; i < 10; i++) {
-        same_finger->weight[i] = 0;
+        same_finger->weight[i] = -INFINITY;
     }
     same_finger->length = 0;
     for (int i = 0; i < DIM2; i++)
@@ -34,7 +35,7 @@ void initialize_skip_stats()
     same_finger->next = left_pinky;
     strcpy(left_pinky->name, "Left Pinky Skipgram");
     for (int i = 0; i < 10; i++) {
-        left_pinky->weight[i] = 0;
+        left_pinky->weight[i] = -INFINITY;
     }
     left_pinky->length = 0;
     for (int i = 0; i < DIM2; i++)
@@ -55,7 +56,7 @@ void initialize_skip_stats()
     left_pinky->next = left_ring;
     strcpy(left_ring->name, "Left Ring Skipgram");
     for (int i = 0; i < 10; i++) {
-        left_ring->weight[i] = 0;
+        left_ring->weight[i] = -INFINITY;
     }
     left_ring->length = 0;
     for (int i = 0; i < DIM2; i++)
@@ -76,7 +77,7 @@ void initialize_skip_stats()
     left_ring->next = left_middle;
     strcpy(left_middle->name, "Left Middle Skipgram");
     for (int i = 0; i < 10; i++) {
-        left_middle->weight[i] = 0;
+        left_middle->weight[i] = -INFINITY;
     }
     left_middle->length = 0;
     for (int i = 0; i < DIM2; i++)
@@ -97,7 +98,7 @@ void initialize_skip_stats()
     left_middle->next = left_index;
     strcpy(left_index->name, "Left Index Skipgram");
     for (int i = 0; i < 10; i++) {
-        left_index->weight[i] = 0;
+        left_index->weight[i] = -INFINITY;
     }
     left_index->length = 0;
     for (int i = 0; i < DIM2; i++)
@@ -118,7 +119,7 @@ void initialize_skip_stats()
     left_index->next = right_index;
     strcpy(right_index->name, "Right Index Skipgram");
     for (int i = 0; i < 10; i++) {
-        right_index->weight[i] = 0;
+        right_index->weight[i] = -INFINITY;
     }
     right_index->length = 0;
     for (int i = 0; i < DIM2; i++)
@@ -139,7 +140,7 @@ void initialize_skip_stats()
     right_index->next = right_middle;
     strcpy(right_middle->name, "Right Middle Skipgram");
     for (int i = 0; i < 10; i++) {
-        right_middle->weight[i] = 0;
+        right_middle->weight[i] = -INFINITY;
     }
     right_middle->length = 0;
     for (int i = 0; i < DIM2; i++)
@@ -160,7 +161,7 @@ void initialize_skip_stats()
     right_middle->next = right_ring;
     strcpy(right_ring->name, "Right Ring Skipgram");
     for (int i = 0; i < 10; i++) {
-        right_ring->weight[i] = 0;
+        right_ring->weight[i] = -INFINITY;
     }
     right_ring->length = 0;
     for (int i = 0; i < DIM2; i++)
@@ -181,7 +182,7 @@ void initialize_skip_stats()
     right_ring->next = right_pinky;
     strcpy(right_pinky->name, "Right Pinky Skipgram");
     for (int i = 0; i < 10; i++) {
-        right_pinky->weight[i] = 0;
+        right_pinky->weight[i] = -INFINITY;
     }
     right_pinky->length = 0;
     for (int i = 0; i < DIM2; i++)
@@ -202,7 +203,7 @@ void initialize_skip_stats()
     right_pinky->next = bad_same_finger;
     strcpy(bad_same_finger->name, "Bad Same Finger Skipgram");
     for (int i = 0; i < 10; i++) {
-        bad_same_finger->weight[i] = 0;
+        bad_same_finger->weight[i] = -INFINITY;
     }
     bad_same_finger->length = 0;
     for (int i = 0; i < DIM2; i++)
@@ -223,7 +224,7 @@ void initialize_skip_stats()
     bad_same_finger->next = bad_left_pinky;
     strcpy(bad_left_pinky->name, "Bad Left Pinky Skipgram");
     for (int i = 0; i < 10; i++) {
-        bad_left_pinky->weight[i] = 0;
+        bad_left_pinky->weight[i] = -INFINITY;
     }
     bad_left_pinky->length = 0;
     for (int i = 0; i < DIM2; i++)
@@ -244,7 +245,7 @@ void initialize_skip_stats()
     bad_left_pinky->next = bad_left_ring;
     strcpy(bad_left_ring->name, "Bad Left Ring Skipgram");
     for (int i = 0; i < 10; i++) {
-        bad_left_ring->weight[i] = 0;
+        bad_left_ring->weight[i] = -INFINITY;
     }
     bad_left_ring->length = 0;
     for (int i = 0; i < DIM2; i++)
@@ -265,7 +266,7 @@ void initialize_skip_stats()
     bad_left_ring->next = bad_left_middle;
     strcpy(bad_left_middle->name, "Bad Left Middle Skipgram");
     for (int i = 0; i < 10; i++) {
-        bad_left_middle->weight[i] = 0;
+        bad_left_middle->weight[i] = -INFINITY;
     }
     bad_left_middle->length = 0;
     for (int i = 0; i < DIM2; i++)
@@ -286,7 +287,7 @@ void initialize_skip_stats()
     bad_left_middle->next = bad_left_index;
     strcpy(bad_left_index->name, "Bad Left Index Skipgram");
     for (int i = 0; i < 10; i++) {
-        bad_left_index->weight[i] = 0;
+        bad_left_index->weight[i] = -INFINITY;
     }
     bad_left_index->length = 0;
     for (int i = 0; i < DIM2; i++)
@@ -307,7 +308,7 @@ void initialize_skip_stats()
     bad_left_index->next = bad_right_index;
     strcpy(bad_right_index->name, "Bad Right Index Skipgram");
     for (int i = 0; i < 10; i++) {
-        bad_right_index->weight[i] = 0;
+        bad_right_index->weight[i] = -INFINITY;
     }
     bad_right_index->length = 0;
     for (int i = 0; i < DIM2; i++)
@@ -328,7 +329,7 @@ void initialize_skip_stats()
     bad_right_index->next = bad_right_middle;
     strcpy(bad_right_middle->name, "Bad Right Middle Skipgram");
     for (int i = 0; i < 10; i++) {
-        bad_right_middle->weight[i] = 0;
+        bad_right_middle->weight[i] = -INFINITY;
     }
     bad_right_middle->length = 0;
     for (int i = 0; i < DIM2; i++)
@@ -349,7 +350,7 @@ void initialize_skip_stats()
     bad_right_middle->next = bad_right_ring;
     strcpy(bad_right_ring->name, "Bad Right Ring Skipgram");
     for (int i = 0; i < 10; i++) {
-        bad_right_ring->weight[i] = 0;
+        bad_right_ring->weight[i] = -INFINITY;
     }
     bad_right_ring->length = 0;
     for (int i = 0; i < DIM2; i++)
@@ -370,7 +371,7 @@ void initialize_skip_stats()
     bad_right_ring->next = bad_right_pinky;
     strcpy(bad_right_pinky->name, "Bad Right Pinky Skipgram");
     for (int i = 0; i < 10; i++) {
-        bad_right_pinky->weight[i] = 0;
+        bad_right_pinky->weight[i] = -INFINITY;
     }
     bad_right_pinky->length = 0;
     for (int i = 0; i < DIM2; i++)
@@ -430,10 +431,19 @@ void trim_skip_stats()
     }
 }
 
+int all_zeroes(skip_stat *stat)
+{
+    for (int i = 1; i <= 9; i++)
+    {
+        if (stat->weight[i] != 0) {return 0;}
+    }
+    return 1;
+}
+
 void clean_skip_stats()
 {
     if (skip_head == NULL) {return;}
-    while (skip_head != NULL && (skip_head->length == 0)) {
+    while (skip_head != NULL && (skip_head->length == 0 || all_zeroes(skip_head))) {
         skip_stat *temp = skip_head;
         skip_head = skip_head->next;
         free(temp);
@@ -441,7 +451,7 @@ void clean_skip_stats()
 
     skip_stat *current = skip_head;
     while (current != NULL && current->next != NULL) {
-        if (current->next->length == 0) {
+        if (current->next->length == 0 || all_zeroes(current->next)) {
             skip_stat *temp = current->next;
             current->next = current->next->next;
             free(temp);

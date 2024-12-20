@@ -1,5 +1,6 @@
 #include <string.h>
 #include <stdlib.h>
+#include <math.h>
 
 #include "tri.h"
 #include "util.h"
@@ -12,7 +13,7 @@ void initialize_tri_stats()
     tri_stat *same_finger = (tri_stat *)malloc(sizeof(tri_stat));
     tri_head = same_finger;
     strcpy(same_finger->name, "Same Finger Trigram");
-    same_finger->weight = 0;
+    same_finger->weight = -INFINITY;
     same_finger->length = 0;
     for (int i = 0; i < DIM3; i++)
     {
@@ -31,7 +32,7 @@ void initialize_tri_stats()
     tri_stat *alt = (tri_stat *)malloc(sizeof(tri_stat));
     same_finger->next = alt;
     strcpy(alt->name, "Alternation");
-    alt->weight = 0;
+    alt->weight = -INFINITY;
     alt->length = 0;
     for (int i = 0; i < DIM3; i++)
     {
@@ -50,7 +51,7 @@ void initialize_tri_stats()
     tri_stat *redirect = (tri_stat *)malloc(sizeof(tri_stat));
     alt->next = redirect;
     strcpy(redirect->name, "Redirect");
-    redirect->weight = 0;
+    redirect->weight = -INFINITY;
     redirect->length = 0;
     for (int i = 0; i < DIM3; i++)
     {
@@ -69,7 +70,7 @@ void initialize_tri_stats()
     tri_stat *bad_redirect = (tri_stat *)malloc(sizeof(tri_stat));
     redirect->next = bad_redirect;
     strcpy(bad_redirect->name, "Bad Redirect");
-    bad_redirect->weight = 0;
+    bad_redirect->weight = -INFINITY;
     bad_redirect->length = 0;
     for (int i = 0; i < DIM3; i++)
     {
@@ -88,7 +89,7 @@ void initialize_tri_stats()
     tri_stat *onehand = (tri_stat *)malloc(sizeof(tri_stat));
     bad_redirect->next = onehand;
     strcpy(onehand->name, "One Hand");
-    onehand->weight = 0;
+    onehand->weight = -INFINITY;
     onehand->length = 0;
     for (int i = 0; i < DIM3; i++)
     {
@@ -107,7 +108,7 @@ void initialize_tri_stats()
     tri_stat *onehand_in = (tri_stat *)malloc(sizeof(tri_stat));
     onehand->next = onehand_in;
     strcpy(onehand_in->name, "One Hand In");
-    onehand_in->weight = 0;
+    onehand_in->weight = -INFINITY;
     onehand_in->length = 0;
     for (int i = 0; i < DIM3; i++)
     {
@@ -126,7 +127,7 @@ void initialize_tri_stats()
     tri_stat *onehand_out = (tri_stat *)malloc(sizeof(tri_stat));
     onehand_in->next = onehand_out;
     strcpy(onehand_out->name, "One Hand Out");
-    onehand_out->weight = 0;
+    onehand_out->weight = -INFINITY;
     onehand_out->length = 0;
     for (int i = 0; i < DIM3; i++)
     {
@@ -145,7 +146,7 @@ void initialize_tri_stats()
     tri_stat *same_row_onehand = (tri_stat *)malloc(sizeof(tri_stat));
     onehand_out->next = same_row_onehand;
     strcpy(same_row_onehand->name, "Same Row One Hand");
-    same_row_onehand->weight = 0;
+    same_row_onehand->weight = -INFINITY;
     same_row_onehand->length = 0;
     for (int i = 0; i < DIM3; i++)
     {
@@ -164,7 +165,7 @@ void initialize_tri_stats()
     tri_stat *same_row_onehand_in = (tri_stat *)malloc(sizeof(tri_stat));
     same_row_onehand->next = same_row_onehand_in;
     strcpy(same_row_onehand_in->name, "Same Row One Hand In");
-    same_row_onehand_in->weight = 0;
+    same_row_onehand_in->weight = -INFINITY;
     same_row_onehand_in->length = 0;
     for (int i = 0; i < DIM3; i++)
     {
@@ -183,7 +184,7 @@ void initialize_tri_stats()
     tri_stat *same_row_onehand_out = (tri_stat *)malloc(sizeof(tri_stat));
     same_row_onehand_in->next = same_row_onehand_out;
     strcpy(same_row_onehand_out->name, "Same Row One Hand Out");
-    same_row_onehand_out->weight = 0;
+    same_row_onehand_out->weight = -INFINITY;
     same_row_onehand_out->length = 0;
     for (int i = 0; i < DIM3; i++)
     {
@@ -202,7 +203,7 @@ void initialize_tri_stats()
     tri_stat *adjacent_finger_onehand = (tri_stat *)malloc(sizeof(tri_stat));
     same_row_onehand_out->next = adjacent_finger_onehand;
     strcpy(adjacent_finger_onehand->name, "Adjacent Finger One Hand");
-    adjacent_finger_onehand->weight = 0;
+    adjacent_finger_onehand->weight = -INFINITY;
     adjacent_finger_onehand->length = 0;
     for (int i = 0; i < DIM3; i++)
     {
@@ -221,7 +222,7 @@ void initialize_tri_stats()
     tri_stat *adjacent_finger_onehand_in = (tri_stat *)malloc(sizeof(tri_stat));
     adjacent_finger_onehand->next = adjacent_finger_onehand_in;
     strcpy(adjacent_finger_onehand_in->name, "Adjacent Finger One Hand In");
-    adjacent_finger_onehand_in->weight = 0;
+    adjacent_finger_onehand_in->weight = -INFINITY;
     adjacent_finger_onehand_in->length = 0;
     for (int i = 0; i < DIM3; i++)
     {
@@ -240,7 +241,7 @@ void initialize_tri_stats()
     tri_stat *adjacent_finger_onehand_out = (tri_stat *)malloc(sizeof(tri_stat));
     adjacent_finger_onehand_in->next = adjacent_finger_onehand_out;
     strcpy(adjacent_finger_onehand_out->name, "Adjacent Finger One Hand Out");
-    adjacent_finger_onehand_out->weight = 0;
+    adjacent_finger_onehand_out->weight = -INFINITY;
     adjacent_finger_onehand_out->length = 0;
     for (int i = 0; i < DIM3; i++)
     {
@@ -259,7 +260,7 @@ void initialize_tri_stats()
     tri_stat *same_row_adjacent_finger_onehand = (tri_stat *)malloc(sizeof(tri_stat));
     adjacent_finger_onehand_out->next = same_row_adjacent_finger_onehand;
     strcpy(same_row_adjacent_finger_onehand->name, "Same Row Adjacent Finger One Hand");
-    same_row_adjacent_finger_onehand->weight = 0;
+    same_row_adjacent_finger_onehand->weight = -INFINITY;
     same_row_adjacent_finger_onehand->length = 0;
     for (int i = 0; i < DIM3; i++)
     {
@@ -278,7 +279,7 @@ void initialize_tri_stats()
     tri_stat *same_row_adjacent_finger_onehand_in = (tri_stat *)malloc(sizeof(tri_stat));
     same_row_adjacent_finger_onehand->next = same_row_adjacent_finger_onehand_in;
     strcpy(same_row_adjacent_finger_onehand_in->name, "Same Row Adjacent Finger One Hand In");
-    same_row_adjacent_finger_onehand_in->weight = 0;
+    same_row_adjacent_finger_onehand_in->weight = -INFINITY;
     same_row_adjacent_finger_onehand_in->length = 0;
     for (int i = 0; i < DIM3; i++)
     {
@@ -297,7 +298,7 @@ void initialize_tri_stats()
     tri_stat *same_row_adjacent_finger_onehand_out = (tri_stat *)malloc(sizeof(tri_stat));
     same_row_adjacent_finger_onehand_in->next = same_row_adjacent_finger_onehand_out;
     strcpy(same_row_adjacent_finger_onehand_out->name, "Same Row Adjacent Finger One Hand Out");
-    same_row_adjacent_finger_onehand_out->weight = 0;
+    same_row_adjacent_finger_onehand_out->weight = -INFINITY;
     same_row_adjacent_finger_onehand_out->length = 0;
     for (int i = 0; i < DIM3; i++)
     {
@@ -316,7 +317,7 @@ void initialize_tri_stats()
     tri_stat *roll = (tri_stat *)malloc(sizeof(tri_stat));
     same_row_adjacent_finger_onehand_out->next = roll;
     strcpy(roll->name, "Roll");
-    roll->weight = 0;
+    roll->weight = -INFINITY;
     roll->length = 0;
     for (int i = 0; i < DIM3; i++)
     {
@@ -335,7 +336,7 @@ void initialize_tri_stats()
     tri_stat *roll_in = (tri_stat *)malloc(sizeof(tri_stat));
     roll->next = roll_in;
     strcpy(roll_in->name, "Roll In");
-    roll_in->weight = 0;
+    roll_in->weight = -INFINITY;
     roll_in->length = 0;
     for (int i = 0; i < DIM3; i++)
     {
@@ -354,7 +355,7 @@ void initialize_tri_stats()
     tri_stat *roll_out = (tri_stat *)malloc(sizeof(tri_stat));
     roll_in->next = roll_out;
     strcpy(roll_out->name, "Roll Out");
-    roll_out->weight = 0;
+    roll_out->weight = -INFINITY;
     roll_out->length = 0;
     for (int i = 0; i < DIM3; i++)
     {
@@ -373,7 +374,7 @@ void initialize_tri_stats()
     tri_stat *same_row_roll = (tri_stat *)malloc(sizeof(tri_stat));
     roll_out->next = same_row_roll;
     strcpy(same_row_roll->name, "Same Row Roll");
-    same_row_roll->weight = 0;
+    same_row_roll->weight = -INFINITY;
     same_row_roll->length = 0;
     for (int i = 0; i < DIM3; i++)
     {
@@ -392,7 +393,7 @@ void initialize_tri_stats()
     tri_stat *same_row_roll_in = (tri_stat *)malloc(sizeof(tri_stat));
     same_row_roll->next = same_row_roll_in;
     strcpy(same_row_roll_in->name, "Same Row Roll In");
-    same_row_roll_in->weight = 0;
+    same_row_roll_in->weight = -INFINITY;
     same_row_roll_in->length = 0;
     for (int i = 0; i < DIM3; i++)
     {
@@ -411,7 +412,7 @@ void initialize_tri_stats()
     tri_stat *same_row_roll_out = (tri_stat *)malloc(sizeof(tri_stat));
     same_row_roll_in->next = same_row_roll_out;
     strcpy(same_row_roll_out->name, "Same Row Roll Out");
-    same_row_roll_out->weight = 0;
+    same_row_roll_out->weight = -INFINITY;
     same_row_roll_out->length = 0;
     for (int i = 0; i < DIM3; i++)
     {
@@ -430,7 +431,7 @@ void initialize_tri_stats()
     tri_stat *adjacent_finger_roll = (tri_stat *)malloc(sizeof(tri_stat));
     same_row_roll_out->next = adjacent_finger_roll;
     strcpy(adjacent_finger_roll->name, "Adjacent Finger Roll");
-    adjacent_finger_roll->weight = 0;
+    adjacent_finger_roll->weight = -INFINITY;
     adjacent_finger_roll->length = 0;
     for (int i = 0; i < DIM3; i++)
     {
@@ -449,7 +450,7 @@ void initialize_tri_stats()
     tri_stat *adjacent_finger_roll_in = (tri_stat *)malloc(sizeof(tri_stat));
     adjacent_finger_roll->next = adjacent_finger_roll_in;
     strcpy(adjacent_finger_roll_in->name, "Adjacent Finger Roll In");
-    adjacent_finger_roll_in->weight = 0;
+    adjacent_finger_roll_in->weight = -INFINITY;
     adjacent_finger_roll_in->length = 0;
     for (int i = 0; i < DIM3; i++)
     {
@@ -468,7 +469,7 @@ void initialize_tri_stats()
     tri_stat *adjacent_finger_roll_out = (tri_stat *)malloc(sizeof(tri_stat));
     adjacent_finger_roll_in->next = adjacent_finger_roll_out;
     strcpy(adjacent_finger_roll_out->name, "Adjacent Finger Roll Out");
-    adjacent_finger_roll_out->weight = 0;
+    adjacent_finger_roll_out->weight = -INFINITY;
     adjacent_finger_roll_out->length = 0;
     for (int i = 0; i < DIM3; i++)
     {
@@ -487,7 +488,7 @@ void initialize_tri_stats()
     tri_stat *same_row_adjacent_finger_roll = (tri_stat *)malloc(sizeof(tri_stat));
     adjacent_finger_roll_out->next = same_row_adjacent_finger_roll;
     strcpy(same_row_adjacent_finger_roll->name, "Same Row Adjacent Finger Roll");
-    same_row_adjacent_finger_roll->weight = 0;
+    same_row_adjacent_finger_roll->weight = -INFINITY;
     same_row_adjacent_finger_roll->length = 0;
     for (int i = 0; i < DIM3; i++)
     {
@@ -506,7 +507,7 @@ void initialize_tri_stats()
     tri_stat *same_row_adjacent_finger_roll_in = (tri_stat *)malloc(sizeof(tri_stat));
     same_row_adjacent_finger_roll->next = same_row_adjacent_finger_roll_in;
     strcpy(same_row_adjacent_finger_roll_in->name, "Same Row Adjacent Finger Roll In");
-    same_row_adjacent_finger_roll_in->weight = 0;
+    same_row_adjacent_finger_roll_in->weight = -INFINITY;
     same_row_adjacent_finger_roll_in->length = 0;
     for (int i = 0; i < DIM3; i++)
     {
@@ -525,7 +526,7 @@ void initialize_tri_stats()
     tri_stat *same_row_adjacent_finger_roll_out = (tri_stat *)malloc(sizeof(tri_stat));
     same_row_adjacent_finger_roll_in->next = same_row_adjacent_finger_roll_out;
     strcpy(same_row_adjacent_finger_roll_out->name, "Same Row Adjacent Finger Roll Out");
-    same_row_adjacent_finger_roll_out->weight = 0;
+    same_row_adjacent_finger_roll_out->weight = -INFINITY;
     same_row_adjacent_finger_roll_out->length = 0;
     for (int i = 0; i < DIM3; i++)
     {
@@ -587,7 +588,7 @@ void trim_tri_stats()
 void clean_tri_stats()
 {
     if (tri_head == NULL) {return;}
-    while (tri_head != NULL && (tri_head->length == 0)) {
+    while (tri_head != NULL && (tri_head->length == 0 || tri_head->weight == 0)) {
         tri_stat *temp = tri_head;
         tri_head = tri_head->next;
         free(temp);
@@ -595,7 +596,7 @@ void clean_tri_stats()
 
     tri_stat *current = tri_head;
     while (current != NULL && current->next != NULL) {
-        if (current->next->length == 0) {
+        if (current->next->length == 0 || current->next->weight == 0) {
             tri_stat *temp = current->next;
             current->next = current->next->next;
             free(temp);

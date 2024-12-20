@@ -3,6 +3,8 @@
 
 #include "global.h"
 
+void log_print(char required_level, const wchar_t *format, ...);
+
 void read_config();
 
 void read_args(int argc, char **argv);
