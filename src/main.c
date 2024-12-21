@@ -270,10 +270,6 @@ int main(int argc, char **argv) {
     stats_to_array();     /* stats.c */
     log_print('n',L"     Done\n\n");
 
-    log_print('n',L"3/3: Normalizing Scores... ");
-    normalize_score();     /* stats.c */
-    log_print('n',L"Done\n\n");
-
     clock_gettime(CLOCK_MONOTONIC, &end);
     elapsed = (end.tv_sec - start.tv_sec) + (end.tv_nsec - start.tv_nsec) / 1e9;
     log_print('q',L"----- Clean Up Complete : %.9lf seconds -----\n\n", elapsed);

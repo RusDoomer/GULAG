@@ -135,8 +135,4 @@ extern quad_stat *stats_quad;
 extern skip_stat *stats_skip;
 extern meta_stat *stats_meta;
 
-extern float max_score;
-extern float min_score;
-extern int normalize;
-
 #endif

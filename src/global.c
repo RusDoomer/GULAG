@@ -71,7 +71,3 @@ tri_stat *stats_tri;
 quad_stat *stats_quad;
 skip_stat *stats_skip;
 meta_stat *stats_meta;
-
-float max_score;
-float min_score;
-int normalize = 0;

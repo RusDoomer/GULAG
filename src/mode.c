@@ -174,55 +174,133 @@ void *thread_function(void *arg) {
     get_score(working_lt);
     copy(max_lt, working_lt);
 
-    // Simulated annealing with percentage completion and estimated time for the first thread
+    // Simulated annealing with enhancements
     struct timespec start, current;
     clock_gettime(CLOCK_MONOTONIC, &start);
-    for (int i = 0; i < iterations; i++) {
-        // Swap two characters in working_lt
-        int row1, col1, row2, col2;
-        do {
-            row1 = rand() % ROW;
-            col1 = rand() % COL;
-            row2 = rand() % ROW;
-            col2 = rand() % COL;
-        } while (pins[row1][col1] || pins[row2][col2] || (row1 == row2 && col1 == col2));
 
-        // Perform the swap
-        int temp = working_lt->matrix[row1][col1];
-        working_lt->matrix[row1][col1] = working_lt->matrix[row2][col2];
-        working_lt->matrix[row2][col2] = temp;
+    float T = 1000.0;    // Initial temperature
+    int reheating_count = 0;
+    int initial_swap_count = 5; // Starting number of swaps
+    int swap_count;
+    float max_T = T;     // Store the initial temperature for scaling
+
+    // For adaptive cooling
+    int improvement_counter = 0;
+
+    if (thread_id == 0) {log_print('n',L"Done\n\n");}
+    if (thread_id == 0) {log_print('n',L"6/9: Waiting for threads to complete... \n");}
+
+    for (int i = 0; i < iterations; i++) {
+        // Temperature-dependent swap count
+        swap_count = (int)(initial_swap_count * (T / max_T));
+        swap_count = swap_count < 1 ? 1 : swap_count;
+        swap_count = swap_count > initial_swap_count ? initial_swap_count : swap_count;
+
+        // Store the swaps for potential reversal
+        int swap_rows1[swap_count];
+        int swap_cols1[swap_count];
+        int swap_rows2[swap_count];
+        int swap_cols2[swap_count];
+
+        // Perform the swaps
+        for (int j = 0; j < swap_count; j++) {
+            int row1, col1, row2, col2;
+            do {
+                row1 = rand() % ROW;
+                col1 = rand() % COL;
+                row2 = rand() % ROW;
+                col2 = rand() % COL;
+            } while (pins[row1][col1] || pins[row2][col2] || (row1 == row2 && col1 == col2));
+
+            // Store swap locations for BOTH positions
+            swap_rows1[j] = row1;
+            swap_cols1[j] = col1;
+            swap_rows2[j] = row2;
+            swap_cols2[j] = col2;
+
+            // Perform the swap
+            int temp = working_lt->matrix[row1][col1];
+            working_lt->matrix[row1][col1] = working_lt->matrix[row2][col2];
+            working_lt->matrix[row2][col2] = temp;
+        }
 
         // Analyze and score the new layout
         single_analyze(working_lt);
         get_score(working_lt);
 
-        // Simulated annealing acceptance criterion
+        // Exponentiate the score difference for acceptance probability (using sigmoid)
         float delta_score = working_lt->score - max_lt->score;
-        if (delta_score > 0 || exp(delta_score / (1000.0 * (1 - (float)i / iterations))) > random_float()) {
+        if (delta_score > 0 || (1.0 / (1.0 + exp(-10 * delta_score / T))) > random_float()) {
             copy(max_lt, working_lt);
+            improvement_counter++; // Increment improvement counter
         } else {
-            // Revert the swap
-            temp = working_lt->matrix[row1][col1];
-            working_lt->matrix[row1][col1] = working_lt->matrix[row2][col2];
-            working_lt->matrix[row2][col2] = temp;
+            // Revert the swaps in reverse order
+            for (int j = swap_count - 1; j >= 0; j--) {
+                int row1 = swap_rows1[j];
+                int col1 = swap_cols1[j];
+                int row2 = swap_rows2[j];
+                int col2 = swap_cols2[j];
+
+                // Perform the reverse swap
+                int temp = working_lt->matrix[row1][col1];
+                working_lt->matrix[row1][col1] = working_lt->matrix[row2][col2];
+                working_lt->matrix[row2][col2] = temp;
+            }
         }
 
+        // Adaptive cooling (A) - Modified to adjust reheating temperature
+        if (i > 0 && i % (iterations / 20) == 0) {
+            double improvement_rate = (double)improvement_counter / (iterations / 20);
+            if (improvement_rate > 0.2) {
+                max_T *= 0.95; // Cool faster if improving rapidly
+            } else {
+                max_T *= 1.05; // Cool slower if not improving much
+            }
+            max_T = max_T > 1500.0 ? 1500.0 : max_T; // Limit max_T to a reasonable upper bound
+            max_T = max_T < T ? T : max_T; // Don't let max_T be less than the current T
+            improvement_counter = 0; // Reset counter
+        }
+
+        // Reheating with temperature clamp
+        if (i > 0 && i % (iterations / 10) == 0) {
+            float old_T = T;
+            T = max_T; // Reheat to the potentially adjusted max_T
+            reheating_count++;
+            if (thread_id == 0) {log_print('v', L"\nReheating (%d) | Old Temp: %f - New Temp: %f\n", reheating_count, old_T, T);}
+        }
+
+        // Non-monotonic "jolt" (B)
+        if (i > 0 && i % (iterations / 50) == 0) {
+            T *= (1.0 + random_float() * 0.3);
+            if (T > max_T) {
+                T = max_T;
+            }
+        }
+
+        // Temperature cooling tied to iteration count
+        float progress = (float)i / iterations;
+        T = max_T * (1.0 - progress); // Linear decrease
+        // T = max_T * exp(-5.0 * progress); // Exponential decrease - You can try this too (seems worse)
+        T = T < 1.0 ? 1.0 : T; // Prevent T from going below 1.0
+
         // Percentage completion and estimated time for the first thread
-        if (thread_id == 0 && i % 100 == 0) { // Only update every 100 iterations
+        if (thread_id == 0 && i % 100 == 0) {
             clock_gettime(CLOCK_MONOTONIC, &current);
             double elapsed = (current.tv_sec - start.tv_sec) + (current.tv_nsec - start.tv_nsec) / 1e9;
-            double progress = (double)i / iterations;
+            double progress_percent = (double)i / iterations;
             double iterationsPerSecond = i / elapsed;
             double totalIterationsPerSecond = iterationsPerSecond * threads;
-            int estimatedRemaining = (iterations - i) / iterationsPerSecond; // Calculate remaining time for this thread
+            int estimatedRemaining = (int)((iterations - i) / iterationsPerSecond);
 
             // Calculate hours, minutes, and seconds
             int hours = estimatedRemaining / 3600;
             int minutes = (estimatedRemaining % 3600) / 60;
             int seconds = estimatedRemaining % 60;
 
-            log_print('n', L"\r%3d%%  ETA: %03dh %02dm %02ds, %8.0lf layouts/sec",
-                (int)(progress * 100), hours, minutes, seconds, totalIterationsPerSecond);
+            // Print the result (with correct pluralization)
+            log_print('n', L"\r%3d%%  ETA: %02dh %02dm %02ds, %8.0lf layout%s/sec                 ",
+                (int)(progress_percent * 100), hours, minutes, seconds, totalIterationsPerSecond,
+                totalIterationsPerSecond == 1 ? "" : "s");
             fflush(stdout);
         }
     }
@@ -285,7 +363,7 @@ void improve(int shuffle) {
     print_layout(lt);
     log_print('n',L"\n");
 
-    normalize = 1;
+    //normalize = 1;
     int iterations = repetitions / threads;
 
     thread_data *thread_data_array = (thread_data *)malloc(threads * sizeof(thread_data));
@@ -301,10 +379,8 @@ void improve(int shuffle) {
         thread_data_array[i].thread_id = i;
         pthread_create(&thread_ids[i], NULL, thread_function, (void *)&thread_data_array[i]);
     }
-    log_print('n',L"Done\n\n");
 
     // Wait for all threads to complete
-    log_print('n',L"6/9: Waiting for threads to complete... ");
     for (int i = 0; i < threads; i++) {
         pthread_join(thread_ids[i], NULL);
     }
@@ -320,7 +396,7 @@ void improve(int shuffle) {
     }
     log_print('n',L"Done\n\n");
 
-    normalize = 0;
+    //normalize = 0;
     log_print('n',L"8/9: Analyzing best layout... ");
     single_analyze(best_layout);
     get_score(best_layout);
