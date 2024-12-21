@@ -216,8 +216,13 @@ void *thread_function(void *arg) {
             double totalIterationsPerSecond = iterationsPerSecond * threads;
             int estimatedRemaining = (iterations - i) / iterationsPerSecond; // Calculate remaining time for this thread
 
-            log_print('n', L"\r%3d%%  ETA: %5ds, %8.0lf layouts/sec             ",
-                     (int)(progress * 100), estimatedRemaining, totalIterationsPerSecond);
+            // Calculate hours, minutes, and seconds
+            int hours = estimatedRemaining / 3600;
+            int minutes = (estimatedRemaining % 3600) / 60;
+            int seconds = estimatedRemaining % 60;
+
+            log_print('n', L"\r%3d%%  ETA: %03dh %02dm %02ds, %8.0lf layouts/sec",
+                (int)(progress * 100), hours, minutes, seconds, totalIterationsPerSecond);
             fflush(stdout);
         }
     }
