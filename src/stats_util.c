@@ -1,3 +1,13 @@
+/*
+ * stats_util.c - Utility functions for layout statistics.
+ *
+ * Author: Rus Doomer
+ *
+ * Description: This file contains utility functions for determining what
+ *              stats each key sequences (n-grams) falls under, as well as
+ *              other miscellaneous helpers.
+ */
+
 #include <string.h>
 #include <math.h>
 
@@ -5,7 +15,19 @@
 #include "global.h"
 #include "util.h"
 
-
+/*
+ * Finds the score of a specific statistic in a given layout.
+ * The function searches for the statistic by name and type within the layout's
+ * statistical data.
+ *
+ * Parameters:
+ *   stat_name: The name of the statistic to find.
+ *   type: The type of the statistic ('m' for monogram, 'b' for bigram, etc.).
+ *   lt: A pointer to the layout structure.
+ *
+ * Returns:
+ *   The score of the found statistic. Returns NaN if the statistic is not found.
+ */
 float find_stat_score(char *stat_name, char type, layout *lt) {
     int i;
 
@@ -49,13 +71,14 @@ float find_stat_score(char *stat_name, char type, layout *lt) {
         case '9':
             for (i = 0; i < SKIP_END; i++) {
                 if (strcmp(stats_skip[i].name, stat_name) == 0) {
-                    // Convert char type to int for skipgram index
+                    /* Convert char type to int for skipgram index */
                     int skip_index = type - '0';
                     return lt->skip_score[skip_index][i];
                 }
             }
             break;
-        case 'e': // Meta stats
+        /* Meta stats */
+        case 'e':
             for (i = 0; i < META_END; i++) {
                 if (strcmp(stats_meta[i].name, stat_name) == 0) {
                     return lt->meta_score[i];
@@ -66,16 +89,18 @@ float find_stat_score(char *stat_name, char type, layout *lt) {
             error("Invalid type specified in find_stat_score");
     }
 
-    // If stat not found, return NaN to let user know this meta stat is unusable
+    /* If stat not found, return NaN to let user know this meta stat is unusable */
     return nan("");
 }
 
+/* 'l' for left hand, 'r' for right hand. */
 char hand(int row0, int col0)
 {
     if (col0 < COL/2) {return 'l';}
     else {return 'r';}
 }
 
+/* An integer representing the finger used (0-7). */
 int finger(int row0, int col0)
 {
     switch(col0)
@@ -104,6 +129,7 @@ int finger(int row0, int col0)
     }
 }
 
+/* pinky and index stretch */
 int is_stretch(int row0, int col0)
 {
     return col0 == 0 || col0 == 5 || col0 == 6 || col0 == 11;
@@ -141,6 +167,7 @@ int is_same_col_quad(int row0, int col0, int row1, int col1, int row2, int col2,
     return col0 == col1 && col1 == col2 && col2 == col3;
 }
 
+/* literal same row */
 int is_same_row_bi(int row0, int col0, int row1, int col1)
 {
     return row0 == row1;
@@ -156,6 +183,7 @@ int is_same_row_quad(int row0, int col0, int row1, int col1, int row2, int col2,
     return row0 == row1 && row1 == row2 && row2 == row3;
 }
 
+/* same row without stretch columns for stats */
 int is_same_row_mod_bi(int row0, int col0, int row1, int col1)
 {
     return row0 == row1
@@ -180,6 +208,7 @@ int is_same_row_mod_quad(int row0, int col0, int row1, int col1, int row2, int c
         && !is_stretch(row3, col3);
 }
 
+/* doesn't include stretch columns */
 int is_adjacent_finger_bi(int row0, int col0, int row1, int col1)
 {
     return !is_stretch(row0, col0) && !is_stretch(row1, col1)
@@ -236,6 +265,7 @@ int row_diff(int row0, int col0, int row1, int col1)
     else {return row0 - row1;}
 }
 
+/* doesn't include repeats for stats */
 int is_same_finger_bi(int row0, int col0, int row1, int col1)
 {
     return (finger(row0, col0) == finger(row1, col1))
@@ -260,11 +290,13 @@ int is_same_finger_quad(int row0, int col0, int row1, int col1, int row2, int co
         && !is_same_pos_bi(row2, col2, row3, col3);
 }
 
+/* 2u sfb */
 int is_bad_same_finger_bi(int row0, int col0, int row1, int col1)
 {
     return is_same_finger_bi(row0, col0, row1, col1) && (row0 - row1 == 2 || row1 - row0 == 2);
 }
 
+/* separate fingers but not index + pinky combo */
 int is_russor_fingers(int row0, int col0, int row1, int col1)
 {
     return !is_same_finger_bi(row0, col0, row1, col1) && !is_same_pos_bi(row0, col0, row1, col1)
@@ -275,12 +307,14 @@ int is_russor_fingers(int row0, int col0, int row1, int col1)
         && !(finger(row0, col0) == 7 && finger(row1, col1) == 4);
 }
 
+/* 2u is full */
 int is_full_russor(int row0, int col0, int row1, int col1)
 {
     return row_diff(row0, col0, row1, col1) == 2
         && is_russor_fingers(row0, col0, row1, col1);
 }
 
+/* 1u is half */
 int is_half_russor(int row0, int col0, int row1, int col1)
 {
     return row_diff(row0, col0, row1, col1) == 1
@@ -302,6 +336,10 @@ int is_pinky_stretch_bi(int row0, int col0, int row1, int col1)
         || (finger(row0, col0) == 6 && col1 == 11)
         || (finger(row1, col1) == 6 && col0 == 11);
 }
+
+/*                                                   */
+/* not explaining all of these this is too much work */
+/*                                                   */
 
 int is_alt(int row0, int col0, int row1, int col1, int row2, int col2)
 {

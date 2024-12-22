@@ -3,6 +3,19 @@
 
 #include "global.h"
 
+/*
+ * Finds the score of a specific statistic in a given layout.
+ * The function searches for the statistic by name and type within the layout's
+ * statistical data.
+ *
+ * Parameters:
+ *   stat_name: The name of the statistic to find.
+ *   type: The type of the statistic ('m' for monogram, 'b' for bigram, etc.).
+ *   lt: A pointer to the layout structure.
+ *
+ * Returns:
+ *   The score of the found statistic. Returns NaN if the statistic is not found.
+ */
 float find_stat_score(char *stat_name, char type, layout *lt);
 
 char hand(int row0, int col0);
@@ -32,6 +45,10 @@ int is_half_russor(int row0, int col0, int row1, int col1);
 
 int is_index_stretch_bi(int row0, int col0, int row1, int col1);
 int is_pinky_stretch_bi(int row0, int col0, int row1, int col1);
+
+/*                                                   */
+/* not explaining all of these this is too much work */
+/*                                                   */
 
 int is_alt(int row0, int col0, int row1, int col1, int row2, int col2);
 int is_redirect(int row0, int col0, int row1, int col1, int row2, int col2);

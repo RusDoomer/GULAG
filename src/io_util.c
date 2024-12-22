@@ -1,3 +1,13 @@
+/*
+ * io_util.c - Utility functions related to input/output operations for the GULAG project.
+ *
+ * Author: Rus Doomer
+ *
+ * Description: This file provides utility functions for handling character conversions,
+ *              validating run and output modes, and other I/O related operations
+ *              within the GULAG project.
+ */
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -7,6 +17,12 @@
 #include "util.h"
 #include "global.h"
 
+/*
+ * Converts a character to its corresponding index in the language array.
+ * Parameters:
+ *   c: The character to convert.
+ * Returns: The index of the character in the language array, or -1 if not found.
+ */
 int convert_char(wchar_t c)
 {
     int ret = char_table[(int) c];
@@ -14,6 +30,12 @@ int convert_char(wchar_t c)
     else {return -1;}
 }
 
+/*
+ * Converts an index in the language array back to its corresponding character.
+ * Parameters:
+ *   i: The index to convert.
+ * Returns: The character corresponding to the index, or L'@' if out of bounds.
+ */
 wchar_t convert_back(int i)
 {
     if (i < 50 && i >= 0) {
@@ -22,6 +44,13 @@ wchar_t convert_back(int i)
     return L'@';
 }
 
+/*
+ * Shifts all elements in an integer array one position to the right, discarding the last element.
+ * Parameters:
+ *   mem: Pointer to the integer array.
+ *   size: The size of the array.
+ * Returns: void.
+ */
 void iterate(int *mem, int size)
 {
     for (int i = size - 1; i > 0; i--)
@@ -30,6 +59,12 @@ void iterate(int *mem, int size)
     }
 }
 
+/*
+ * Checks for duplicate characters in a wide character array, excluding adjacent duplicates.
+ * Parameters:
+ *   arr: The wide character array to check.
+ * Returns: The number of duplicate pairs found (excluding adjacent pairs), or -1 if no duplicates.
+ */
 int check_duplicates(wchar_t *arr)
 {
     int dups = -1;
@@ -43,6 +78,13 @@ int check_duplicates(wchar_t *arr)
     return dups;
 }
 
+
+/*
+ * Validates and converts a run mode string to its corresponding character representation.
+ * Parameters:
+ *   optarg: The string representing the run mode.
+ * Returns: The character representing the validated run mode, or 'a' if invalid.
+ */
 char check_run_mode(char *optarg)
 {
     if (strcmp(optarg, "a") == 0
@@ -77,11 +119,18 @@ char check_run_mode(char *optarg)
         || strcmp(optarg, "information") == 0) {
         return 'f';
     } else {
+        /* util.c - error handling */
         error("Invalid run mode in arguments.");
         return 'a';
     }
 }
 
+/*
+ * Validates and converts an output mode string to its corresponding character representation.
+ * Parameters:
+ *   optarg: The string representing the output mode.
+ * Returns: The character representing the validated output mode, or 'n' if invalid.
+ */
 char check_output_mode(char *optarg)
 {
     if (strcmp(optarg, "q") == 0 || strcmp(optarg, "quiet") == 0
@@ -96,6 +145,7 @@ char check_output_mode(char *optarg)
         || strcmp(optarg, "verbose") == 0) {
         return 'v';
     } else {
+        /* util.c - error handling */
         error("Invalid output mode in arguments.");
         return 'n';
     }

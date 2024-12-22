@@ -1,3 +1,12 @@
+/*
+ * main.c - Main source file for the GULAG project.
+ *
+ * Author: Rus Doomer
+ *
+ * Description: This file contains the main function and logic for
+ *              initializing, running, and shutting down the GULAG.
+ */
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <locale.h>
@@ -11,44 +20,49 @@
 
 #define UNICODE_MAX 65535
 
+/*
+ * Performs program initialization, including setting the locale,
+ * allocating memory, hiding the cursor and seeding the random number generator.
+ * Returns: void.
+ */
 void start_up()
 {
+    /* Set locale for wide character support. */
     log_print('n',L"1/4: Setting Locale... ");
-    // set locale
     const char* locale = setlocale(LC_ALL, "en_US.UTF-8");
     if (locale == NULL) {
         error("Failed to set locale.");
         return;
     }
 
+    /* Set stdout to wide-oriented. */
     log_print('n',L"Setting error stream... ");
-    // Set stdout to wide-oriented
     if (fwide(stdout, 1) <= 0) {
         error("Failed to set wide-oriented stream.");
         return;
     }
 
+    /* Hide cursor. */
     log_print('n',L"Hiding cursor... ");
-    // hide cursor
     wprintf(L"\e[?25l");
 
+    /* Seed random number generator. */
     log_print('n',L"Seeding RNG... ");
-    //seed random number
     srand(time(NULL));
     log_print('n',L"Done\n\n");
 
-    log_print('n',L"2/4: Allocating language array, ");
-    // allocate lang array
+    /* Allocate language array. */
+    log_print('n',L"2/4: Allocating language array... ");
     lang_arr = (wchar_t *)calloc(101, sizeof(wchar_t));
 
+    /* Allocate character hash table array. */
     log_print('n',L"Allocating character hashmap... ");
-    // allocate char table array
     char_table = (int *)calloc(UNICODE_MAX+1, sizeof(int));
     log_print('n',L"Done\n\n");
 
+    /* Allocate arrays for ngrams directly from corpus. */
     log_print('n',L"3/4: Allocating corpus arrays...\n");
     log_print('v',L"     Monograms... Integer... ");
-    // allocate arrays for ngrams directly from corpus
     corpus_mono = (int *)calloc(LANG_LENGTH, sizeof(int));
     log_print('v',L"Floating Point... ");
     linear_mono = (float *)calloc(LANG_LENGTH, sizeof(float));
@@ -105,21 +119,33 @@ void start_up()
     log_print('v',L"Done\n");
     log_print('n',L"     Done\n\n");
 
+    /* stats.c - initializes and trims statistics */
     log_print('n',L"4/4: Initializing stats...\n");
     initialize_stats();
     log_print('n',L"     Done\n\n");
 }
 
+/*
+ * Performs cleanup, including showing the cursor and freeing allocated memory.
+ * Returns: void.
+ */
 void shut_down()
 {
+    /* Show cursor. */
     log_print('n',L"1/3: Showing cursor... ");
-    //show cursor
     wprintf(L"\e[?25h");
 
+    /* Free language array. */
+    log_print('n',L"Freeing language array... ");
+    free(lang_arr);
+    log_print('n',L"Done\n\n");
+
+    /* Free character hash table array. */
     log_print('n',L"Freeing character hashmap... ");
     free(char_table);
     log_print('n',L"Done\n\n");
 
+    /* Free arrays for ngrams directly from corpus. */
     log_print('n',L"2/3: Freeing corpus arrays... ");
     log_print('v',L"\n     Monograms... ");
     free(corpus_mono);
@@ -173,11 +199,19 @@ void shut_down()
     log_print('v',L"       Done\n");
     log_print('n',L"     Done\n\n");
 
+    /* stats.c - frees all stats */
     log_print('n',L"3/3: Freeing stats... ");
     free_stats();
     log_print('n',L"     Done\n\n");
 }
 
+/*
+ * Program entry point.
+ * Parameters:
+ *   argc: Argument count.
+ *   argv: Argument list.
+ * Returns: 0 if successful.
+ */
 int main(int argc, char **argv) {
     struct timespec start, end;
     double elapsed;
@@ -193,18 +227,18 @@ int main(int argc, char **argv) {
 
     clock_gettime(CLOCK_MONOTONIC, &start);
     log_print('q',L"----- Setting Up -----\n\n");
-    log_print('q',L"1/3: Reading config... ");
     /* io.c - holds defaults to be overwritten by args */
+    log_print('q',L"1/3: Reading config... ");
     read_config();
     log_print('q',L"Done\n\n");
 
-    log_print('q',L"2/3: Reading command line arguments... ");
     /* io.c - overwrites config */
+    log_print('q',L"2/3: Reading command line arguments... ");
     read_args(argc, argv);
     log_print('q',L"Done\n\n");
 
-    log_print('q',L"3/3: Checking arguments... ");
     /* io.c - final check that all options are correct */
+    log_print('q',L"3/3: Checking arguments... ");
     check_setup();
     log_print('q',L"Done\n\n");
 
@@ -225,34 +259,39 @@ int main(int argc, char **argv) {
     clock_gettime(CLOCK_MONOTONIC, &start);
     log_print('q',L"----- Reading Data -----\n\n");
 
+    /* io.c - read language file and fill array */
     log_print('n',L"1/4: Reading language... ");
-    read_lang(lang_name); /* io.c */
+    read_lang(lang_name);
     log_print('n',L"Done\n\n");
 
+    /* io.c - read from cache if it exists */
     log_print('n',L"2/4: Reading corpus... ");
     log_print('v',L"Looking for cache... ");
     int corpus_cache = 0;
     corpus_cache = read_corpus_cache();
     log_print('n',L"Done\n\n");
     if (!corpus_cache) {
+        /* The next operation is slow so we want to let the user see
+           what step they are stuck on. */
+        /* io.c - read entire corpus file and fill arrays */
         log_print('v',L"Reading raw corpus... ");
-        // the next operation is slow so we want to let the user see
-        // what step they are stuck on
-        fflush(stdout);
-        read_corpus();    /* io.c */
+        read_corpus();
         log_print('n',L"Done\n\n");
 
+        /* io.c - create new corpus cache */
         log_print('n',L"2.5\4: Creating corpus cache... ");
-        cache_corpus();   /* io.c */
+        cache_corpus();
         log_print('n',L"Done\n\n");
     }
 
+    /* util.c - take corpus arrays from raw frequencies to percentages */
     log_print('n',L"3/4: Normalize corpus... ");
-    normalize_corpus(); /* util.c */
+    normalize_corpus();
     log_print('n',L"Done\n\n");
 
+    /* io.c - read weights and fill in stats*/
     log_print('n',L"4/4: Reading stat weights... ");
-    read_weights();       /* io.c */
+    read_weights();
     log_print('n',L"Done\n\n");
 
     clock_gettime(CLOCK_MONOTONIC, &end);
@@ -262,12 +301,14 @@ int main(int argc, char **argv) {
     clock_gettime(CLOCK_MONOTONIC, &start);
     log_print('q',L"----- Cleaning Up -----\n\n");
 
+    /* stats.c - remove stats with 0 length or weight */
     log_print('n',L"1/3: Removing irrelevant stats... ");
-    clean_stats();        /* stats.c */
+    clean_stats();
     log_print('n',L"     Done\n\n");
 
+    /* stats.c - convert stats linked list to array */
     log_print('n',L"2/3: Converting stats linked list to contiguous array... ");
-    stats_to_array();     /* stats.c */
+    stats_to_array();
     log_print('n',L"     Done\n\n");
 
     clock_gettime(CLOCK_MONOTONIC, &end);
@@ -312,45 +353,54 @@ int main(int argc, char **argv) {
     clock_gettime(CLOCK_MONOTONIC, &start);
     log_print('q',L"----- Running -----\n\n");
 
-    switch(run_mode) {       /* all in mode.c */
+    /* all in mode.c */
+    switch(run_mode) {
         case 'a':
+            /* analyze one layout */
             log_print('n',L"Running single analysis\n");
-            analysis();      /* analyze one layout */
+            analysis();
             log_print('n',L"Done\n\n");
             break;
         case 'c':
+            /* compare 2 layouts */
             log_print('n',L"Running comparison\n");
-            compare();       /* compare 2 layouts */
+            compare();
             log_print('n',L"Done\n\n");
             break;
         case 'r':
+            /* rank all layouts in directory */
             log_print('n',L"Running ranking\n");
-            rank();          /* rank all layouts in directory */
+            rank();
             log_print('n',L"\nDone\n\n");
             break;
         case 'g':
+            /* generate a new layout */
             log_print('n',L"Running generation\n");
-            generate();      /* generate a new layout */
+            generate();
             log_print('n',L"Done\n\n");
             break;
         case 'i':
+            /* improve a layout */
             log_print('n',L"Running optimization\n");
-            improve(0);       /* improve a layout */
+            improve(0);
             log_print('n',L"Done\n\n");
             break;
         case 'b':
+            /* benchmark to find ideal number of threads */
             log_print('n',L"Running benchmark\n");
-            gen_benchmark(); /* benchmark to find ideal number of threads */
+            gen_benchmark();
             log_print('n',L"Done\n\n");
             break;
         case 'h':
+            /* print help info */
             log_print('n',L"Printing help message\n");
-            print_help();    /* print help info */
+            print_help();
             log_print('n',L"Done\n\n");
             break;
         case 'f':
+            /* print info screen */
             log_print('n',L"Printing info message\n");
-            print_info();    /* print info screen */
+            print_info();
             log_print('n',L"Done\n\n");
             break;
     }
@@ -367,7 +417,9 @@ int main(int argc, char **argv) {
     free(layout_name);
     free(layout2_name);
     free(weight_name);
-    shut_down(); /* reverse start_up */
+
+    /* reverse start_up */
+    shut_down();
 
     clock_gettime(CLOCK_MONOTONIC, &end);
     elapsed = (end.tv_sec - start.tv_sec) + (end.tv_nsec - start.tv_nsec) / 1e9;
