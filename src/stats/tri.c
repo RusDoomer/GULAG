@@ -696,4 +696,5 @@ void free_tri_stats()
         tri_head = tri_head->next;
         free(temp);
     }
+    free(stats_tri);
 }

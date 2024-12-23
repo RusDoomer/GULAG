@@ -1226,4 +1226,5 @@ void free_quad_stats()
         quad_head = quad_head->next;
         free(temp);
     }
+    free(stats_quad);
 }

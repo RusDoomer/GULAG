@@ -482,4 +482,5 @@ void free_mono_stats()
         mono_head = mono_head->next;
         free(temp);
     }
+    free(stats_mono);
 }

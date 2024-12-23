@@ -19,8 +19,7 @@ void error(const char *msg);
  *   i: Pointer to store the flattened index.
  * Returns: void.
  */
-void flat_quad(int row0, int col0, int row1, int col1, int row2, int col2,
-    int row3, int col3, int *i);
+void flat_quad(int row0, int col0, int row1, int col1, int row2, int col2, int row3, int col3, int *i);
 
 /*
  * Unflattens a 1D index into a 4D matrix coordinate.
@@ -30,8 +29,7 @@ void flat_quad(int row0, int col0, int row1, int col1, int row2, int col2,
  *                                                   row and column indices.
  * Returns: void.
  */
-void unflat_quad(int i, int *row0, int *col0, int *row1, int *col1,
-    int *row2, int *col2, int *row3, int *col3);
+void unflat_quad(int i, int *row0, int *col0, int *row1, int *col1, int *row2, int *col2, int *row3, int *col3);
 
 /*
  * Flattens a 3D matrix coordinate into a 1D index.
@@ -40,8 +38,7 @@ void unflat_quad(int i, int *row0, int *col0, int *row1, int *col1,
  *   i: Pointer to store the flattened index.
  * Returns: void.
  */
-void flat_tri(int row0, int col0, int row1, int col1, int row2, int col2,
-    int *i);
+void flat_tri(int row0, int col0, int row1, int col1, int row2, int col2, int *i);
 
 /*
  * Unflattens a 1D index into a 3D matrix coordinate.
@@ -51,8 +48,7 @@ void flat_tri(int row0, int col0, int row1, int col1, int row2, int col2,
  *                                       column indices.
  * Returns: void.
  */
-void unflat_tri(int i, int *row0, int *col0, int *row1, int *col1,
-    int *row2, int *col2);
+void unflat_tri(int i, int *row0, int *col0, int *row1, int *col1, int *row2, int *col2);
 
 /*
  * Flattens a 2D matrix coordinate into a 1D index.

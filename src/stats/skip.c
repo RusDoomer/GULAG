@@ -562,4 +562,5 @@ void free_skip_stats()
         skip_head = skip_head->next;
         free(temp);
     }
+    free(stats_skip);
 }

@@ -120,6 +120,7 @@ void free_meta_stats()
         meta_head = meta_head->next;
         free(temp);
     }
+    free(stats_meta);
 }
 
 /*

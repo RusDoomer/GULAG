@@ -579,4 +579,5 @@ void free_bi_stats()
         bi_head = bi_head->next;
         free(temp);
     }
+    free(stats_bi);
 }

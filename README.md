@@ -1,4 +1,4 @@
-# GULAG: GPU Utilizing Layout Analyzer and Generator
+# GULAG V0.1: GPU Utilizing Layout Analyzer and Generator
 
 ## Overview
 
