@@ -1,3 +1,26 @@
+/*
+ * stats/tri.c - Trigram statistic definitions for the GULAG project.
+ *
+ * Author: Rus Doomer
+ *
+ * Description: This file contains the implementation for initializing, cleaning,
+ *              converting, and freeing trigram statistics used in the GULAG.
+ *              Trigram statistics track the frequency and positioning of three
+ *              character sequences on a keyboard layout.
+ *
+ * Adding new stats:
+ *     1. In initialize_tri_stats(), add a new tri_stat structure.
+ *     2. Define its name, and set its weight to -INFINITY (it will be changed later in io.c).
+ *     3. Make sure to add it to the linked list by setting it as the next element of the last stat.
+ *     4. Define its length to 0, then loop through the DIM3 (46656) possible trigrams on the
+ *        layout.
+ *     5. Use unflat_tri() to convert the 1D index to a 6D coordinate.
+ *     6. Use an if statement and a stats_util.c function to check if the ngram falls under
+ *        the stat.
+ *     7. If it does, add it to the ngrams array and increment length.
+ *     8. Add the statistic to the weights files in data/weights/.
+ */
+
 #include <string.h>
 #include <stdlib.h>
 #include <math.h>
@@ -7,16 +30,28 @@
 #include "stats_util.h"
 #include "global.h"
 
+
+/*
+ * Initializes the linked list of trigram statistics.
+ * Each trigram statistic tracks the usage of specific key sequences.
+ * The function allocates memory for each stat and sets default values,
+ * including a negative infinity weight which will be later updated.
+ * Statistics are defined for various key sequences and combinations.
+ */
 void initialize_tri_stats()
 {
     int row0, col0, row1, col1, row2, col2;
+
+    /* Allocate and initialize SFTs. */
     tri_stat *same_finger = (tri_stat *)malloc(sizeof(tri_stat));
+    /* Ensure you set the head on the first stat of each type. */
     tri_head = same_finger;
     strcpy(same_finger->name, "Same Finger Trigram");
     same_finger->weight = -INFINITY;
     same_finger->length = 0;
     for (int i = 0; i < DIM3; i++)
     {
+        /* util.c - convert a 1D index into a 6D matrix coordinate */
         unflat_tri(i, &row0, &col0, &row1, &col1, &row2, &col2);
         if (is_same_finger_tri(row0, col0, row1, col1, row2, col2))
         {
@@ -29,6 +64,7 @@ void initialize_tri_stats()
         }
     }
 
+    /* standard trigram stats after this */
     tri_stat *alt = (tri_stat *)malloc(sizeof(tri_stat));
     same_finger->next = alt;
     strcpy(alt->name, "Alternation");
@@ -545,31 +581,39 @@ void initialize_tri_stats()
     same_row_adjacent_finger_roll_out->next = NULL;
 }
 
+/*
+ * Trims the statistics in the linked list to move unused entries to the end.
+ * This is done by iterating through each statistic's ngrams array and
+ * reordering elements to place all valid entries at the beginning
+ * of the array. This process ensures memory efficiency by eliminating
+ * gaps in the array. It is somewhat analagous to a correctional officer
+ * ordering prisoners to form an orderly line, ensuring no gaps or disorder.
+ */
 void trim_tri_stats()
 {
     tri_stat *current = tri_head;
 
     while (current != NULL)
     {
-        // Copy valid ngram entries into earliest free index
+        /* Copy valid ngram entries into earliest free index */
         if (current->length != 0)
         {
-            int left = 0;             // Index for the front of the array
-            int right = DIM3 - 1;    // Index for the back of the array
+            int left = 0;
+            int right = DIM3 - 1;
 
-            // Use two pointers to efficiently partition the array
+            /* Use two pointers to efficiently partition the array */
             while (left < right) {
-                // Find the next -1 from the left
+                /* Find the next -1 from the left */
                 while (left < right && current->ngrams[left] != -1) {
                     left++;
                 }
 
-                // Find the next non -1 from the right
+                /* Find the next non -1 from the right */
                 while (left < right && current->ngrams[right] == -1) {
                     right--;
                 }
 
-                // Swap the elements to move -1 to the back and non -1 to the front
+                /* Swap the elements to move -1 to the back and non -1 to the front */
                 if (left < right) {
                     int temp = current->ngrams[left];
                     current->ngrams[left] = current->ngrams[right];
@@ -580,13 +624,19 @@ void trim_tri_stats()
             }
         }
 
-        // Move to the next node
         current = current->next;
     }
 }
 
+/*
+ * Cleans the trigram statistics linked list by removing statistics with zero length or weight.
+ * This function ensures that only relevant statistics are kept for analysis,
+ * similar to weeding out unnecessary files from a meticulously organized archive.
+ * It updates the TRI_END global variable to reflect the new count of valid statistics.
+ */
 void clean_tri_stats()
 {
+    /* Remove statistics from the beginning of the list if they have zero length or weight */
     if (tri_head == NULL) {return;}
     while (tri_head != NULL && (tri_head->length == 0 || tri_head->weight == 0)) {
         tri_stat *temp = tri_head;
@@ -594,6 +644,7 @@ void clean_tri_stats()
         free(temp);
     }
 
+    /* Iterate through the rest of the list and remove any node with zero length or weight */
     tri_stat *current = tri_head;
     while (current != NULL && current->next != NULL) {
         if (current->next->length == 0 || current->next->weight == 0) {
@@ -605,6 +656,7 @@ void clean_tri_stats()
         }
     }
 
+    /* Recount the number of valid statistics */
     current = tri_head;
     while (current != NULL) {
         TRI_END++;
@@ -612,17 +664,29 @@ void clean_tri_stats()
     }
 }
 
+/*
+ * Converts the linked list of trigram statistics to a contiguous array for easier access.
+ * This function allocates memory for an array of tri_stat structures and copies
+ * data from the linked list to the array. This is akin to transferring data from
+ * individual files to a consolidated ledger for streamlined processing.
+ */
 void tri_to_array()
 {
     stats_tri = (tri_stat *)malloc(sizeof(tri_stat) * TRI_END);
     tri_stat *current_tri = tri_head;
     for (int i = 0; i < TRI_END; i++) {
         memcpy(&stats_tri[i], current_tri, sizeof(tri_stat));
-        stats_tri[i].next = NULL; // Set next pointer to NULL
+        /* Set next pointer to NULL */
+        stats_tri[i].next = NULL;
         current_tri = current_tri->next;
     }
 }
 
+/*
+ * Frees the memory allocated for the trigram statistics linked list.
+ * This function iterates through the list, freeing each node's memory,
+ * similar to the careful archiving of documents that are no longer needed.
+ */
 void free_tri_stats()
 {
     if (tri_head == NULL) {return;}

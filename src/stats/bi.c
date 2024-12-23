@@ -1,3 +1,26 @@
+/*
+ * stats/bi.c - Bigram statistic definitions for the GULAG project.
+ *
+ * Author: Rus Doomer
+ *
+ * Description: This file contains the implementation for initializing, cleaning,
+ *              converting, and freeing bigram statistics used in the GULAG.
+ *              Bigram statistics track the frequency and positioning of two
+ *              character sequences on a keyboard layout.
+ *
+ * Adding new stats:
+ *     1. In initialize_bi_stats(), add a new bi_stat structure.
+ *     2. Define its name, and set its weight to -INFINITY (it will be changed later in io.c).
+ *     3. Make sure to add it to the linked list by setting it as the next element of the last stat.
+ *     4. Define its length to 0, then loop through the DIM2 (1296) possible bigrams on the
+ *        layout.
+ *     5. Use unflat_bi() to convert the 1D index to a 4D coordinate.
+ *     6. Use an if statement and a stats_util.c function to check if the ngram falls under
+ *        the stat.
+ *     7. If it does, add it to the ngrams array and increment length.
+ *     8. Add the statistic to the weights files in data/weights/.
+ */
+
 #include <string.h>
 #include <stdlib.h>
 #include <math.h>
@@ -7,9 +30,16 @@
 #include "stats_util.h"
 #include "global.h"
 
+/*
+ * Initializes the linked list of bigram statistics.
+ * Allocates and initializes each bi_stat structure, setting default values
+ * for name, weight, and ngrams. The weight is initially set to negative infinity,
+ * indicating that it will be updated later.
+ */
 void initialize_bi_stats()
 {
     int row0, col0, row1, col1;
+    /* Allocate memory for SFBs */
     bi_stat *same_finger = (bi_stat *)malloc(sizeof(bi_stat));
     bi_head = same_finger;
     strcpy(same_finger->name, "Same Finger Bigram");
@@ -17,6 +47,7 @@ void initialize_bi_stats()
     same_finger->length = 0;
     for (int i = 0; i < DIM2; i++)
     {
+        /* util.c - converts a 1D index into a 4D matrix coordinate */
         unflat_bi(i, &row0, &col0, &row1, &col1);
         if (is_same_finger_bi(row0, col0, row1, col1))
         {
@@ -29,6 +60,7 @@ void initialize_bi_stats()
         }
     }
 
+    /* initialize per finger bigram stats */
     bi_stat *left_pinky = (bi_stat *)malloc(sizeof(bi_stat));
     same_finger->next = left_pinky;
     strcpy(left_pinky->name, "Left Pinky Bigram");
@@ -181,6 +213,7 @@ void initialize_bi_stats()
         }
     }
 
+    /* initialize 2U SFBs */
     bi_stat *bad_same_finger = (bi_stat *)malloc(sizeof(bi_stat));
     right_pinky->next = bad_same_finger;
     strcpy(bad_same_finger->name, "Bad Same Finger Bigram");
@@ -200,6 +233,7 @@ void initialize_bi_stats()
         }
     }
 
+    /* initialize per finger 2U bigram stats */
     bi_stat *bad_left_pinky = (bi_stat *)malloc(sizeof(bi_stat));
     bad_same_finger->next = bad_left_pinky;
     strcpy(bad_left_pinky->name, "Bad Left Pinky Bigram");
@@ -352,6 +386,7 @@ void initialize_bi_stats()
         }
     }
 
+    /* initialize russor stats */
     bi_stat *full_russor = (bi_stat *)malloc(sizeof(bi_stat));
     bad_right_pinky->next = full_russor;
     strcpy(full_russor->name, "Full Russor Bigram");
@@ -390,6 +425,7 @@ void initialize_bi_stats()
         }
     }
 
+    /* initialize LSBs */
     bi_stat *index_lsb = (bi_stat *)malloc(sizeof(bi_stat));
     half_russor->next = index_lsb;
     strcpy(index_lsb->name, "Index Stretch Bigram");
@@ -431,31 +467,38 @@ void initialize_bi_stats()
     pinky_lsb->next = NULL;
 }
 
+/*
+ * Trims the statistics in the linked list to move unused entries to the end.
+ * This is done by iterating through each statistic's ngrams array and
+ * reordering elements to place all valid entries at the beginning
+ * of the array. This process ensures memory efficiency by eliminating
+ * gaps in the array.
+ */
 void trim_bi_stats()
 {
     bi_stat *current = bi_head;
 
     while (current != NULL)
     {
-        // Copy valid ngram entries into earliest free index
+        /* Copy valid ngram entries into earliest free index */
         if (current->length != 0)
         {
-            int left = 0;             // Index for the front of the array
-            int right = DIM2 - 1;    // Index for the back of the array
+            int left = 0;
+            int right = DIM2 - 1;
 
-            // Use two pointers to efficiently partition the array
+            /* Use two pointers to partition the array */
             while (left < right) {
-                // Find the next -1 from the left
+                /* Find the next -1 from the left */
                 while (left < right && current->ngrams[left] != -1) {
                     left++;
                 }
 
-                // Find the next non -1 from the right
+                /* Find the next non -1 from the right */
                 while (left < right && current->ngrams[right] == -1) {
                     right--;
                 }
 
-                // Swap the elements to move -1 to the back and non -1 to the front
+                /* Swap the elements to move -1 to the back and non -1 to the front */
                 if (left < right) {
                     int temp = current->ngrams[left];
                     current->ngrams[left] = current->ngrams[right];
@@ -466,13 +509,18 @@ void trim_bi_stats()
             }
         }
 
-        // Move to the next node
         current = current->next;
     }
 }
 
+/*
+ * Removes all stats that have a length of 0, or a weight of 0.
+ * Iterates through the linked list, freeing the memory
+ * of each deleted node, and updates the BI_END global variable.
+ */
 void clean_bi_stats()
 {
+    /* Remove statistics from the beginning of the list if they have zero length or weight */
     if (bi_head == NULL) {return;}
     while (bi_head != NULL && (bi_head->length == 0 || bi_head->weight == 0)) {
         bi_stat *temp = bi_head;
@@ -480,6 +528,7 @@ void clean_bi_stats()
         free(temp);
     }
 
+    /* Iterate through the rest of the list and remove any node with zero length or weight */
     bi_stat *current = bi_head;
     while (current != NULL && current->next != NULL) {
         if (current->next->length == 0 || current->next->weight == 0) {
@@ -491,6 +540,7 @@ void clean_bi_stats()
         }
     }
 
+    /* Recount the number of valid statistics */
     current = bi_head;
     while (current != NULL) {
         BI_END++;
@@ -498,17 +548,28 @@ void clean_bi_stats()
     }
 }
 
+/*
+ * Converts the linked list of bigram statistics to a contiguous array.
+ * This function allocates memory for an array of bi_stat structures
+ * and copies the data from the linked list to the array, allowing for
+ * more efficient access and manipulation of the statistics.
+ */
 void bi_to_array()
 {
     stats_bi = (bi_stat *)malloc(sizeof(bi_stat) * BI_END);
     bi_stat *current_bi = bi_head;
     for (int i = 0; i < BI_END; i++) {
         memcpy(&stats_bi[i], current_bi, sizeof(bi_stat));
-        stats_bi[i].next = NULL; // Set next pointer to NULL
+        /* Set next pointer to NULL */
+        stats_bi[i].next = NULL;
         current_bi = current_bi->next;
     }
 }
 
+/*
+ * Frees the memory allocated for the bigram statistics linked list.
+ * Iterates through the list, freeing each node's memory.
+ */
 void free_bi_stats()
 {
     if (bi_head == NULL) {return;}

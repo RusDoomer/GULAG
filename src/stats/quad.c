@@ -1,3 +1,26 @@
+/*
+ * stats/quad.c - Quadgram statistic definitions for the GULAG project.
+ *
+ * Author: Rus Doomer
+ *
+ * Description: This file contains the implementation for initializing, cleaning,
+ *              converting, and freeing quadgram statistics used in the GULAG.
+ *              Quadgram statistics track the frequency and positioning of four
+ *              character sequences on a keyboard layout.
+ *
+ * Adding new stats:
+ *     1. In initialize_quad_stats(), add a new quad_stat structure.
+ *     2. Define its name, and set its weight to -INFINITY (it will be changed later in io.c).
+ *     3. Make sure to add it to the linked list by setting it as the next element of the last stat.
+ *     4. Define its length to 0, then loop through the DIM4 (1679616) possible quadgrams on the
+ *        layout.
+ *     5. Use unflat_quad() to convert the 1D index to an 8D coordinate.
+ *     6. Use an if statement and a stats_util.c function to check if the ngram falls under
+ *        the stat.
+ *     7. If it does, add it to the ngrams array and increment length.
+ *     8. Add the statistic to the weights files in data/weights/.
+ */
+
 #include <string.h>
 #include <stdlib.h>
 #include <math.h>
@@ -7,16 +30,26 @@
 #include "stats_util.h"
 #include "global.h"
 
+/*
+ * Initializes the linked list of quadgram statistics.
+ * Each quadgram statistic tracks the usage of specific key sequences.
+ * The function allocates memory for each stat and sets default values,
+ * including a negative infinity weight which will be later updated.
+ * Statistics are defined for various key sequences and combinations.
+ */
 void initialize_quad_stats()
 {
     int row0, col0, row1, col1, row2, col2, row3, col3;
+    /* Allocate and initialize SFQs. */
     quad_stat *same_finger = (quad_stat *)malloc(sizeof(quad_stat));
+    /* Ensure you set the head on the first stat of each type. */
     quad_head = same_finger;
     strcpy(same_finger->name, "Same Finger Quadgram");
     same_finger->weight = -INFINITY;
     same_finger->length = 0;
     for (int i = 0; i < DIM4; i++)
     {
+        /* util.c - convert a 1D index into a 8D matrix coordinate */
         unflat_quad(i, &row0, &col0, &row1, &col1, &row2, &col2, &row3, &col3);
         if (is_same_finger_quad(row0, col0, row1, col1, row2, col2, row3, col3))
         {
@@ -29,6 +62,7 @@ void initialize_quad_stats()
         }
     }
 
+    /* the rest are quad stats, I won't explain them */
     quad_stat *alt = (quad_stat *)malloc(sizeof(quad_stat));
     same_finger->next = alt;
     strcpy(alt->name, "Chained Alternation");
@@ -1077,31 +1111,39 @@ void initialize_quad_stats()
     same_row_adjacent_finger_chained_roll_mix->next = NULL;
 }
 
+/*
+ * Trims the statistics in the linked list to move unused entries to the end.
+ * This is done by iterating through each statistic's ngrams array and
+ * reordering elements to place all valid entries at the beginning
+ * of the array. This process ensures memory efficiency by eliminating
+ * gaps in the array. It is somewhat analagous to a correctional officer
+ * ordering prisoners to form an orderly line, ensuring no gaps or disorder.
+ */
 void trim_quad_stats()
 {
     quad_stat *current = quad_head;
 
     while (current != NULL)
     {
-        // Copy valid ngram entries into earliest free index
+        /* Copy valid ngram entries into earliest free index */
         if (current->length != 0)
         {
-            int left = 0;             // Index for the front of the array
-            int right = DIM4 - 1;    // Index for the back of the array
+            int left = 0;
+            int right = DIM4 - 1;
 
-            // Use two pointers to efficiently partition the array
+            /* Use two pointers to efficiently partition the array */
             while (left < right) {
-                // Find the next -1 from the left
+                /* Find the next -1 from the left */
                 while (left < right && current->ngrams[left] != -1) {
                     left++;
                 }
 
-                // Find the next non -1 from the right
+                /* Find the next non -1 from the right */
                 while (left < right && current->ngrams[right] == -1) {
                     right--;
                 }
 
-                // Swap the elements to move -1 to the back and non -1 to the front
+                /* Swap the elements to move -1 to the back and non -1 to the front */
                 if (left < right) {
                     int temp = current->ngrams[left];
                     current->ngrams[left] = current->ngrams[right];
@@ -1112,13 +1154,19 @@ void trim_quad_stats()
             }
         }
 
-        // Move to the next node
         current = current->next;
     }
 }
 
+/*
+ * Cleans the quadgram statistics linked list by removing statistics with zero length or weight.
+ * This function ensures that only relevant statistics are kept for analysis,
+ * similar to weeding out unnecessary files from a meticulously organized archive.
+ * It updates the QUAD_END global variable to reflect the new count of valid statistics.
+ */
 void clean_quad_stats()
 {
+    /* Remove statistics from the beginning of the list if they have zero length or weight */
     if (quad_head == NULL) {return;}
     while (quad_head != NULL && (quad_head->length == 0 || quad_head->weight == 0)) {
         quad_stat *temp = quad_head;
@@ -1126,6 +1174,7 @@ void clean_quad_stats()
         free(temp);
     }
 
+    /* Iterate through the rest of the list and remove any node with zero length or weight */
     quad_stat *current = quad_head;
     while (current != NULL && current->next != NULL) {
         if (current->next->length == 0 || current->next->weight == 0) {
@@ -1137,6 +1186,7 @@ void clean_quad_stats()
         }
     }
 
+    /* Recount the number of valid statistics */
     current = quad_head;
     while (current != NULL) {
         QUAD_END++;
@@ -1144,17 +1194,29 @@ void clean_quad_stats()
     }
 }
 
+/*
+ * Converts the linked list of quadgram statistics to a contiguous array for easier access.
+ * This function allocates memory for an array of quad_stat structures and copies
+ * data from the linked list to the array. This is akin to transferring data from
+ * individual files to a consolidated ledger for streamlined processing.
+ */
 void quad_to_array()
 {
     stats_quad = (quad_stat *)malloc(sizeof(quad_stat) * QUAD_END);
     quad_stat *current_quad = quad_head;
     for (int i = 0; i < QUAD_END; i++) {
         memcpy(&stats_quad[i], current_quad, sizeof(quad_stat));
-        stats_quad[i].next = NULL; // Set next pointer to NULL
+        /* Set next pointer to NULL */
+        stats_quad[i].next = NULL;
         current_quad = current_quad->next;
     }
 }
 
+/*
+ * Frees the memory allocated for the quadgram statistics linked list.
+ * This function iterates through the list, freeing each node's memory,
+ * similar to the careful archiving of documents that are no longer needed.
+ */
 void free_quad_stats()
 {
     if (quad_head == NULL) {return;}

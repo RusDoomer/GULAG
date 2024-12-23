@@ -1,3 +1,26 @@
+/*
+ * stats/mono.c - Monogram statistic definitions for the GULAG project.
+ *
+ * Author: Rus Doomer
+ *
+ * Description: This file contains the implementation for initializing, cleaning,
+ *              converting, and freeing monogram statistics used in the GULAG.
+ *              Monogram statistics track the frequency and positioning of single
+ *              characters on a keyboard layout.
+ *
+ * Adding new stats:
+ *     1. In initialize_mono_stats(), add a new mono_stat structure.
+ *     2. Define its name, and set its weight to -INFINITY (it will be changed later in io.c).
+ *     3. Make sure to add it to the linked list by setting it as the next element of the last stat.
+ *     4. Define its length to 0, then loop through the DIM1 (36) possible positions on the
+ *        layout.
+ *     5. Use unflat_mono() to convert the 1D index to a 2D coordinate.
+ *     6. Use an if statement and a stats_util.c function to check if the ngram falls under
+ *        the stat.
+ *     7. If it does, add it to the ngrams array and increment length.
+ *     8. Add the statistic to the weights files in data/weights/.
+ */
+
 #include <string.h>
 #include <stdlib.h>
 #include <math.h>
@@ -7,18 +30,27 @@
 #include "stats_util.h"
 #include "global.h"
 
-// IF YOU WANT TO ADD STATS HERE'S WHERE YOU DO IT
+/*
+ * Initializes the linked list of monogram statistics.
+ * Each monogram statistic tracks the usage of specific keys or key positions.
+ * The function allocates memory for each stat and sets default values,
+ * including a negative infinity weight which will be later updated.
+ * Statistics are defined for various key positions and hand usage.
+ */
 void initialize_mono_stats()
 {
     int row0, col0;
 
+    /* Allocate and initialize a new stats for column/finger usage. */
     mono_stat *left_outer = (mono_stat *)malloc(sizeof(mono_stat));
+    /* Ensure you set the head on the first stat of each type */
     mono_head = left_outer;
     strcpy(left_outer->name, "Left Outer Usage");
     left_outer->weight = -INFINITY;
     left_outer->length = 0;
     for (int i = 0; i < DIM1; i++)
     {
+        /* util.c - convert a 1D index into a 2D matrix coordinate */
         unflat_mono(i, &row0, &col0);
         if (col0 == 0)
         {
@@ -241,6 +273,7 @@ void initialize_mono_stats()
         }
     }
 
+    /* Allocate and initialize a new stats for hand usage. */
     mono_stat *left_hand = (mono_stat *)malloc(sizeof(mono_stat));
     right_outer->next = left_hand;
     strcpy(left_hand->name, "Left Hand Usage");
@@ -279,6 +312,7 @@ void initialize_mono_stats()
         }
     }
 
+    /* Allocate and initialize a new stats for row usage. */
     mono_stat *top_row = (mono_stat *)malloc(sizeof(mono_stat));
     right_hand->next = top_row;
     strcpy(top_row->name, "Top Row Usage");
@@ -339,31 +373,38 @@ void initialize_mono_stats()
     bottom_row->next = NULL;
 }
 
+/*
+ * Trims the statistics in the linked list to move unused entries to the end.
+ * This is done by iterating through each statistic's ngrams array and
+ * reordering elements to place all valid entries at the beginning
+ * of the array. This process ensures memory efficiency by eliminating
+ * gaps in the array.
+ */
 void trim_mono_stats()
 {
     mono_stat *current = mono_head;
 
     while (current != NULL)
     {
-        // Copy valid ngram entries into earliest free index
+        /* Copy valid ngram entries into earliest free index */
         if (current->length != 0)
         {
-            int left = 0;             // Index for the front of the array
-            int right = DIM1 - 1;    // Index for the back of the array
+            int left = 0;
+            int right = DIM1 - 1;
 
-            // Use two pointers to efficiently partition the array
+            /* Use two pointers to partition the array */
             while (left < right) {
-                // Find the next -1 from the left
+                /* Find the next -1 from the left */
                 while (left < right && current->ngrams[left] != -1) {
                     left++;
                 }
 
-                // Find the next non -1 from the right
+                /* Find the next non -1 from the right */
                 while (left < right && current->ngrams[right] == -1) {
                     right--;
                 }
 
-                // Swap the elements to move -1 to the back and non -1 to the front
+                 /* Swap the elements to move -1 to the back and non -1 to the front */
                 if (left < right) {
                     int temp = current->ngrams[left];
                     current->ngrams[left] = current->ngrams[right];
@@ -374,13 +415,17 @@ void trim_mono_stats()
             }
         }
 
-        // Move to the next node
         current = current->next;
     }
 }
 
+/*
+ * Cleans the monogram statistics linked list by removing statistics with zero length or weight.
+ * This ensures that only relevant statistics are considered in the analysis.
+ */
 void clean_mono_stats()
 {
+    /* Remove statistics from the beginning of the list if they have zero length or weight */
     if (mono_head == NULL) {return;}
     while (mono_head != NULL && (mono_head->length == 0 || mono_head->weight == 0)) {
         mono_stat *temp = mono_head;
@@ -388,6 +433,7 @@ void clean_mono_stats()
         free(temp);
     }
 
+    /* Iterate through the rest of the list and remove any node with zero length or weight */
     mono_stat *current = mono_head;
     while (current != NULL && current->next != NULL) {
         if (current->next->length == 0 || current->next->weight == 0) {
@@ -399,6 +445,7 @@ void clean_mono_stats()
         }
     }
 
+    /* Recount the number of valid statistics */
     current = mono_head;
     while (current != NULL) {
         MONO_END++;
@@ -406,17 +453,26 @@ void clean_mono_stats()
     }
 }
 
+/*
+ * Converts the linked list of monogram statistics to a contiguous array for easier access.
+ * Allocates memory for an array of mono_stat structures and copies data from the linked list.
+ */
 void mono_to_array()
 {
     stats_mono = (mono_stat *)malloc(sizeof(mono_stat) * MONO_END);
     mono_stat *current_mono = mono_head;
     for (int i = 0; i < MONO_END; i++) {
         memcpy(&stats_mono[i], current_mono, sizeof(mono_stat));
-        stats_mono[i].next = NULL; // Set next pointer to NULL
+        /* Set next pointer to NULL */
+        stats_mono[i].next = NULL;
         current_mono = current_mono->next;
     }
 }
 
+/*
+ * Frees the memory allocated for the monogram statistics linked list.
+ * Iterates through the list, freeing each node's memory.
+ */
 void free_mono_stats()
 {
     if (mono_head == NULL) {return;}
