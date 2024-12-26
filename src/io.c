@@ -1,10 +1,10 @@
 /*
- * io.c - Input/output operations for the GULAG project.
+ * io.c - Input/output operations for the GULAG.
  *
  * Author: Rus Doomer
  *
  * Description: This file handles file operations, argument parsing,
- *              and user interaction for the GULAG project. It includes functions
+ *              and user interaction for the GULAG. It includes functions
  *              for reading configuration files, processing command-line arguments,
  *              handling corpus data, and managing layout input/output.
  */

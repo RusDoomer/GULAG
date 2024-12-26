@@ -1,5 +1,5 @@
 /*
- * stats/bi.c - Bigram statistic definitions for the GULAG project.
+ * stats/bi.c - Bigram statistic definitions for the GULAG.
  *
  * Author: Rus Doomer
  *

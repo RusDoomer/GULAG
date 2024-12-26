@@ -1,5 +1,5 @@
 /*
- * stats/quad.c - Quadgram statistic definitions for the GULAG project.
+ * stats/quad.c - Quadgram statistic definitions for the GULAG.
  *
  * Author: Rus Doomer
  *

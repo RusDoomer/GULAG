@@ -49,6 +49,8 @@ void generate();
  */
 void improve(int shuffle);
 
+void cl_improve(int shuffle);
+
 /*
  * Performs a benchmark to determine the optimal number of threads for layout generation.
  * It runs the generation process with different numbers of threads and measures performance.
@@ -65,7 +67,7 @@ void gen_benchmark();
 void print_help();
 
 /*
- * Prints an introductory message and information about the GULAG project.
+ * Prints an introductory message and information about the GULAG.
  *
  * Returns: void.
  */

@@ -1,10 +1,10 @@
 /*
- * util.c - Utility functions for the GULAG project.
+ * util.c - Utility functions for the GULAG.
  *
  * Author: Rus Doomer
  *
  * Description: This file contains various utility functions used throughout
- *              the GULAG project, including error handling, data structure
+ *              the GULAG, including error handling, data structure
  *              manipulation, and other generic helper functions.
  */
 

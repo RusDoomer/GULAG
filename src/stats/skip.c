@@ -1,5 +1,5 @@
 /*
- * stats/skip.c - Skipgram statistic definitions for the GULAG project.
+ * stats/skip.c - Skipgram statistic definitions for the GULAG.
  *
  * Author: Rus Doomer
  *

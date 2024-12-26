@@ -1,5 +1,5 @@
 /*
- * stats/tri.c - Trigram statistic definitions for the GULAG project.
+ * stats/tri.c - Trigram statistic definitions for the GULAG.
  *
  * Author: Rus Doomer
  *

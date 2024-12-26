@@ -1,11 +1,11 @@
 /*
- * io_util.c - Utility functions related to input/output operations for the GULAG project.
+ * io_util.c - Utility functions related to input/output operations for the GULAG.
  *
  * Author: Rus Doomer
  *
  * Description: This file provides utility functions for handling character conversions,
  *              validating run and output modes, and other I/O related operations
- *              within the GULAG project.
+ *              within the GULAG.
  */
 
 #include <stdio.h>

@@ -1,10 +1,10 @@
 /*
- * global.c - Global variable definitions and constants for the GULAG project.
+ * global.c - Global variable definitions and constants for the GULAG.
  *
  * Author: Rus Doomer
  *
  * Description: This file contains the definitions of global variables and constants used
- *              throughout the GULAG project. These variables manage configuration settings,
+ *              throughout the GULAG. These variables manage configuration settings,
  *              language data, corpus statistics, and layout information. Management
  *              of these resources is crucial for the efficient operation of the GULAG.
  */

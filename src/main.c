@@ -1,5 +1,5 @@
 /*
- * main.c - Main source file for the GULAG project.
+ * main.c - Main source file for the GULAG.
  *
  * Author: Rus Doomer
  *
@@ -382,7 +382,8 @@ int main(int argc, char **argv) {
         case 'i':
             /* improve a layout */
             log_print('n',L"Running optimization\n");
-            improve(0);
+            //improve(0);
+            cl_improve(0);
             log_print('n',L"Done\n\n");
             break;
         case 'b':

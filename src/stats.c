@@ -1,5 +1,5 @@
 /*
- * stats.c - Statistic management for the GULAG project.
+ * stats.c - Statistic management for the GULAG.
  *
  * Author: Rus Doomer
  *

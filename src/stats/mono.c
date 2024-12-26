@@ -1,5 +1,5 @@
 /*
- * stats/mono.c - Monogram statistic definitions for the GULAG project.
+ * stats/mono.c - Monogram statistic definitions for the GULAG.
  *
  * Author: Rus Doomer
  *

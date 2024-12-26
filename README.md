@@ -41,11 +41,10 @@ GULAG is a GPU-accelerated keyboard layout optimizer designed to analyze and gen
 
 ### Prerequisites
 
--   A system with OpenCL-compatible GPU and drivers.
+-   A linux system with OpenCL-compatible GPU and drivers.
 -   OpenCL development package (e.g., `opencl-headers`, `ocl-icd-opencl-dev`).
 -   A C compiler (e.g., GCC).
 -   `make` utility for building the project.
--   `getopt` for command line arguments parsing.
 
 ### Installation
 

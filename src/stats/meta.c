@@ -1,5 +1,5 @@
 /*
- * stats/meta.c - Meta statistic definitions for the GULAG project.
+ * stats/meta.c - Meta statistic definitions for the GULAG.
  *
  * Author: Rus Doomer
  *
