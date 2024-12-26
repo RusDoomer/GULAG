@@ -35,6 +35,8 @@ int DIM2 = dim2;
 int DIM3 = dim3;
 int DIM4 = dim4;
 
+int MAX_SWAPS = dim1 / 2;
+
 /*
  * Number of tracked statistics for each ngram type.
  * the name NGRAM_END is a relic of when these were enums
@@ -59,6 +61,9 @@ char run_mode = 'a';
 int repetitions = 10000;
 int threads = 8;
 char output_mode = 'v';
+
+double layouts_per_second_real = 0;
+double layouts_per_second_total = 0;
 
 /* The selected language's character set. */
 wchar_t *lang_arr;

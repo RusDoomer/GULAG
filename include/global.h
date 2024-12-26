@@ -25,6 +25,8 @@ extern int DIM2;
 extern int DIM3;
 extern int DIM4;
 
+extern int MAX_SWAPS;
+
 /*
  * Number of tracked statistics for each ngram type.
  * the name NGRAM_END is a relic of when these were enums
@@ -49,6 +51,9 @@ extern char run_mode;
 extern int repetitions;
 extern int threads;
 extern char output_mode;
+
+extern double layouts_per_second_real;
+extern double layouts_per_second_total;
 
 /* The selected language's character set. */
 extern wchar_t *lang_arr;

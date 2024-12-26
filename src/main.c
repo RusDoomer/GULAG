@@ -213,9 +213,10 @@ void shut_down()
  * Returns: 0 if successful.
  */
 int main(int argc, char **argv) {
-    struct timespec start, end;
+    struct timespec full_start, start, end, full_end;
     double elapsed;
 
+    clock_gettime(CLOCK_MONOTONIC, &full_start);
     clock_gettime(CLOCK_MONOTONIC, &start);
     log_print('q',L"\nWelcome to the GULAG\n\n");
     log_print('q',L"----- Starting Up -----\n\n");
@@ -426,6 +427,11 @@ int main(int argc, char **argv) {
     elapsed = (end.tv_sec - start.tv_sec) + (end.tv_nsec - start.tv_nsec) / 1e9;
     log_print('q',L"----- Shut Down Complete : %.9lf seconds -----\n\n", elapsed);
 
+    log_print('q',L"Layouts per second........................: %lf\n", layouts_per_second_real);
+
+    clock_gettime(CLOCK_MONOTONIC, &full_end);
+    elapsed = (full_end.tv_sec - full_start.tv_sec) + (full_end.tv_nsec - full_start.tv_nsec) / 1e9;
+    log_print('q',L"Layouts per second w/ startup and shutdown: %lf\n\n", layouts_per_second_total);
     log_print('q',L"You are free to go.\n\n");
     return 0;
 }

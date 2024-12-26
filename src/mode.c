@@ -269,7 +269,7 @@ void *thread_function(void *arg) {
     float T = 1000.0;
     int reheating_count = 0;
     /* Starting number of swaps */
-    int initial_swap_count = 18;
+    int initial_swap_count = MAX_SWAPS;
     int swap_count;
     /* Store the initial temperature for scaling */
     float max_T = T;
@@ -596,8 +596,9 @@ void cl_improve(int shuffle) {
     log_print('n', L"Done\n\n");
 
     if (shuffle) {
-        log_print('n', L"3/9: Shuffling layout... ");
-        shuffle_layout(lt);
+        log_print('n', L"3/9: Skipping shuffle... ");
+        // Don't shuffle on the host, we'll do it on the device
+        // shuffle_layout(lt);
         strcpy(lt->name, "random shuffle");
         log_print('n', L"Done\n\n");
     } else {
@@ -626,49 +627,43 @@ void cl_improve(int shuffle) {
     log_print('v', L"5/9: Initializing OpenCL...\n");
     log_print('v', L"     Getting platform and device... ");
     err = clGetPlatformIDs(1, &platform, NULL);
-    if (err != CL_SUCCESS) {
-        error("OpenCL Error: Failed to get platform ID.");
-    }
+    if (err != CL_SUCCESS) {error("OpenCL Error: Failed to get platform ID.");}
+
     err = clGetDeviceIDs(platform, CL_DEVICE_TYPE_GPU, 1, &device, NULL);
-    if (err != CL_SUCCESS) {
-        error("OpenCL Error: Failed to get device ID.");
-    }
+    if (err != CL_SUCCESS) {error("OpenCL Error: Failed to get device ID.");}
     log_print('v', L"Done\n");
 
     // Create context
     log_print('v', L"     Creating context... ");
     context = clCreateContext(NULL, 1, &device, NULL, NULL, &err);
-    if (err != CL_SUCCESS) {
-        error("OpenCL Error: Failed to create context.");
-    }
+    if (err != CL_SUCCESS) {error("OpenCL Error: Failed to create context.");}
     log_print('v', L"Done\n");
 
     // Create command queue (using the non-deprecated function)
     log_print('v', L"     Creating command queue... ");
     cl_queue_properties props[] = {0}; // No special properties needed
     queue = clCreateCommandQueueWithProperties(context, device, props, &err);
-    if (err != CL_SUCCESS) {
-        error("OpenCL Error: Failed to create command queue.");
-    }
+    if (err != CL_SUCCESS) {error("OpenCL Error: Failed to create command queue.");}
     log_print('v', L"Done\n");
 
     // Read kernel source
     log_print('v', L"     Reading kernel source... ");
     size_t source_length;
     char* kernel_source = read_source_file("src/kernel.cl", &source_length);
-    if (kernel_source == NULL) {
-        error("Failed to read kernel source file.");
-    }
+    if (kernel_source == NULL) {error("Failed to read kernel source file.");}
     log_print('v', L"Done\n");
 
     // Create and build program
     log_print('v', L"     Creating and building program... ");
     program = clCreateProgramWithSource(context, 1, (const char**)&kernel_source, &source_length, &err);
-    if (err != CL_SUCCESS) {
-        error("OpenCL Error: Failed to create program from source.");
-    }
+    if (err != CL_SUCCESS) {error("OpenCL Error: Failed to create program from source.");}
 
-    err = clBuildProgram(program, 1, &device, NULL, NULL, NULL);
+    // Compiler options to pass constants to the kernel using #define
+    char options[512]; // Ensure this is large enough for all defines
+    sprintf(options, "-D MONO_END=%d -D BI_END=%d -D TRI_END=%d -D QUAD_END=%d -D SKIP_END=%d -D META_END=%d -D THREADS=%d -D REPETITIONS=%d -D ROW=%d -D COL=%d -D DIM1=%d -D DIM2=%d -D DIM3=%d -D DIM4=%d -D MAX_SWAPS=%d",
+            MONO_END, BI_END, TRI_END, QUAD_END, SKIP_END, META_END, threads, repetitions, ROW, COL, DIM1, DIM2, DIM3, DIM4, MAX_SWAPS);
+
+    err = clBuildProgram(program, 1, &device, options, NULL, NULL);
     if (err != CL_SUCCESS) {
         size_t log_size;
         clGetProgramBuildInfo(program, device, CL_PROGRAM_BUILD_LOG, 0, NULL, &log_size);
@@ -683,165 +678,72 @@ void cl_improve(int shuffle) {
     // Create kernel
     log_print('v', L"     Creating kernel... ");
     kernel = clCreateKernel(program, "improve_kernel", &err);
-    if (err != CL_SUCCESS) {
-        error("OpenCL Error: Failed to create kernel.");
-    }
+    if (err != CL_SUCCESS) {error("OpenCL Error: Failed to create kernel.");}
     log_print('v', L"Done\n");
 
     // Allocate and copy data to device buffers
     log_print('v', L"     Allocating and copying data to device buffers...\n");
     cl_mem buffer_linear_mono = clCreateBuffer(context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, sizeof(float) * LANG_LENGTH, linear_mono, &err);
-    if (err != CL_SUCCESS) {
-        error("OpenCL Error: Failed to create buffer for linear_mono.");
-    }
-
+    if (err != CL_SUCCESS) {error("OpenCL Error: Failed to create buffer for linear_mono.");}
     cl_mem buffer_linear_bi = clCreateBuffer(context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, sizeof(float) * LANG_LENGTH * LANG_LENGTH, linear_bi, &err);
-    if (err != CL_SUCCESS) {
-        error("OpenCL Error: Failed to create buffer for linear_bi.");
-    }
-
+    if (err != CL_SUCCESS) {error("OpenCL Error: Failed to create buffer for linear_bi.");}
     cl_mem buffer_linear_tri = clCreateBuffer(context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, sizeof(float) * LANG_LENGTH * LANG_LENGTH * LANG_LENGTH, linear_tri, &err);
-    if (err != CL_SUCCESS) {
-        error("OpenCL Error: Failed to create buffer for linear_tri.");
-    }
-
+    if (err != CL_SUCCESS) {error("OpenCL Error: Failed to create buffer for linear_tri.");}
     cl_mem buffer_linear_quad = clCreateBuffer(context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, sizeof(float) * LANG_LENGTH * LANG_LENGTH * LANG_LENGTH * LANG_LENGTH, linear_quad, &err);
-    if (err != CL_SUCCESS) {
-        error("OpenCL Error: Failed to create buffer for linear_quad.");
-    }
-
+    if (err != CL_SUCCESS) {error("OpenCL Error: Failed to create buffer for linear_quad.");}
     cl_mem buffer_linear_skip = clCreateBuffer(context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, sizeof(float) * 10 * LANG_LENGTH * LANG_LENGTH, linear_skip, &err);
-    if (err != CL_SUCCESS) {
-        error("OpenCL Error: Failed to create buffer for linear_skip.");
-    }
-
+    if (err != CL_SUCCESS) {error("OpenCL Error: Failed to create buffer for linear_skip.");}
     cl_mem buffer_stats_mono = clCreateBuffer(context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, sizeof(mono_stat) * MONO_END, stats_mono, &err);
-    if (err != CL_SUCCESS) {
-        error("OpenCL Error: Failed to create buffer for stats_mono.");
-    }
-
+    if (err != CL_SUCCESS) {error("OpenCL Error: Failed to create buffer for stats_mono.");}
     cl_mem buffer_stats_bi = clCreateBuffer(context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, sizeof(bi_stat) * BI_END, stats_bi, &err);
-    if (err != CL_SUCCESS) {
-        error("OpenCL Error: Failed to create buffer for stats_bi.");
-    }
-
+    if (err != CL_SUCCESS) {error("OpenCL Error: Failed to create buffer for stats_bi.");}
     cl_mem buffer_stats_tri = clCreateBuffer(context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, sizeof(tri_stat) * TRI_END, stats_tri, &err);
-    if (err != CL_SUCCESS) {
-        error("OpenCL Error: Failed to create buffer for stats_tri.");
-    }
-
+    if (err != CL_SUCCESS) {error("OpenCL Error: Failed to create buffer for stats_tri.");}
     cl_mem buffer_stats_quad = clCreateBuffer(context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, sizeof(quad_stat) * QUAD_END, stats_quad, &err);
-    if (err != CL_SUCCESS) {
-        error("OpenCL Error: Failed to create buffer for stats_quad.");
-    }
-
+    if (err != CL_SUCCESS) {error("OpenCL Error: Failed to create buffer for stats_quad.");}
     cl_mem buffer_stats_skip = clCreateBuffer(context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, sizeof(skip_stat) * SKIP_END, stats_skip, &err);
-    if (err != CL_SUCCESS) {
-        error("OpenCL Error: Failed to create buffer for stats_skip.");
-    }
-
+    if (err != CL_SUCCESS) {error("OpenCL Error: Failed to create buffer for stats_skip.");}
     cl_mem buffer_stats_meta = clCreateBuffer(context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, sizeof(meta_stat) * META_END, stats_meta, &err);
-    if (err != CL_SUCCESS) {
-        error("OpenCL Error: Failed to create buffer for stats_meta.");
-    }
-
+    if (err != CL_SUCCESS) {error("OpenCL Error: Failed to create buffer for stats_meta.");}
     cl_mem buffer_layout = clCreateBuffer(context, CL_MEM_READ_WRITE | CL_MEM_COPY_HOST_PTR, sizeof(layout), lt, &err);
-    if (err != CL_SUCCESS) {
-        error("OpenCL Error: Failed to create buffer for layout.");
-    }
-
+    if (err != CL_SUCCESS) {error("OpenCL Error: Failed to create buffer for layout.");}
     cl_mem buffer_pins = clCreateBuffer(context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, sizeof(int) * ROW * COL, pins, &err);
-    if (err != CL_SUCCESS) {
-        error("OpenCL Error: Failed to create buffer for pins.");
-    }
+    if (err != CL_SUCCESS) {error("OpenCL Error: Failed to create buffer for pins.");}
     log_print('v', L"     Done\n");
+
+    // Generate a seed on the host
+    unsigned int seed = (unsigned int)time(NULL);
 
     // Set kernel arguments
     log_print('v', L"     Setting kernel arguments... ");
     err = clSetKernelArg(kernel, 0, sizeof(cl_mem), &buffer_linear_mono);
-    if (err != CL_SUCCESS) {
-        error("OpenCL Error: Failed to set kernel argument 0.");
-    }
+    if (err != CL_SUCCESS) {error("OpenCL Error: Failed to set kernel argument 0.");}
     err = clSetKernelArg(kernel, 1, sizeof(cl_mem), &buffer_linear_bi);
-    if (err != CL_SUCCESS) {
-        error("OpenCL Error: Failed to set kernel argument 1.");
-    }
+    if (err != CL_SUCCESS) {error("OpenCL Error: Failed to set kernel argument 1.");}
     err = clSetKernelArg(kernel, 2, sizeof(cl_mem), &buffer_linear_tri);
-    if (err != CL_SUCCESS) {
-        error("OpenCL Error: Failed to set kernel argument 2.");
-    }
+    if (err != CL_SUCCESS) {error("OpenCL Error: Failed to set kernel argument 2.");}
     err = clSetKernelArg(kernel, 3, sizeof(cl_mem), &buffer_linear_quad);
-    if (err != CL_SUCCESS) {
-        error("OpenCL Error: Failed to set kernel argument 3.");
-    }
+    if (err != CL_SUCCESS) {error("OpenCL Error: Failed to set kernel argument 3.");}
     err = clSetKernelArg(kernel, 4, sizeof(cl_mem), &buffer_linear_skip);
-    if (err != CL_SUCCESS) {
-        error("OpenCL Error: Failed to set kernel argument 4.");
-    }
+    if (err != CL_SUCCESS) {error("OpenCL Error: Failed to set kernel argument 4.");}
     err = clSetKernelArg(kernel, 5, sizeof(cl_mem), &buffer_stats_mono);
-    if (err != CL_SUCCESS) {
-        error("OpenCL Error: Failed to set kernel argument 5.");
-    }
+    if (err != CL_SUCCESS) {error("OpenCL Error: Failed to set kernel argument 5.");}
     err = clSetKernelArg(kernel, 6, sizeof(cl_mem), &buffer_stats_bi);
-    if (err != CL_SUCCESS) {
-        error("OpenCL Error: Failed to set kernel argument 6.");
-    }
+    if (err != CL_SUCCESS) {error("OpenCL Error: Failed to set kernel argument 6.");}
     err = clSetKernelArg(kernel, 7, sizeof(cl_mem), &buffer_stats_tri);
-    if (err != CL_SUCCESS) {
-        error("OpenCL Error: Failed to set kernel argument 7.");
-    }
+    if (err != CL_SUCCESS) {error("OpenCL Error: Failed to set kernel argument 7.");}
     err = clSetKernelArg(kernel, 8, sizeof(cl_mem), &buffer_stats_quad);
-    if (err != CL_SUCCESS) {
-        error("OpenCL Error: Failed to set kernel argument 8.");
-    }
+    if (err != CL_SUCCESS) {error("OpenCL Error: Failed to set kernel argument 8.");}
     err = clSetKernelArg(kernel, 9, sizeof(cl_mem), &buffer_stats_skip);
-    if (err != CL_SUCCESS) {
-        error("OpenCL Error: Failed to set kernel argument 9.");
-    }
+    if (err != CL_SUCCESS) {error("OpenCL Error: Failed to set kernel argument 9.");}
     err = clSetKernelArg(kernel, 10, sizeof(cl_mem), &buffer_stats_meta);
-    if (err != CL_SUCCESS) {
-        error("OpenCL Error: Failed to set kernel argument 10.");
-    }
+    if (err != CL_SUCCESS) {error("OpenCL Error: Failed to set kernel argument 10.");}
     err = clSetKernelArg(kernel, 11, sizeof(cl_mem), &buffer_layout);
-    if (err != CL_SUCCESS) {
-        error("OpenCL Error: Failed to set kernel argument 11.");
-    }
-    err = clSetKernelArg(kernel, 12, sizeof(int), &MONO_END);
-    if (err != CL_SUCCESS) {
-        error("OpenCL Error: Failed to set kernel argument 12.");
-    }
-    err = clSetKernelArg(kernel, 13, sizeof(int), &BI_END);
-    if (err != CL_SUCCESS) {
-        error("OpenCL Error: Failed to set kernel argument 13.");
-    }
-    err = clSetKernelArg(kernel, 14, sizeof(int), &TRI_END);
-    if (err != CL_SUCCESS) {
-        error("OpenCL Error: Failed to set kernel argument 14.");
-    }
-    err = clSetKernelArg(kernel, 15, sizeof(int), &QUAD_END);
-    if (err != CL_SUCCESS) {
-        error("OpenCL Error: Failed to set kernel argument 15.");
-    }
-    err = clSetKernelArg(kernel, 16, sizeof(int), &SKIP_END);
-    if (err != CL_SUCCESS) {
-        error("OpenCL Error: Failed to set kernel argument 16.");
-    }
-    err = clSetKernelArg(kernel, 17, sizeof(int), &META_END);
-    if (err != CL_SUCCESS) {
-        error("OpenCL Error: Failed to set kernel argument 17.");
-    }
-    err = clSetKernelArg(kernel, 18, sizeof(int), &threads);
-    if (err != CL_SUCCESS) {
-        error("OpenCL Error: Failed to set kernel argument 18.");
-    }
-    err = clSetKernelArg(kernel, 19, sizeof(int), &repetitions);
-    if (err != CL_SUCCESS) {
-        error("OpenCL Error: Failed to set kernel argument 19.");
-    }
-    err = clSetKernelArg(kernel, 20, sizeof(cl_mem), &buffer_pins);
-    if (err != CL_SUCCESS) {
-        error("OpenCL Error: Failed to set kernel argument 20.");
-    }
+    if (err != CL_SUCCESS) {error("OpenCL Error: Failed to set kernel argument 11.");}
+    err = clSetKernelArg(kernel, 12, sizeof(cl_mem), &buffer_pins);
+    if (err != CL_SUCCESS) {error("OpenCL Error: Failed to set kernel argument 12.");}
+    err = clSetKernelArg(kernel, 13, sizeof(int), &seed);
+    if (err != CL_SUCCESS) {error("OpenCL Error: Failed to set kernel argument 13.");}
     log_print('v', L"Done\n");
 
     // Enqueue kernel
@@ -849,9 +751,7 @@ void cl_improve(int shuffle) {
     size_t global_size = threads; // Example: same number of threads as your C code
     size_t local_size = 1; // You might want to adjust this later
     err = clEnqueueNDRangeKernel(queue, kernel, 1, NULL, &global_size, &local_size, 0, NULL, NULL);
-    if (err != CL_SUCCESS) {
-        error("OpenCL Error: Failed to enqueue kernel.");
-    }
+    if (err != CL_SUCCESS) {error("OpenCL Error: Failed to enqueue kernel.");}
     log_print('v', L"Done\n");
 
     // Wait for kernel to finish (for now)
@@ -859,12 +759,10 @@ void cl_improve(int shuffle) {
     clFinish(queue);
     log_print('v', L"Done\n");
 
-    // Read results back (in the future)
+    // Read results back
     log_print('v', L"7/9: Reading results back from OpenCL device...\n\n");
     err = clEnqueueReadBuffer(queue, buffer_layout, CL_TRUE, 0, sizeof(layout), lt, 0, NULL, NULL);
-    if (err != CL_SUCCESS) {
-        error("OpenCL Error: Failed to read buffer for layout.");
-    }
+    if (err != CL_SUCCESS) {error("OpenCL Error: Failed to read buffer for layout.");}
     log_print('v', L"Done\n");
 
     // Cleanup
@@ -891,6 +789,8 @@ void cl_improve(int shuffle) {
     // ... rest of your improve logic (print best layout, etc.) ...
 
     log_print('v', L"9/9: Printing layout...\n\n");
+    single_analyze(lt);
+    get_score(lt);
     print_layout(lt);
     log_print('v', L"Done\n\n");
 

@@ -224,7 +224,7 @@ void check_setup()
         error("invalid output mode selected");
     }
     if (threads < 1) {error("invalid threads selected");}
-    if (repetitions < 1) {error("invalid repetitions selected");}
+    if (repetitions < threads) {error("invalid repetitions selected");}
 }
 
 /*
