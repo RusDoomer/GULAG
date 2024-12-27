@@ -22,10 +22,6 @@
 #include "global.h"
 #include "structs.h"
 #include "io.h"
-#include <stdio.h>
-#include <stdlib.h>
-#include <locale.h>
-#include <time.h>
 
 /*
  * Initializes all statistical data structures for the GULAG.
