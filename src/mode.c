@@ -660,8 +660,8 @@ void cl_improve(int shuffle) {
 
     // Compiler options to pass constants to the kernel using #define
     char options[512]; // Ensure this is large enough for all defines
-    sprintf(options, "-D MONO_END=%d -D BI_END=%d -D TRI_END=%d -D QUAD_END=%d -D SKIP_END=%d -D META_END=%d -D THREADS=%d -D REPETITIONS=%d -D ROW=%d -D COL=%d -D DIM1=%d -D DIM2=%d -D DIM3=%d -D DIM4=%d -D MAX_SWAPS=%d",
-            MONO_END, BI_END, TRI_END, QUAD_END, SKIP_END, META_END, threads, repetitions, ROW, COL, DIM1, DIM2, DIM3, DIM4, MAX_SWAPS);
+    sprintf(options, "-D MONO_END=%d -D BI_END=%d -D TRI_END=%d -D QUAD_END=%d -D SKIP_END=%d -D META_END=%d -D THREADS=%d -D REPETITIONS=%d -D MAX_SWAPS=%d",
+            MONO_END, BI_END, TRI_END, QUAD_END, SKIP_END, META_END, threads, repetitions, MAX_SWAPS);
 
     err = clBuildProgram(program, 1, &device, options, NULL, NULL);
     if (err != CL_SUCCESS) {
@@ -787,7 +787,6 @@ void cl_improve(int shuffle) {
     log_print('v', L"Done\n\n");
 
     // ... rest of your improve logic (print best layout, etc.) ...
-
     log_print('v', L"9/9: Printing layout...\n\n");
     single_analyze(lt);
     get_score(lt);

@@ -15,7 +15,7 @@ EXECUTABLE := gulag
 
 # Compiler flags
 CFLAGS := -I$(INCLUDE_DIR) -I$(INCLUDE_DIR)/stats -Wall -DCL_TARGET_OPENCL_VERSION=300
-LDFLAGS := -lOpenCL -lm -fopenmp
+LDFLAGS := -lOpenCL -lm
 OPT_FLAGS := -O3 -march=native
 DEBUG_FLAGS := -g -fsanitize=address
 
