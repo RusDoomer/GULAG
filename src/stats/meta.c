@@ -135,9 +135,15 @@ void meta_analysis(layout *lt)
 {
     /* Calculate hand balance. */
     lt->meta_score[0] = 0;
-    /* stats_util.c - finds the score of a specific statistic in a given layout */
-    lt->meta_score[0] += find_stat_score("Left Hand Usage", 'm', lt);
-    lt->meta_score[0] -= find_stat_score("Right Hand Usage", 'm', lt);
-    /* Take absolute value. */
-    if (lt->meta_score[0] < 0) {lt->meta_score[0] *= -1;}
+    /* stats_util.c - finds the index of a specific statistic in a given layout */
+    int left_hand = find_stat_index("Left Hand Usage", 'm', lt);
+    int right_hand = find_stat_index("Right Hand Usage", 'm', lt);
+    if (left_hand == -1 || right_hand == -1) {lt->meta_score[0] = nan("");}
+    else
+    {
+        lt->meta_score[0] += lt->mono_score[left_hand];
+        lt->meta_score[0] -= lt->mono_score[right_hand];
+        /* Take absolute value. */
+        if (lt->meta_score[0] < 0) {lt->meta_score[0] *= -1;}
+    }
 }

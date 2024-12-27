@@ -17,7 +17,7 @@
  * Returns:
  *   The score of the found statistic. Returns NaN if the statistic is not found.
  */
-float find_stat_score(char *stat_name, char type, layout *lt);
+int find_stat_index(char *stat_name, char type, layout *lt);
 
 char hand(int row0, int col0);
 int finger(int row0, int col0);

@@ -22,6 +22,7 @@
 #include <CL/cl.h>
 
 #include "mode.h"
+#include "stats_util.h"
 #include "util.h"
 #include "io_util.h"
 #include "io.h"
@@ -598,9 +599,8 @@ void cl_improve(int shuffle) {
     log_print('n', L"Done\n\n");
 
     if (shuffle) {
-        log_print('n', L"3/9: Skipping shuffle... ");
-        // Don't shuffle on the host, we'll do it on the device
-        // shuffle_layout(lt);
+        log_print('n', L"3/9: Shuffling layout... ");
+        shuffle_layout(lt);
         strcpy(lt->name, "random shuffle");
         log_print('n', L"Done\n\n");
     } else {
@@ -660,10 +660,16 @@ void cl_improve(int shuffle) {
     program = clCreateProgramWithSource(context, 1, (const char**)&kernel_source, &source_length, &err);
     if (err != CL_SUCCESS) {error("OpenCL Error: Failed to create program from source.");}
 
+    // Find mono_stat indexes for Hand Balance Meta Stat
+    int index_left_hand_usage = find_stat_index("Left Hand Usage", 'm', lt);
+    int index_right_hand_usage = find_stat_index("Right Hand Usage", 'm', lt);
+    if (index_left_hand_usage == -1 || index_right_hand_usage == -1) {error("hand usage stats must have non-zero weight even if you don't care, sorry :)");}
+    if (index_left_hand_usage >= MONO_END || index_right_hand_usage >= MONO_END) {error("the index of left hand usage or right hand usage is out of bounds, idk what you did");}
+
     // Compiler options to pass constants to the kernel using #define
     char options[512]; // Ensure this is large enough for all defines
-    sprintf(options, "-D MONO_END=%d -D BI_END=%d -D TRI_END=%d -D QUAD_END=%d -D SKIP_END=%d -D META_END=%d -D THREADS=%d -D REPETITIONS=%d -D MAX_SWAPS=%d",
-            MONO_END, BI_END, TRI_END, QUAD_END, SKIP_END, META_END, threads, repetitions, MAX_SWAPS);
+    sprintf(options, "-D MONO_END=%d -D BI_END=%d -D TRI_END=%d -D QUAD_END=%d -D SKIP_END=%d -D META_END=%d -D THREADS=%d -D REPETITIONS=%d -D MAX_SWAPS=%d -D LEFT_HAND=%d -D RIGHT_HAND=%d",
+            MONO_END, BI_END, TRI_END, QUAD_END, SKIP_END, META_END, threads, repetitions, MAX_SWAPS, index_left_hand_usage, index_right_hand_usage);
 
     err = clBuildProgram(program, 1, &device, options, NULL, NULL);
     if (err != CL_SUCCESS) {
@@ -787,6 +793,8 @@ void cl_improve(int shuffle) {
     clReleaseCommandQueue(queue);
     clReleaseContext(context);
     log_print('v', L"Done\n\n");
+
+    log_print('v', L"cl score : %f\n\n", lt->score);
 
     // ... rest of your improve logic (print best layout, etc.) ...
     log_print('v', L"9/9: Printing layout...\n\n");
