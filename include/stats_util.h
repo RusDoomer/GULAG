@@ -2,6 +2,7 @@
 #define STATS_UTIL_H
 
 #include "global.h"
+#include "structs.h"
 
 /*
  * Finds the score of a specific statistic in a given layout.

@@ -2,6 +2,7 @@
 #define IO_UTIL_H
 
 #include "global.h"
+#include "structs.h"
 
 /*
  * Converts a character to its corresponding index in the language array.

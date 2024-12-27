@@ -9,6 +9,7 @@
 
 #include "analyze.h"
 #include "global.h"
+#include "structs.h"
 #include "util.h"
 #include "io_util.h"
 #include "meta.h"

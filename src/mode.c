@@ -26,6 +26,8 @@
 #include "io_util.h"
 #include "io.h"
 #include "analyze.h"
+#include "global.h"
+#include "structs.h"
 
 /*
  * Performs analysis on a single layout.

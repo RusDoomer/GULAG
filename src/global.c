@@ -12,6 +12,7 @@
 #include <wchar.h>
 
 #include "global.h"
+#include "structs.h"
 
 /* Defining dimensions for the layout grid. */
 #define row 3

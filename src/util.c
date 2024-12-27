@@ -16,6 +16,7 @@
 
 #include "util.h"
 #include "global.h"
+#include "structs.h"
 #include "io.h"
 #include "io_util.h"
 

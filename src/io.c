@@ -21,6 +21,7 @@
 #include "io_util.h"
 #include "util.h"
 #include "global.h"
+#include "structs.h"
 
 #define UNICODE_MAX 65535
 #define BUFFER_SIZE 10000

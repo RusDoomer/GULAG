@@ -1,5 +1,7 @@
 // kernel.cl
 
+#include "structs.h"
+
 #define ROW 3
 #define COL 12
 #define DIM1 ROW * COL
@@ -32,59 +34,6 @@ typedef struct cl_layout {
     float meta_score[META_END];
     float score;
 } cl_layout;
-
-// Redefine necessary structs
-typedef struct layout {
-    char name[100];
-    int matrix[ROW][COL];
-    float *mono_score;
-    float *bi_score;
-    float *tri_score;
-    float *quad_score;
-    float **skip_score;
-    float *meta_score;
-    float score;
-} layout;
-
-typedef struct mono_stat {
-    char name[100];
-    int ngrams[DIM1];
-    int length;
-    float weight;
-} mono_stat;
-
-typedef struct bi_stat {
-    char name[100];
-    int ngrams[DIM2];
-    int length;
-    float weight;
-} bi_stat;
-
-typedef struct tri_stat {
-    char name[100];
-    int ngrams[DIM3];
-    int length;
-    float weight;
-} tri_stat;
-
-typedef struct quad_stat {
-    char name[100];
-    int ngrams[DIM4];
-    int length;
-    float weight;
-} quad_stat;
-
-typedef struct skip_stat {
-    char name[100];
-    int ngrams[DIM2];
-    int length;
-    float weight[10];
-} skip_stat;
-
-typedef struct meta_stat {
-    char name[100];
-    float weight;
-} meta_stat;
 
 // Simple pseudo-random number generator (Park-Miller)
 uint park_miller_rng(uint seed) {
@@ -126,16 +75,16 @@ __kernel void improve_kernel(__constant float *linear_mono,
                              __global layout *lt,
                              __constant int *pins,
                              uint seed) {
-
+    // access pins like this pins[i][j] becomes pins[i * COL + j];
     int global_id = get_global_id(0);
 
     // Test: Set the layout name to the name of the second mono_stat
     if (global_id == 0) {
 
         // Ensure we don't go out of bounds if MONO_END < 2
-        if (MONO_END >= 2) {
-            for (int i = 0; i < DIM1; i++) {
-                //lt->name[i] = (char)stats_mono[1].ngrams[i];
+        for (int i = 0; i < ROW; i++) {
+            for (int j = 0; j < COL; j++) {
+                // lt->matrix[i][j] = pins[i * COL + j];
             }
         }
 

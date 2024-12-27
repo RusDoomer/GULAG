@@ -20,6 +20,7 @@
 #include "meta.h"
 
 #include "global.h"
+#include "structs.h"
 #include "io.h"
 #include <stdio.h>
 #include <stdlib.h>

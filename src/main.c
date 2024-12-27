@@ -14,6 +14,7 @@
 
 #include "io.h"
 #include "global.h"
+#include "structs.h"
 #include "util.h"
 #include "mode.h"
 #include "stats.h"

@@ -2,6 +2,7 @@
 #define IO_H
 
 #include "global.h"
+#include "structs.h"
 
 /*
  * Prints a message to the standard output stream, with verbosity control.

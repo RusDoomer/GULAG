@@ -16,6 +16,7 @@
 #include "io_util.h"
 #include "util.h"
 #include "global.h"
+#include "structs.h"
 
 /*
  * Converts a character to its corresponding index in the language array.

@@ -2,6 +2,7 @@
 #define ANALYZE_H
 
 #include "global.h"
+#include "structs.h"
 
 /*
  * Performs analysis on a single layout, calculating statistics for monograms,

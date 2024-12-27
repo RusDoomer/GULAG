@@ -29,6 +29,7 @@
 #include "util.h"
 #include "stats_util.h"
 #include "global.h"
+#include "structs.h"
 
 /*
  * Initializes the linked list of monogram statistics.

@@ -2,6 +2,7 @@
 #define UTIL_H
 
 #include "global.h"
+#include "structs.h"
 
 /*
  * Error handling function.
