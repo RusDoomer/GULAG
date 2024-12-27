@@ -837,8 +837,8 @@ void cl_improve(int shuffle) {
     log_print('v', L"Done\n\n");
 
     log_print('v', L"cl score : %f\n", lt->score);
-    log_print('v', L"time per layout : %.9lf seconds\n", elapsed / (1000 * threads));
-    log_print('v', L"layouts / sec   : %.9lf\n\n", (1000 * threads) / elapsed);
+    log_print('v', L"time per layout : %.9lf seconds\n", elapsed / repetitions);
+    log_print('v', L"layouts / sec   : %.9lf\n\n", repetitions / elapsed);
 
     // ... rest of your improve logic (print best layout, etc.) ...
     log_print('v', L"9/9: Printing layout...\n\n");

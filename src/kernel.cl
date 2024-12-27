@@ -366,10 +366,11 @@ __kernel void improve_kernel(__constant float *linear_mono,
     size_t global_id = get_global_id(0);
     size_t group_id = get_group_id(0);
     size_t local_id = get_local_id(0);
+    size_t total = get_global_size(0);
 
     __local cl_layout working;
 
-    for (int iter = 0; iter < 1000; iter++)
+    for (int iter = 0; iter < REPETITIONS / THREADS; iter++)
     {
         // Each worker copies a portion of the host layout to the local layout
         if (local_id == 0) {
@@ -457,5 +458,5 @@ __kernel void improve_kernel(__constant float *linear_mono,
     }
     barrier(CLK_GLOBAL_MEM_FENCE);
     // Copy the score back to the host layout
-    if (global_id == 0) {lt->score = working.score;}
+    if (global_id == total - 2) {lt->score = working.score;}
 }
