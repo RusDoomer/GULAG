@@ -617,7 +617,8 @@ void cl_improve(int shuffle) {
     log_print('n', L"\n");
 
     // OpenCL setup
-    cl_platform_id platform;
+    cl_platform_id *platforms;
+    cl_uint num_platforms;
     cl_device_id device;
     cl_context context;
     cl_command_queue queue;
@@ -625,15 +626,48 @@ void cl_improve(int shuffle) {
     cl_kernel kernel;
     cl_int err;
 
-    // Get platform and device
+    // Get all platforms
     log_print('v', L"5/9: Initializing OpenCL...\n");
-    log_print('v', L"     Getting platform and device... ");
-    err = clGetPlatformIDs(1, &platform, NULL);
-    if (err != CL_SUCCESS) {error("OpenCL Error: Failed to get platform ID.");}
+    log_print('v', L"     Getting platforms... ");
+    err = clGetPlatformIDs(0, NULL, &num_platforms);
+    if (err != CL_SUCCESS) {error("OpenCL Error: Failed to get number of platforms.");}
 
-    err = clGetDeviceIDs(platform, CL_DEVICE_TYPE_GPU, 1, &device, NULL);
-    if (err != CL_SUCCESS) {error("OpenCL Error: Failed to get device ID.");}
+    platforms = (cl_platform_id *)malloc(sizeof(cl_platform_id) * num_platforms);
+    err = clGetPlatformIDs(num_platforms, platforms, NULL);
+    if (err != CL_SUCCESS) {
+        free(platforms);
+        error("OpenCL Error: Failed to get platform IDs.");
+    }
     log_print('v', L"Done\n");
+
+    // Attempt to find a GPU device across all platforms
+    log_print('v', L"     Finding a suitable device... ");
+    int device_found = 0;
+    for (int i = 0; i < num_platforms; i++) {
+        err = clGetDeviceIDs(platforms[i], CL_DEVICE_TYPE_GPU, 1, &device, NULL);
+        if (err == CL_SUCCESS) {
+            device_found = 1;
+            break;
+        }
+    }
+
+    // If no GPU is found, try to get any other available device
+    if (!device_found) {
+        for (int i = 0; i < num_platforms; i++) {
+            err = clGetDeviceIDs(platforms[i], CL_DEVICE_TYPE_ALL, 1, &device, NULL);
+            if (err == CL_SUCCESS) {
+                device_found = 1;
+                break;
+            }
+        }
+    }
+
+    if (!device_found) {
+        free(platforms);
+        error("OpenCL Error: No suitable device found.");
+    }
+    log_print('v', L"Done\n");
+    free(platforms); // Free platforms array after use
 
     // Create context
     log_print('v', L"     Creating context... ");
