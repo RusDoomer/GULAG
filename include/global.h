@@ -27,6 +27,7 @@ extern int DIM3;
 extern int DIM4;
 
 extern int MAX_SWAPS;
+extern int WORKERS;
 
 /*
  * Number of tracked statistics for each ngram type.

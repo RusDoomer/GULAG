@@ -612,7 +612,7 @@ void cl_improve(int shuffle) {
     single_analyze(lt);
     get_score(lt);
     log_print('n', L"Done\n\n");
-
+    lt->score = -115684;
     print_layout(lt);
     log_print('n', L"\n");
 
@@ -702,8 +702,8 @@ void cl_improve(int shuffle) {
 
     // Compiler options to pass constants to the kernel using #define
     char options[512]; // Ensure this is large enough for all defines
-    sprintf(options, "-D MONO_END=%d -D BI_END=%d -D TRI_END=%d -D QUAD_END=%d -D SKIP_END=%d -D META_END=%d -D THREADS=%d -D REPETITIONS=%d -D MAX_SWAPS=%d -D LEFT_HAND=%d -D RIGHT_HAND=%d",
-            MONO_END, BI_END, TRI_END, QUAD_END, SKIP_END, META_END, threads, repetitions, MAX_SWAPS, index_left_hand_usage, index_right_hand_usage);
+    sprintf(options, "-D MONO_END=%d -D BI_END=%d -D TRI_END=%d -D QUAD_END=%d -D SKIP_END=%d -D META_END=%d -D THREADS=%d -D REPETITIONS=%d -D MAX_SWAPS=%d -D WORKERS=%d -D LEFT_HAND=%d -D RIGHT_HAND=%d",
+            MONO_END, BI_END, TRI_END, QUAD_END, SKIP_END, META_END, threads, repetitions, MAX_SWAPS, WORKERS, index_left_hand_usage, index_right_hand_usage);
 
     err = clBuildProgram(program, 1, &device, options, NULL, NULL);
     if (err != CL_SUCCESS) {
@@ -788,10 +788,15 @@ void cl_improve(int shuffle) {
     if (err != CL_SUCCESS) {error("OpenCL Error: Failed to set kernel argument 13.");}
     log_print('v', L"Done\n");
 
+    struct timespec start, end;
+    double elapsed;
+
+    clock_gettime(CLOCK_MONOTONIC, &start);
+
     // Enqueue kernel
     log_print('v', L"6/9: Enqueueing kernel... ");
-    size_t global_size = threads; // Example: same number of threads as your C code
-    size_t local_size = 1; // You might want to adjust this later
+    size_t global_size = threads * WORKERS; // Example: same number of threads as your C code
+    size_t local_size = WORKERS; // Example: one workgroup
     err = clEnqueueNDRangeKernel(queue, kernel, 1, NULL, &global_size, &local_size, 0, NULL, NULL);
     if (err != CL_SUCCESS) {error("OpenCL Error: Failed to enqueue kernel.");}
     log_print('v', L"Done\n");
@@ -806,6 +811,9 @@ void cl_improve(int shuffle) {
     err = clEnqueueReadBuffer(queue, buffer_layout, CL_TRUE, 0, sizeof(layout), lt, 0, NULL, NULL);
     if (err != CL_SUCCESS) {error("OpenCL Error: Failed to read buffer for layout.");}
     log_print('v', L"Done\n");
+
+    clock_gettime(CLOCK_MONOTONIC, &end);
+    elapsed = (end.tv_sec - start.tv_sec) + (end.tv_nsec - start.tv_nsec) / 1e9;
 
     // Cleanup
     log_print('v', L"8/9: Cleaning up OpenCL...\n");
@@ -828,7 +836,9 @@ void cl_improve(int shuffle) {
     clReleaseContext(context);
     log_print('v', L"Done\n\n");
 
-    log_print('v', L"cl score : %f\n\n", lt->score);
+    log_print('v', L"cl score : %f\n", lt->score);
+    log_print('v', L"time per layout : %.9lf seconds\n", elapsed / (1000 * threads));
+    log_print('v', L"layouts / sec   : %.9lf\n\n", (1000 * threads) / elapsed);
 
     // ... rest of your improve logic (print best layout, etc.) ...
     log_print('v', L"9/9: Printing layout...\n\n");
