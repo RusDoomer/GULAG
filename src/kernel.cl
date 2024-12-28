@@ -370,11 +370,19 @@ __kernel void improve_kernel(__constant float *linear_mono,
 
     __local cl_layout working;
 
+    // Each worker copies a portion of the host layout to the local layout
+    if (local_id == 0) {
+        copy_host_to_cl(&working, lt);
+        working.score = 0;
+    }
+    barrier(CLK_LOCAL_MEM_FENCE);
+
     for (int iter = 0; iter < REPETITIONS / THREADS; iter++)
     {
-        // Each worker copies a portion of the host layout to the local layout
         if (local_id == 0) {
-            copy_host_to_cl(&working, lt);
+            seed = park_miller_rng(seed);
+            shuffle_cl_layout(&working, seed, global_id);
+            working.score = 0;
         }
         barrier(CLK_LOCAL_MEM_FENCE);
 
