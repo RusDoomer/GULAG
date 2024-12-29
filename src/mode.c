@@ -767,6 +767,16 @@ void cl_improve(int shuffle) {
 
     cl_mem buffer_pins = clCreateBuffer(context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, sizeof(int) * ROW * COL, pins, &err);
     if (err != CL_SUCCESS) {error("OpenCL Error: Failed to create buffer for pins.");}
+
+    // Create a buffer to hold the iteration counts from each work item
+    int *reps_data = (int *)malloc(sizeof(int) * threads);
+    if (reps_data == NULL) { error("Failed to allocate memory for reps_data."); }
+    for (int i = 0; i < threads; i++) {
+        reps_data[i] = 0; // Initialize to 0
+    }
+
+    cl_mem buffer_reps = clCreateBuffer(context, CL_MEM_WRITE_ONLY, sizeof(int) * threads, NULL, &err);
+    if (err != CL_SUCCESS) { error("OpenCL Error: Failed to create buffer for reps."); }
     log_print('v', L"     Done\n");
 
     // Generate a seed on the host
@@ -803,6 +813,10 @@ void cl_improve(int shuffle) {
     if (err != CL_SUCCESS) {error("OpenCL Error: Failed to set kernel argument 12.");}
     err = clSetKernelArg(kernel, 13, sizeof(int), &seed);
     if (err != CL_SUCCESS) {error("OpenCL Error: Failed to set kernel argument 13.");}
+
+    // Set the buffer_reps as the 15th argument (index 14)
+    err = clSetKernelArg(kernel, 14, sizeof(cl_mem), &buffer_reps);
+    if (err != CL_SUCCESS) { error("OpenCL Error: Failed to set kernel argument 14."); }
     log_print('v', L"Done\n");
 
     struct timespec start, end;
@@ -827,19 +841,23 @@ void cl_improve(int shuffle) {
     err = clEnqueueReadBuffer(queue, buffer_layouts, CL_TRUE, 0, sizeof(layout) * threads, layouts, 0, NULL, NULL);
     if (err != CL_SUCCESS) {error("OpenCL Error: Failed to read buffer for layouts.");}
 
+    // Read back the iteration counts from the device
+    err = clEnqueueReadBuffer(queue, buffer_reps, CL_TRUE, 0, sizeof(int) * threads, reps_data, 0, NULL, NULL);
+    if (err != CL_SUCCESS) { error("OpenCL Error: Failed to read buffer for reps."); }
+
     clock_gettime(CLOCK_MONOTONIC, &end);
     elapsed = (end.tv_sec - start.tv_sec) + (end.tv_nsec - start.tv_nsec) / 1e9;
 
     // **(6) Find the best layout among all threads**
     log_print('n', L"7/9: Selecting best layout... ");
-    log_print('v', L"\n\n PRINTING LAYOUTS \n\n");
+    log_print('v', L"\n\n PRINTING LAYOUTS\n\n");
     char temp = output_mode;
     output_mode = 'q';
     layout *best_layout;
     alloc_layout(&best_layout);
     best_layout->score = -INFINITY;
     for (int i = 0; i < threads; i++) {
-        log_print('q', L"Layout %d: CL Results\n", i);
+        log_print('q', L"Layout %d: CL Results - REPS COMPLETED: %d\n", i, reps_data[i]);
         print_layout(&layouts[i]);
         log_print('q', L"Layout %d: Real Results\n", i);
         skeleton_copy(lt, &layouts[i]);
@@ -869,6 +887,7 @@ void cl_improve(int shuffle) {
     clReleaseMemObject(buffer_stats_meta);
     clReleaseMemObject(buffer_layouts);
     clReleaseMemObject(buffer_pins);
+    clReleaseMemObject(buffer_reps);
     clReleaseKernel(kernel);
     clReleaseProgram(program);
     clReleaseCommandQueue(queue);
@@ -892,6 +911,7 @@ void cl_improve(int shuffle) {
 
     free(layouts);
     free_layout(lt);
+    free(reps_data);
 }
 
 /*

@@ -322,18 +322,24 @@ inline void cl_get_score(__local cl_layout *lt,
     }
 }
 
-// Simple pseudo-random number generator (Park-Miller)
-uint park_miller_rng(uint seed) {
-    uint a = 16807;
-    uint m = 2147483647;
-    return (seed * a) % m;
+// State (needs to be persistent)
+typedef struct {
+    ulong state;
+    ulong inc;
+} PCG32State;
+
+uint pcg32(PCG32State *state) {
+    ulong oldstate = state->state;
+    state->state = oldstate * 6364136223846793005ULL + state->inc;
+    uint xorshifted = ((oldstate >> 18u) ^ oldstate) >> 27u;
+    uint rot = oldstate >> 59u;
+    return (xorshifted >> rot) | (xorshifted << ((-rot) & 31));
 }
 
 // Function to shuffle the layout matrix (within the kernel)
-void shuffle_layout(__global layout *lt, uint seed, int global_id) {
+void shuffle_layout(__global layout *lt, PCG32State *rng_state, int global_id) {
     for (int i = DIM1 - 1; i > 0; i--) {
-        seed = park_miller_rng(seed + global_id); // Use a different seed for each thread
-        int j = seed % (i + 1);
+        int j = pcg32(rng_state) % (i + 1);
 
         int i_row = i / COL;
         int i_col = i % COL;
@@ -347,11 +353,10 @@ void shuffle_layout(__global layout *lt, uint seed, int global_id) {
     }
 }
 
-// Function to shuffle the layout matrix (within the kernel)
-void shuffle_cl_layout(__local cl_layout *lt, uint seed, int global_id) {
+// Function to shuffle a cl_layout matrix (within the kernel)
+void shuffle_cl_layout(__local cl_layout *lt, PCG32State *rng_state, int global_id) {
     for (int i = DIM1 - 1; i > 0; i--) {
-        seed = park_miller_rng(seed + global_id); // Use a different seed for each thread
-        int j = seed % (i + 1);
+        int j = pcg32(rng_state) % (i + 1);
 
         int i_row = i / COL;
         int i_col = i % COL;
@@ -476,13 +481,23 @@ __kernel void improve_kernel(__constant float *linear_mono,
                              __constant meta_stat *stats_meta,
                              __global layout *layouts,
                              __constant int *pins,
-                             int seed) {
+                             int seed,
+                             __global int *reps) {
     size_t global_id = get_global_id(0);
     size_t group_id = get_group_id(0);
     size_t local_id = get_local_id(0);
 
+    PCG32State rng_state;
+    rng_state.state = seed + get_global_id(0) + (get_group_id(0) * get_global_size(0));
+    rng_state.inc = (seed * 2) + 1; // Ensure increment is odd
+
+
+
     // Each workgroup gets a copy of the initial layout in local memory
     __local cl_layout working;
+    // Keep track of the best layout found by the workgroup
+    __local cl_layout best_layout;
+    best_layout.score = -__builtin_inff();
 
     if (local_id == 0) {
         // Only the first worker in the group copies the layout from global to local memory
@@ -490,36 +505,42 @@ __kernel void improve_kernel(__constant float *linear_mono,
     }
     barrier(CLK_LOCAL_MEM_FENCE); // Ensure the copy is complete before proceeding
 
-    if (local_id == 0) {
-        // Each thread modifies its layout (e.g., using shuffling or other logic)
-        shuffle_cl_layout(&working, seed, global_id);
+    for (int i = 0; i < REPETITIONS / THREADS; i++)
+    {
+        if (local_id == 0) {
+            // Each thread modifies its layout (e.g., using shuffling or other logic)
+            shuffle_cl_layout(&working, &rng_state, global_id);
+            reps[get_group_id(0)] = i+1;
+        }
+        barrier(CLK_LOCAL_MEM_FENCE);
+
+        // Calculate statistics
+        calculate_mono_stats(&working, local_id, stats_mono, linear_mono);
+        calculate_bi_stats(&working, local_id, stats_bi, linear_bi);
+        calculate_tri_stats(&working, local_id, stats_tri, linear_tri);
+        calculate_quad_stats(&working, local_id, stats_quad, linear_quad);
+        calculate_skip_stats(&working, local_id, stats_skip, linear_skip);
+
+        barrier(CLK_LOCAL_MEM_FENCE);
+
+        // Only the first worker runs meta_analysis and get_score
+        if (local_id == 0) {
+            cl_meta_analysis(&working);
+            cl_get_score(&working, stats_mono, stats_bi, stats_tri, stats_quad, stats_skip, stats_meta);
+
+            if (working.score > best_layout.score)
+            {
+                copy_cl_to_cl(&best_layout, &working);
+                copy_cl_to_host(&layouts[group_id], &working);
+            }
+            //if (working.score > best_layout.score) {copy_cl_to_cl(&best_layout, &working);}
+        }
+        barrier(CLK_LOCAL_MEM_FENCE);
     }
-    barrier(CLK_LOCAL_MEM_FENCE);
 
-    // Calculate statistics
-    calculate_mono_stats(&working, local_id, stats_mono, linear_mono);
-    calculate_bi_stats(&working, local_id, stats_bi, linear_bi);
-    calculate_tri_stats(&working, local_id, stats_tri, linear_tri);
-    calculate_quad_stats(&working, local_id, stats_quad, linear_quad);
-    calculate_skip_stats(&working, local_id, stats_skip, linear_skip);
+    barrier(CLK_GLOBAL_MEM_FENCE);
 
-    barrier(CLK_LOCAL_MEM_FENCE);
-
-    // Only the first worker runs meta_analysis and get_score
-    if (local_id == 0) {
-        cl_meta_analysis(&working);
-        cl_get_score(&working, stats_mono, stats_bi, stats_tri, stats_quad, stats_skip, stats_meta);
-    }
-    barrier(CLK_LOCAL_MEM_FENCE);
-
-    // Keep track of the best layout found by the workgroup
-    __local cl_layout best_layout;
-    if (local_id == 0) {
-        copy_cl_to_cl(&best_layout, &working);
-    }
-    barrier(CLK_LOCAL_MEM_FENCE);
-
-    if (local_id ==0) {
-        copy_cl_to_host(&layouts[group_id], &best_layout);
-    }
+    //if (local_id ==0) {
+    //    copy_cl_to_host(&layouts[group_id], &best_layout);
+    //}
 }
