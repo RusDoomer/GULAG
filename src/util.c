@@ -570,6 +570,26 @@ void copy(layout *lt_dest, layout *lt_src)
 }
 
 /*
+ * Copies the matrix, name, and overall score only of one layout to another.
+ * Parameters:
+ *   lt_dest: Pointer to the destination layout.
+ *   lt_src: Pointer to the source layout.
+ * Returns: void.
+ */
+void skeleton_copy(layout *lt_dest, layout *lt_src)
+{
+    strcpy(lt_dest->name, lt_src->name);
+    for (int i = 0; i < ROW; i++)
+    {
+        for (int j = 0; j < COL; j++)
+        {
+            lt_dest->matrix[i][j] = lt_src->matrix[i][j];
+        }
+    }
+    lt_dest->score = lt_src->score;
+}
+
+/*
  * Generates a random float between 0 and 1.
  * Returns: The generated random float.
  */

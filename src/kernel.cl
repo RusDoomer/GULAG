@@ -48,6 +48,8 @@ inline void copy_host_to_cl(__local cl_layout *lt_dest, __global layout *lt_src)
             lt_dest->matrix[i][j] = lt_src->matrix[i][j];
         }
     }
+
+    lt_dest->score = lt_src->score;
 }
 
 // Copy matrix from cl_layout to normal layout
@@ -60,6 +62,22 @@ inline void copy_cl_to_host(__global layout *lt_dest, __local cl_layout *lt_src)
             lt_dest->matrix[i][j] = lt_src->matrix[i][j];
         }
     }
+
+    lt_dest->score = lt_src->score;
+}
+
+// Copy matrix from cl_layout to  cl_layout
+inline void copy_cl_to_cl(__local cl_layout *lt_dest, __local cl_layout *lt_src)
+{
+    for (int i = 0; i < ROW; i++)
+    {
+        for (int j = 0; j < COL; j++)
+        {
+            lt_dest->matrix[i][j] = lt_src->matrix[i][j];
+        }
+    }
+
+    lt_dest->score = lt_src->score;
 }
 
 /*
@@ -347,6 +365,103 @@ void shuffle_cl_layout(__local cl_layout *lt, uint seed, int global_id) {
     }
 }
 
+// Calculate monogram statistics
+inline void calculate_mono_stats(__local cl_layout *working,
+                                 size_t local_id,
+                                 __constant mono_stat *stats_mono,
+                                 __constant float *linear_mono) {
+    int row0, col0;
+    for (int i = local_id; i < MONO_END; i += WORKERS) {
+        working->mono_score[i] = 0;
+        int length = stats_mono[i].length;
+        for (int j = 0; j < length; j++) {
+            unflat_mono(stats_mono[i].ngrams[j], &row0, &col0);
+            if (working->matrix[row0][col0] != -1) {
+                size_t index = index_mono(working->matrix[row0][col0]);
+                working->mono_score[i] += linear_mono[index];
+            }
+        }
+    }
+}
+
+// Calculate bigram statistics
+inline void calculate_bi_stats(__local cl_layout *working,
+                               size_t local_id,
+                               __constant bi_stat *stats_bi,
+                               __constant float *linear_bi) {
+    int row0, col0, row1, col1;
+    for (int i = local_id; i < BI_END; i += WORKERS) {
+        working->bi_score[i] = 0;
+        int length = stats_bi[i].length;
+        for (int j = 0; j < length; j++) {
+            unflat_bi(stats_bi[i].ngrams[j], &row0, &col0, &row1, &col1);
+            if (working->matrix[row0][col0] != -1 && working->matrix[row1][col1] != -1) {
+                size_t index = index_bi(working->matrix[row0][col0], working->matrix[row1][col1]);
+                working->bi_score[i] += linear_bi[index];
+            }
+        }
+    }
+}
+
+// Calculate trigram statistics
+inline void calculate_tri_stats(__local cl_layout *working,
+                                size_t local_id,
+                                __constant tri_stat *stats_tri,
+                                __constant float *linear_tri) {
+    int row0, col0, row1, col1, row2, col2;
+    for (int i = local_id; i < TRI_END; i += WORKERS) {
+        working->tri_score[i] = 0;
+        int length = stats_tri[i].length;
+        for (int j = 0; j < length; j++) {
+            unflat_tri(stats_tri[i].ngrams[j], &row0, &col0, &row1, &col1, &row2, &col2);
+            if (working->matrix[row0][col0] != -1 && working->matrix[row1][col1] != -1 && working->matrix[row2][col2] != -1) {
+                size_t index = index_tri(working->matrix[row0][col0], working->matrix[row1][col1], working->matrix[row2][col2]);
+                working->tri_score[i] += linear_tri[index];
+            }
+        }
+    }
+}
+
+// Calculate quadgram statistics
+inline void calculate_quad_stats(__local cl_layout *working,
+                                 size_t local_id,
+                                 __constant quad_stat *stats_quad,
+                                 __constant float *linear_quad) {
+    int row0, col0, row1, col1, row2, col2, row3, col3;
+    for (int i = local_id; i < QUAD_END; i += WORKERS) {
+        working->quad_score[i] = 0;
+        int length = stats_quad[i].length;
+        for (int j = 0; j < length; j++) {
+            unflat_quad(stats_quad[i].ngrams[j], &row0, &col0, &row1, &col1, &row2, &col2, &row3, &col3);
+            if (working->matrix[row0][col0] != -1 && working->matrix[row1][col1] != -1 && working->matrix[row2][col2] != -1 && working->matrix[row3][col3] != -1) {
+                size_t index = index_quad(working->matrix[row0][col0], working->matrix[row1][col1], working->matrix[row2][col2], working->matrix[row3][col3]);
+                working->quad_score[i] += linear_quad[index];
+            }
+        }
+    }
+}
+
+// Calculate skipgram statistics
+inline void calculate_skip_stats(__local cl_layout *working,
+                                 size_t local_id,
+                                 __constant skip_stat *stats_skip,
+                                 __constant float *linear_skip) {
+    int row0, col0, row1, col1;
+    for (int i = local_id; i < SKIP_END; i += WORKERS) {
+        int length = stats_skip[i].length;
+        for (int k = 1; k <= 9; k++) {
+            working->skip_score[k][i] = 0;
+            for (int j = 0; j < length; j++) {
+                unflat_bi(stats_skip[i].ngrams[j], &row0, &col0, &row1, &col1);
+                if (working->matrix[row0][col0] != -1 && working->matrix[row1][col1] != -1) {
+                    size_t index = index_skip(k, working->matrix[row0][col0], working->matrix[row1][col1]);
+                    working->skip_score[k][i] += linear_skip[index];
+                }
+            }
+        }
+    }
+}
+
 // Kernel function
 __kernel void improve_kernel(__constant float *linear_mono,
                              __constant float *linear_bi,
@@ -359,112 +474,52 @@ __kernel void improve_kernel(__constant float *linear_mono,
                              __constant quad_stat *stats_quad,
                              __constant skip_stat *stats_skip,
                              __constant meta_stat *stats_meta,
-                             __global layout *lt,
+                             __global layout *layouts,
                              __constant int *pins,
                              int seed) {
-    // access pins like this pins[i][j] becomes pins[i * COL + j];
     size_t global_id = get_global_id(0);
     size_t group_id = get_group_id(0);
     size_t local_id = get_local_id(0);
-    size_t total = get_global_size(0);
 
+    // Each workgroup gets a copy of the initial layout in local memory
     __local cl_layout working;
 
-    // Each worker copies a portion of the host layout to the local layout
     if (local_id == 0) {
-        copy_host_to_cl(&working, lt);
-        working.score = 0;
+        // Only the first worker in the group copies the layout from global to local memory
+        copy_host_to_cl(&working, &layouts[group_id]);
+    }
+    barrier(CLK_LOCAL_MEM_FENCE); // Ensure the copy is complete before proceeding
+
+    if (local_id == 0) {
+        // Each thread modifies its layout (e.g., using shuffling or other logic)
+        shuffle_cl_layout(&working, seed, global_id);
     }
     barrier(CLK_LOCAL_MEM_FENCE);
 
-    for (int iter = 0; iter < REPETITIONS / THREADS; iter++)
-    {
-        if (local_id == 0) {
-            seed = park_miller_rng(seed);
-            shuffle_cl_layout(&working, seed, global_id);
-            working.score = 0;
-        }
-        barrier(CLK_LOCAL_MEM_FENCE);
+    // Calculate statistics
+    calculate_mono_stats(&working, local_id, stats_mono, linear_mono);
+    calculate_bi_stats(&working, local_id, stats_bi, linear_bi);
+    calculate_tri_stats(&working, local_id, stats_tri, linear_tri);
+    calculate_quad_stats(&working, local_id, stats_quad, linear_quad);
+    calculate_skip_stats(&working, local_id, stats_skip, linear_skip);
 
-        int row0, col0, row1, col1, row2, col2, row3, col3;
+    barrier(CLK_LOCAL_MEM_FENCE);
 
-        // Calculate monogram statistics.
-        for (int i = local_id; i < MONO_END; i += WORKERS) {
-            working.mono_score[i] = 0;
-            int length = stats_mono[i].length;
-            for (int j = 0; j < length; j++) {
-                unflat_mono(stats_mono[i].ngrams[j], &row0, &col0);
-                if (working.matrix[row0][col0] != -1) {
-                    size_t index = index_mono(working.matrix[row0][col0]);
-                    working.mono_score[i] += linear_mono[index];
-                }
-            }
-        }
-
-        // Calculate bigram statistics.
-        for (int i = local_id; i < BI_END; i += WORKERS) {
-            working.bi_score[i] = 0;
-            int length = stats_bi[i].length;
-            for (int j = 0; j < length; j++) {
-                unflat_bi(stats_bi[i].ngrams[j], &row0, &col0, &row1, &col1);
-                if (working.matrix[row0][col0] != -1 && working.matrix[row1][col1] != -1) {
-                    size_t index = index_bi(working.matrix[row0][col0], working.matrix[row1][col1]);
-                    working.bi_score[i] += linear_bi[index];
-                }
-            }
-        }
-
-        // Calculate trigram statistics.
-        for (int i = local_id; i < TRI_END; i += WORKERS) {
-            working.tri_score[i] = 0;
-            int length = stats_tri[i].length;
-            for (int j = 0; j < length; j++) {
-                unflat_tri(stats_tri[i].ngrams[j], &row0, &col0, &row1, &col1, &row2, &col2);
-                if (working.matrix[row0][col0] != -1 && working.matrix[row1][col1] != -1 && working.matrix[row2][col2] != -1) {
-                    size_t index = index_tri(working.matrix[row0][col0], working.matrix[row1][col1], working.matrix[row2][col2]);
-                    working.tri_score[i] += linear_tri[index];
-                }
-            }
-        }
-
-        // Calculate quadgram statistics.
-        for (int i = local_id; i < QUAD_END; i += WORKERS) {
-            working.quad_score[i] = 0;
-            int length = stats_quad[i].length;
-            for (int j = 0; j < length; j++) {
-                unflat_quad(stats_quad[i].ngrams[j], &row0, &col0, &row1, &col1, &row2, &col2, &row3, &col3);
-                if (working.matrix[row0][col0] != -1 && working.matrix[row1][col1] != -1 && working.matrix[row2][col2] != -1 && working.matrix[row3][col3] != -1) {
-                    size_t index = index_quad(working.matrix[row0][col0], working.matrix[row1][col1], working.matrix[row2][col2], working.matrix[row3][col3]);
-                    working.quad_score[i] += linear_quad[index];
-                }
-            }
-        }
-
-        // Calculate skipgram statistics.
-        for (int i = local_id; i < SKIP_END; i += WORKERS) {
-            int length = stats_skip[i].length;
-            for (int k = 1; k <= 9; k++) {
-                working.skip_score[k][i] = 0;
-                for (int j = 0; j < length; j++) {
-                    unflat_bi(stats_skip[i].ngrams[j], &row0, &col0, &row1, &col1);
-                    if (working.matrix[row0][col0] != -1 && working.matrix[row1][col1] != -1) {
-                        size_t index = index_skip(k, working.matrix[row0][col0], working.matrix[row1][col1]);
-                        working.skip_score[k][i] += linear_skip[index];
-                    }
-                }
-            }
-        }
-
-        barrier(CLK_LOCAL_MEM_FENCE);
-
-        // Only the first worker runs meta_analysis and get_score
-        if (local_id == 0) {
-            cl_meta_analysis(&working);
-            cl_get_score(&working, stats_mono, stats_bi, stats_tri, stats_quad, stats_skip, stats_meta);
-        }
-        barrier(CLK_LOCAL_MEM_FENCE);
+    // Only the first worker runs meta_analysis and get_score
+    if (local_id == 0) {
+        cl_meta_analysis(&working);
+        cl_get_score(&working, stats_mono, stats_bi, stats_tri, stats_quad, stats_skip, stats_meta);
     }
-    barrier(CLK_GLOBAL_MEM_FENCE);
-    // Copy the score back to the host layout
-    if (global_id == total - 2) {lt->score = working.score;}
+    barrier(CLK_LOCAL_MEM_FENCE);
+
+    // Keep track of the best layout found by the workgroup
+    __local cl_layout best_layout;
+    if (local_id == 0) {
+        copy_cl_to_cl(&best_layout, &working);
+    }
+    barrier(CLK_LOCAL_MEM_FENCE);
+
+    if (local_id ==0) {
+        copy_cl_to_host(&layouts[group_id], &best_layout);
+    }
 }

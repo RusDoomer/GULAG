@@ -612,7 +612,7 @@ void cl_improve(int shuffle) {
     single_analyze(lt);
     get_score(lt);
     log_print('n', L"Done\n\n");
-    lt->score = -115684;
+
     print_layout(lt);
     log_print('n', L"\n");
 
@@ -723,6 +723,16 @@ void cl_improve(int shuffle) {
     if (err != CL_SUCCESS) {error("OpenCL Error: Failed to create kernel.");}
     log_print('v', L"Done\n");
 
+    // Create an array of layouts on the host - NOT FULL LAYOUTS ONLY MATRIX, NAME, AND OVERALL SCORE
+    log_print('v', L"     Creating array of layouts on host... ");
+    layout *layouts = (layout *)malloc(sizeof(layout) * threads);
+    if (layouts == NULL) {error("Failed to allocate memory for layouts.");}
+    for (int i = 0; i < threads; i++)
+    {
+        skeleton_copy(&layouts[i], lt);
+    }
+    log_print('v', L"Done\n");
+
     // Allocate and copy data to device buffers
     log_print('v', L"     Allocating and copying data to device buffers...\n");
     cl_mem buffer_linear_mono = clCreateBuffer(context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, sizeof(float) * LANG_LENGTH, linear_mono, &err);
@@ -747,8 +757,14 @@ void cl_improve(int shuffle) {
     if (err != CL_SUCCESS) {error("OpenCL Error: Failed to create buffer for stats_skip.");}
     cl_mem buffer_stats_meta = clCreateBuffer(context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, sizeof(meta_stat) * META_END, stats_meta, &err);
     if (err != CL_SUCCESS) {error("OpenCL Error: Failed to create buffer for stats_meta.");}
-    cl_mem buffer_layout = clCreateBuffer(context, CL_MEM_READ_WRITE | CL_MEM_COPY_HOST_PTR, sizeof(layout), lt, &err);
-    if (err != CL_SUCCESS) {error("OpenCL Error: Failed to create buffer for layout.");}
+    // **(2) Create a buffer for the array of layouts**
+    cl_mem buffer_layouts = clCreateBuffer(context, CL_MEM_READ_WRITE, sizeof(layout) * threads, NULL, &err);
+    if (err != CL_SUCCESS) {error("OpenCL Error: Failed to create buffer for layouts.");}
+
+    // **(3) Write the array of layouts to the buffer**
+    err = clEnqueueWriteBuffer(queue, buffer_layouts, CL_TRUE, 0, sizeof(layout) * threads, layouts, 0, NULL, NULL);
+    if (err != CL_SUCCESS) {error("OpenCL Error: Failed to write layouts to buffer.");}
+
     cl_mem buffer_pins = clCreateBuffer(context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, sizeof(int) * ROW * COL, pins, &err);
     if (err != CL_SUCCESS) {error("OpenCL Error: Failed to create buffer for pins.");}
     log_print('v', L"     Done\n");
@@ -780,7 +796,8 @@ void cl_improve(int shuffle) {
     if (err != CL_SUCCESS) {error("OpenCL Error: Failed to set kernel argument 9.");}
     err = clSetKernelArg(kernel, 10, sizeof(cl_mem), &buffer_stats_meta);
     if (err != CL_SUCCESS) {error("OpenCL Error: Failed to set kernel argument 10.");}
-    err = clSetKernelArg(kernel, 11, sizeof(cl_mem), &buffer_layout);
+    // **(4) Set the buffer for the layout array as a kernel argument**
+    err = clSetKernelArg(kernel, 11, sizeof(cl_mem), &buffer_layouts);
     if (err != CL_SUCCESS) {error("OpenCL Error: Failed to set kernel argument 11.");}
     err = clSetKernelArg(kernel, 12, sizeof(cl_mem), &buffer_pins);
     if (err != CL_SUCCESS) {error("OpenCL Error: Failed to set kernel argument 12.");}
@@ -806,14 +823,36 @@ void cl_improve(int shuffle) {
     clFinish(queue);
     log_print('v', L"Done\n");
 
-    // Read results back
-    log_print('v', L"7/9: Reading results back from OpenCL device...\n\n");
-    err = clEnqueueReadBuffer(queue, buffer_layout, CL_TRUE, 0, sizeof(layout), lt, 0, NULL, NULL);
-    if (err != CL_SUCCESS) {error("OpenCL Error: Failed to read buffer for layout.");}
-    log_print('v', L"Done\n");
+    // **(5) Read back the array of layouts from the buffer**
+    err = clEnqueueReadBuffer(queue, buffer_layouts, CL_TRUE, 0, sizeof(layout) * threads, layouts, 0, NULL, NULL);
+    if (err != CL_SUCCESS) {error("OpenCL Error: Failed to read buffer for layouts.");}
 
     clock_gettime(CLOCK_MONOTONIC, &end);
     elapsed = (end.tv_sec - start.tv_sec) + (end.tv_nsec - start.tv_nsec) / 1e9;
+
+    // **(6) Find the best layout among all threads**
+    log_print('n', L"7/9: Selecting best layout... ");
+    log_print('v', L"\n\n PRINTING LAYOUTS \n\n");
+    char temp = output_mode;
+    output_mode = 'q';
+    layout *best_layout;
+    alloc_layout(&best_layout);
+    best_layout->score = -INFINITY;
+    for (int i = 0; i < threads; i++) {
+        log_print('q', L"Layout %d: CL Results\n", i);
+        print_layout(&layouts[i]);
+        log_print('q', L"Layout %d: Real Results\n", i);
+        skeleton_copy(lt, &layouts[i]);
+        single_analyze(lt);
+        get_score(lt);
+        print_layout(lt);
+        if (layouts[i].score > best_layout->score) {
+            skeleton_copy(best_layout, &layouts[i]);
+        }
+        log_print('q', L"\n");
+    }
+    output_mode = temp;
+    log_print('n',L"Done\n\n");
 
     // Cleanup
     log_print('v', L"8/9: Cleaning up OpenCL...\n");
@@ -828,7 +867,7 @@ void cl_improve(int shuffle) {
     clReleaseMemObject(buffer_stats_quad);
     clReleaseMemObject(buffer_stats_skip);
     clReleaseMemObject(buffer_stats_meta);
-    clReleaseMemObject(buffer_layout);
+    clReleaseMemObject(buffer_layouts);
     clReleaseMemObject(buffer_pins);
     clReleaseKernel(kernel);
     clReleaseProgram(program);
@@ -836,17 +875,22 @@ void cl_improve(int shuffle) {
     clReleaseContext(context);
     log_print('v', L"Done\n\n");
 
-    log_print('v', L"cl score : %f\n", lt->score);
+    log_print('v', L"cl score : %f\n", best_layout->score);
     log_print('v', L"time per layout : %.9lf seconds\n", elapsed / repetitions);
     log_print('v', L"layouts / sec   : %.9lf\n\n", repetitions / elapsed);
 
     // ... rest of your improve logic (print best layout, etc.) ...
     log_print('v', L"9/9: Printing layout...\n\n");
-    single_analyze(lt);
-    get_score(lt);
-    print_layout(lt);
+    /* analyze.c - perform a single layout analysis */
+    log_print('n',L"8/9: Analyzing best layout... ");
+    single_analyze(best_layout);
+    /* util.c - calculates the overall score */
+    get_score(best_layout);
+    log_print('n',L"Done\n\n");
+    print_layout(best_layout);
     log_print('v', L"Done\n\n");
 
+    free(layouts);
     free_layout(lt);
 }
 

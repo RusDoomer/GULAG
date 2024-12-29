@@ -37,7 +37,7 @@ int DIM3 = dim3;
 int DIM4 = dim4;
 
 int MAX_SWAPS = dim1 / 2;
-int WORKERS = 1;
+int WORKERS = 16;
 
 /*
  * Number of tracked statistics for each ngram type.
