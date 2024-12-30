@@ -481,7 +481,8 @@ void generate() {
  */
 void improve(int shuffle) {
     /* Work for timing total/real layouts/second */
-    layouts_analyzed = 0;
+    layouts_analyzed += ((int)repetitions/threads + 1) * threads;
+    layouts_analyzed += 2;
     struct timespec compute_start, compute_end;
     clock_gettime(CLOCK_MONOTONIC, &compute_start);
 
@@ -525,8 +526,6 @@ void improve(int shuffle) {
     log_print('n',L"\n");
 
     int iterations = repetitions / threads;
-    layouts_analyzed += (iterations + 1) * threads;
-    layouts_analyzed += 2;
 
     /* Allocate memory for thread data and thread IDs */
     thread_data *thread_data_array = (thread_data *)malloc(threads * sizeof(thread_data));
@@ -1031,7 +1030,7 @@ void gen_benchmark()
 
     /* print the tests to be done */
     log_print('v',L"Planned runs... ");
-    for (int i = 0; i < total; i++) {log_print('v',L"%d, ", thread_array[i]);}
+    for (int i = 0; i < total; i++) {log_print('v',L"%d ", thread_array[i]);}
     log_print('v',L"\n\n");
 
     /* temporarily set output mode to quiet */
@@ -1180,7 +1179,7 @@ void cl_gen_benchmark()
 
     /* print the tests to be done */
     log_print('v',L"    Planned runs... ");
-    for (int i = 0; i < total; i++) {log_print('v',L"%d, ", thread_array[i]);}
+    for (int i = 0; i < total; i++) {log_print('v',L"%d ", thread_array[i]);}
     log_print('v',L"\n\n");
 
     /* temporarily set output mode to quiet */
@@ -1239,6 +1238,11 @@ void cl_gen_benchmark()
  * Returns: void.
  */
 void print_help() {
+    /* Work for timing total/real layouts/second */
+    layouts_analyzed = 0;
+    struct timespec compute_start, compute_end;
+    clock_gettime(CLOCK_MONOTONIC, &compute_start);
+
     log_print('q',L"Arguments:\n");
     // 80           @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
     log_print('q',L"  -l <language> : Chooses the language, the basis of all data in this program.\n");
@@ -1285,6 +1289,9 @@ void print_help() {
     log_print('q',L"  All of these options can be set in config.conf but command line arguments will\n");
     log_print('q',L"  be prioritized. config.conf also sets the pins for the improve mode; all\n");
     log_print('q',L"  positions that are not \'.\' will be pinned.\n");
+
+    clock_gettime(CLOCK_MONOTONIC, &compute_end);
+    elapsed_compute_time += (compute_end.tv_sec - compute_start.tv_sec) + (compute_end.tv_nsec - compute_start.tv_nsec) / 1e9;
 }
 
 /*
@@ -1293,6 +1300,14 @@ void print_help() {
  * Returns: void.
  */
 void print_info() {
+    /* Work for timing total/real layouts/second */
+    layouts_analyzed = 0;
+    struct timespec compute_start, compute_end;
+    clock_gettime(CLOCK_MONOTONIC, &compute_start);
+
     log_print('q',L"Welcome to GULAG v0.1 (AKA CULAG)\n");
     return;
+
+    clock_gettime(CLOCK_MONOTONIC, &compute_end);
+    elapsed_compute_time += (compute_end.tv_sec - compute_start.tv_sec) + (compute_end.tv_nsec - compute_start.tv_nsec) / 1e9;
 }
