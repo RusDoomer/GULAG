@@ -11,12 +11,12 @@ SOURCES := $(wildcard $(SRC_DIR)/*.c $(SRC_DIR)/*/*.c)
 OBJECTS := $(patsubst $(SRC_DIR)/%.c,$(BUILD_DIR)/%.o,$(SOURCES))
 
 # Executable name and location (in the base directory)
-EXECUTABLE := gulag 
+EXECUTABLE := gulag
 
 # Compiler flags
 CFLAGS := -I$(INCLUDE_DIR) -I$(INCLUDE_DIR)/stats -Wall -DCL_TARGET_OPENCL_VERSION=300
-LDFLAGS := -lOpenCL -lm
-OPT_FLAGS := -O3 -march=native
+LDFLAGS := -lOpenCL -lm -lpthread -flto=auto
+OPT_FLAGS := -O3 -march=native -flto=auto -ffast-math
 DEBUG_FLAGS := -g -fsanitize=address
 
 # Default target to build the optimized version
