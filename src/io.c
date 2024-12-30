@@ -85,7 +85,9 @@ void read_config()
     int i = 0;
 
     /* Read and set pinned key positions. */
-    fscanf(config, " %s", discard);
+    if (fscanf(config, " %s", discard) != 1) {
+        error("Failed to read from config file.");
+    }
     if (strcmp(discard, "pins:") != 0) {
         error("Expected 'pins:' at the start of the config file.");
     }
@@ -100,42 +102,62 @@ void read_config()
     }
 
     /* Read and set various parameters from the configuration file. */
-    fscanf(config, "%s %s", discard, buff);
+    if (fscanf(config, "%s %s", discard, buff) != 2) {
+        error("Failed to read language name from config file.");
+    }
     lang_name = (char *)malloc((sizeof(char) * strlen(buff)) + 1);
     strcpy(lang_name, buff);
 
-    fscanf(config, "%s %s", discard, buff);
+    if (fscanf(config, "%s %s", discard, buff) != 2) {
+        error("Failed to read corpus name from config file.");
+    }
     corpus_name = (char *)malloc((sizeof(char) * strlen(buff)) + 1);
     strcpy(corpus_name, buff);
 
-    fscanf(config, "%s %s", discard, buff);
+    if (fscanf(config, "%s %s", discard, buff) != 2) {
+        error("Failed to read layout name from config file.");
+    }
     layout_name = (char *)malloc((sizeof(char) * strlen(buff)) + 1);
     strcpy(layout_name, buff);
 
-    fscanf(config, "%s %s", discard, buff);
+    if (fscanf(config, "%s %s", discard, buff) != 2) {
+        error("Failed to read layout2 name from config file.");
+    }
     layout2_name = (char *)malloc((sizeof(char) * strlen(buff)) + 1);
     strcpy(layout2_name, buff);
 
-    fscanf(config, "%s %s", discard, buff);
+    if (fscanf(config, "%s %s", discard, buff) != 2) {
+        error("Failed to read weight name from config file.");
+    }
     weight_name = (char *)malloc((sizeof(char) * strlen(buff)) + 1);
     strcpy(weight_name, buff);
 
     /* io_util.c - validates and converts run mode */
-    fscanf(config, "%s %s", discard, buff);
+    if (fscanf(config, "%s %s", discard, buff) != 2) {
+        error("Failed to read run mode from config file.");
+    }
     run_mode = check_run_mode(buff);
 
-    fscanf(config, "%s %s", discard, buff);
+    if (fscanf(config, "%s %s", discard, buff) != 2) {
+        error("Failed to read repetitions from config file.");
+    }
     repetitions = atoi(buff);
 
-    fscanf(config, "%s %s", discard, buff);
+    if (fscanf(config, "%s %s", discard, buff) != 2) {
+        error("Failed to read threads from config file.");
+    }
     threads = atoi(buff);
 
     /* io_util.c - validates and converts output mode */
-    fscanf(config, "%s %s", discard, buff);
+    if (fscanf(config, "%s %s", discard, buff) != 2) {
+        error("Failed to read output mode from config file.");
+    }
     output_mode = check_output_mode(buff);
 
     /* io_util.c - validates and converts backend mode */
-    fscanf(config, "%s %s", discard, buff);
+    if (fscanf(config, "%s %s", discard, buff) != 2) {
+        error("Failed to read backend mode from config file.");
+    }
     backend_mode = check_backend_mode(buff);
 
     fclose(config);
@@ -743,7 +765,7 @@ void quiet_print(layout *lt)
         log_print('q',L"\n");
     }
 
-    log_print('q',L"score : %f\n", lt->score);
+    log_print('q',L"score : %f\n\n", lt->score);
     return;
 }
 

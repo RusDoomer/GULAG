@@ -633,7 +633,12 @@ char* read_source_file(const char* filename, size_t* length) {
         return NULL;
     }
 
-    fread(source, 1, *length, file);
+    size_t bytes_read = fread(source, 1, *length, file);
+    if (bytes_read != *length) {
+        free(source);
+        fclose(file);
+        return NULL;
+    }
     source[*length] = '\0';
 
     fclose(file);

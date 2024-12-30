@@ -29,7 +29,7 @@
 void start_up()
 {
     /* Set locale for wide character support. */
-    log_print('n',L"1/4: Setting Locale... ");
+    log_print('n',L"1/3: Setting Locale... ");
     const char* locale = setlocale(LC_ALL, "en_US.UTF-8");
     if (locale == NULL) {
         error("Failed to set locale.");
@@ -53,7 +53,7 @@ void start_up()
     log_print('n',L"Done\n\n");
 
     /* Allocate language array. */
-    log_print('n',L"2/4: Allocating language array... ");
+    log_print('n',L"2/3: Allocating language array... ");
     lang_arr = (wchar_t *)calloc(101, sizeof(wchar_t));
 
     /* Allocate character hash table array. */
@@ -62,7 +62,7 @@ void start_up()
     log_print('n',L"Done\n\n");
 
     /* Allocate arrays for ngrams directly from corpus. */
-    log_print('n',L"3/4: Allocating corpus arrays...\n");
+    log_print('n',L"3/3: Allocating corpus arrays...\n");
     log_print('v',L"     Monograms... Integer... ");
     corpus_mono = (int *)calloc(LANG_LENGTH, sizeof(int));
     log_print('v',L"Floating Point... ");
@@ -119,11 +119,6 @@ void start_up()
     linear_skip = (float *)calloc(10 * LANG_LENGTH * LANG_LENGTH, sizeof(float));
     log_print('v',L"Done\n");
     log_print('n',L"     Done\n\n");
-
-    /* stats.c - initializes and trims statistics */
-    log_print('n',L"4/4: Initializing stats...\n");
-    initialize_stats();
-    log_print('n',L"     Done\n\n");
 }
 
 /*
@@ -139,7 +134,6 @@ void shut_down()
     /* Free language array. */
     log_print('n',L"Freeing language array... ");
     free(lang_arr);
-    log_print('n',L"Done\n\n");
 
     /* Free character hash table array. */
     log_print('n',L"Freeing character hashmap... ");
@@ -259,6 +253,18 @@ int main(int argc, char **argv) {
     log_print('n',L"out mode: %c |\n\n", output_mode);
 
     clock_gettime(CLOCK_MONOTONIC, &start);
+    /* stats.c - initializes and trims statistics */
+    log_print('q',L"----- Initializing Stats -----\n\n");
+
+    log_print('n',L"1/1: Building stats... ");
+    initialize_stats();
+    log_print('n',L"     Done\n\n");
+
+    clock_gettime(CLOCK_MONOTONIC, &end);
+    elapsed = (end.tv_sec - start.tv_sec) + (end.tv_nsec - start.tv_nsec) / 1e9;
+    log_print('q',L"----- Initialization : %.9lf seconds -----\n\n", elapsed);
+
+    clock_gettime(CLOCK_MONOTONIC, &start);
     log_print('q',L"----- Reading Data -----\n\n");
 
     /* io.c - read language file and fill array */
@@ -319,31 +325,42 @@ int main(int argc, char **argv) {
 
     log_print('v',L"----- Weights -----\n\n");
 
+    log_print('v',L"MONOGRAM:\n\n");
     for (int i = 0; i < MONO_END; i++)
     {
         log_print('v',L"%s : %f\n", stats_mono[i].name, stats_mono[i].weight);
     }
+
+    log_print('v',L"\nBIGRAM:\n\n");
     for (int i = 0; i < BI_END; i++)
     {
         log_print('v',L"%s : %f\n", stats_bi[i].name, stats_bi[i].weight);
     }
+
+    log_print('v',L"\nTRIGRAM:\n\n");
     for (int i = 0; i < TRI_END; i++)
     {
         log_print('v',L"%s : %f\n", stats_tri[i].name, stats_tri[i].weight);
     }
+
+    log_print('v',L"\nQUADGRAM:\n\n");
     for (int i = 0; i < QUAD_END; i++)
     {
         log_print('v',L"%s : %f\n", stats_quad[i].name, stats_quad[i].weight);
     }
+
+    log_print('v',L"\nSKIPGRAM:\n\n");
     for (int i = 0; i < SKIP_END; i++)
     {
-        log_print('v',L"%s : ", stats_skip[i].name);
+        log_print('v',L"%s : \n    ", stats_skip[i].name);
         for (int j = 1; j <= 9; j++)
         {
             log_print('v',L"%f ", stats_skip[i].weight[j]);
         }
         log_print('v',L"\n");
     }
+
+    log_print('v',L"\nMETA:\n\n");
     for (int i = 0; i < META_END; i++)
     {
         log_print('v',L"%s : %f\n", stats_meta[i].name, stats_meta[i].weight);
@@ -359,26 +376,26 @@ int main(int argc, char **argv) {
     switch(run_mode) {
         case 'a':
             /* analyze one layout */
-            log_print('n',L"Running single analysis\n");
+            log_print('n',L"Running single analysis\n\n");
             analysis();
             log_print('n',L"Done\n\n");
             break;
         case 'c':
             /* compare 2 layouts */
-            log_print('n',L"Running comparison\n");
+            log_print('n',L"Running comparison\n\n");
             compare();
             log_print('n',L"Done\n\n");
             break;
         case 'r':
             /* rank all layouts in directory */
-            log_print('n',L"Running ranking\n");
+            log_print('n',L"Running ranking\n\n");
             rank();
             log_print('n',L"\nDone\n\n");
             break;
         case 'g':
             /* generate a new layout */
             if (backend_mode == 'c') {
-                log_print('n',L"Running cpu generation\n");
+                log_print('n',L"Running cpu generation\n\n");
                 generate();
                 log_print('n',L"Done\n\n");
             } else if (backend_mode == 'o') {
@@ -390,11 +407,11 @@ int main(int argc, char **argv) {
         case 'i':
             /* improve a layout */
             if (backend_mode == 'c') {
-                log_print('n',L"Running cpu optimization\n");
+                log_print('n',L"Running cpu optimization\n\n");
                 improve(0);
                 log_print('n',L"Done\n\n");
             } else if (backend_mode == 'o') {
-                log_print('n',L"Running opencl optimization\n");
+                log_print('n',L"Running opencl optimization\n\n");
                 cl_improve(0);
                 log_print('n',L"Done\n\n");
             }
@@ -402,24 +419,24 @@ int main(int argc, char **argv) {
         case 'b':
             /* benchmark to find ideal number of threads */
             if (backend_mode == 'c') {
-                log_print('n',L"Running cpu benchmark\n");
+                log_print('n',L"Running cpu benchmark\n\n");
                 gen_benchmark();
                 log_print('n',L"Done\n\n");
             } else if (backend_mode == 'o') {
-                log_print('n',L"Running opencl benchmark\n");
+                log_print('n',L"Running opencl benchmark\n\n");
                 cl_gen_benchmark();
                 log_print('n',L"Done\n\n");
             }
             break;
         case 'h':
             /* print help info */
-            log_print('n',L"Printing help message\n");
+            log_print('n',L"Printing help message\n\n");
             print_help();
             log_print('n',L"Done\n\n");
             break;
         case 'f':
             /* print info screen */
-            log_print('n',L"Printing info message\n");
+            log_print('n',L"Printing info message\n\n");
             print_info();
             log_print('n',L"Done\n\n");
             break;

@@ -36,6 +36,7 @@ void initialize_stats()
      * stats/mono.c - initializes linked list for monogram stats
      *                trims the length of the linked list
      */
+    log_print('v',L"\n");
     log_print('v',L"     Initializing monogram stats... ");
     initialize_mono_stats();
     log_print('v',L"trimming monogram stats... ");
