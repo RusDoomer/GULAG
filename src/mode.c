@@ -779,9 +779,7 @@ void cl_improve(int shuffle) {
     // Create a buffer to hold the iteration counts from each work item
     int *reps_data = (int *)malloc(sizeof(int) * threads);
     if (reps_data == NULL) { error("Failed to allocate memory for reps_data."); }
-    for (int i = 0; i < threads; i++) {
-        reps_data[i] = 0; // Initialize to 0
-    }
+    for (int i = 0; i < threads; i++) {reps_data[i] = 0;}
 
     cl_mem buffer_reps = clCreateBuffer(context, CL_MEM_WRITE_ONLY, sizeof(int) * threads, NULL, &err);
     if (err != CL_SUCCESS) { error("OpenCL Error: Failed to create buffer for reps."); }

@@ -512,8 +512,23 @@ __kernel void improve_kernel(__constant float *linear_mono,
     }
     barrier(CLK_LOCAL_MEM_FENCE); // Ensure the copy is complete before proceeding
 
+    // *** Simulated Annealing Logic ***
+
+    // Initial temperature and other parameters are now defined using #define from build options
+    float T = 1000;
+    int reheating_count = 0;
+    int initial_swap_count = MAX_SWAPS;
+    int swap_count;
+    float max_T = T;
+    int improvement_counter = 0;
+
     for (int i = 0; i < REPETITIONS / THREADS; i++)
     {
+        // Temperature-dependent swap count
+        swap_count = (int)(initial_swap_count * (T / max_T));
+        swap_count = swap_count < 1 ? 1 : swap_count;
+        swap_count = swap_count > initial_swap_count ? initial_swap_count : swap_count;
+
         // Store swaps for potential reversal
         int swap_rows1[MAX_SWAPS];
         int swap_cols1[MAX_SWAPS];
@@ -560,17 +575,49 @@ __kernel void improve_kernel(__constant float *linear_mono,
             cl_meta_analysis(&working);
             cl_get_score(&working, stats_mono, stats_bi, stats_tri, stats_quad, stats_skip, stats_meta);
 
-            if (working.score > best_layout.score)
-            {
+            // Exponentiate the score difference for acceptance probability (using sigmoid)
+            float delta_score = working.score - best_layout.score;
+            if (delta_score > 0 || (1.0 / (1.0 + exp(-10 * delta_score / T))) > (float)pcg32(&rng_state) / 4294967295.0) {
                 copy_cl_to_cl(&best_layout, &working);
-            }
-            else
-            {
+                improvement_counter++;
+            } else {
                 // Revert the swaps
-                for (int j = MAX_SWAPS - 1; j >= 0; j--) {
+                for (int j = swap_count - 1; j >= 0; j--) {
                     swap_keys(&working, swap_rows1[j], swap_cols1[j], swap_rows2[j], swap_cols2[j]);
                 }
             }
+
+            // Adaptive cooling
+            if (i > 0 && i % (REPETITIONS / (20 * THREADS)) == 0) {
+                float improvement_rate = (float)improvement_counter / (REPETITIONS / (20 * THREADS));
+                if (improvement_rate > 0.2) {
+                    max_T *= 0.95;
+                } else {
+                    max_T *= 1.05;
+                }
+                max_T = max_T > 1500.0 ? 1500.0 : max_T;
+                max_T = max_T < T ? T : max_T;
+                improvement_counter = 0;
+            }
+
+            // Reheating
+            if (i > 0 && i % (REPETITIONS / (10 * THREADS)) == 0) {
+                T = max_T;
+                reheating_count++;
+            }
+
+            // Non-monotonic "jolt"
+            if (i > 0 && i % (REPETITIONS / (50 * THREADS)) == 0) {
+                T *= (1.0 + (float)pcg32(&rng_state) / 4294967295.0 * 0.3); // Random float between 0 and 0.3
+                if (T > max_T) {
+                    T = max_T;
+                }
+            }
+
+            // Temperature cooling
+            float progress = (float)i / (REPETITIONS / THREADS);
+            T = max_T * (1.0 - progress);
+            T = T < 1.0 ? 1.0 : T;
         }
         barrier(CLK_LOCAL_MEM_FENCE);
     }
