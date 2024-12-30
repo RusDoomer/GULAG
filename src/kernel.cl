@@ -534,8 +534,9 @@ __kernel void improve_kernel(__constant float *linear_mono,
     int swap_count;
     float max_T = T;
     int improvement_counter = 0;
+    int iterations = REPETITIONS / THREADS;
 
-    for (int i = 0; i < REPETITIONS / THREADS; i++)
+    for (int i = 0; i < iterations; i++)
     {
         /* Temperature-dependent swap count */
         swap_count = (int)(initial_swap_count * (T / max_T));

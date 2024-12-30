@@ -55,8 +55,8 @@ extern int threads;
 extern char output_mode;
 extern char backend_mode;
 
-extern double layouts_per_second_real;
-extern double layouts_per_second_total;
+extern double layouts_analyzed;
+extern double elapsed_compute_time;
 
 /* The selected language's character set. */
 extern wchar_t *lang_arr;

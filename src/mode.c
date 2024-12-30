@@ -38,6 +38,11 @@
  * Returns: void.
  */
 void analysis() {
+    /* Work for timing total/real layouts/second */
+    layouts_analyzed = 1;
+    struct timespec compute_start, compute_end;
+    clock_gettime(CLOCK_MONOTONIC, &compute_start);
+
     layout *lt;
 
     /* util.c - allocates memory for a layout structure */
@@ -69,6 +74,9 @@ void analysis() {
     log_print('n',L"6/6: Freeing layout... ");
     free_layout(lt);
     log_print('n',L"Done\n\n");
+
+    clock_gettime(CLOCK_MONOTONIC, &compute_end);
+    elapsed_compute_time += (compute_end.tv_sec - compute_start.tv_sec) + (compute_end.tv_nsec - compute_start.tv_nsec) / 1e9;
     return;
 }
 
@@ -81,6 +89,10 @@ void analysis() {
  * Returns: void.
  */
 void compare() {
+    /* Work for timing total/real layouts/second */
+    layouts_analyzed = 2;
+    struct timespec compute_start, compute_end;
+
     layout *lt1, *lt2, *lt_diff;
 
     /* util.c - allocates memory for the layouts */
@@ -101,6 +113,8 @@ void compare() {
     log_print('n',L"%s... ", layout2_name);
     log_print('n',L"Done\n\n");
 
+    clock_gettime(CLOCK_MONOTONIC, &compute_start);
+
     /* analyze.c - perform layout analyses */
     log_print('n',L"3/7: Analyzing layout... ");
     single_analyze(lt1);
@@ -109,7 +123,6 @@ void compare() {
     log_print('n',L"%s... ", layout2_name);
     log_print('n',L"Done\n\n");
 
-
     /* util.c - calculate the overall scores */
     log_print('n',L"4/7: Calculating Score... ");
     get_score(lt1);
@@ -117,6 +130,9 @@ void compare() {
     get_score(lt2);
     log_print('n',L"%s... ", layout2_name);
     log_print('n',L"Done\n\n");
+
+    clock_gettime(CLOCK_MONOTONIC, &compute_end);
+    elapsed_compute_time += (compute_end.tv_sec - compute_start.tv_sec) + (compute_end.tv_nsec - compute_start.tv_nsec) / 1e9;
 
     /* util.c - calculate the difference between the two layouts */
     log_print('n',L"5/7: Calculating Difference... ");
@@ -148,6 +164,10 @@ void compare() {
  * Returns: void.
  */
 void rank() {
+    /* Work for timing total/real layouts/second */
+    layouts_analyzed = 0;
+    struct timespec compute_start, compute_end;
+    clock_gettime(CLOCK_MONOTONIC, &compute_start);
 
     /* Construct the path to the layouts directory */
     char *path = (char*)malloc(strlen("./data//layouts") + strlen(lang_name) + 1);
@@ -204,6 +224,7 @@ void rank() {
             log_print('n',L"Freeing... ");
             free_layout(lt);
             log_print('n',L"Done\n\n");
+            layouts_analyzed++;
         }
     }
 
@@ -217,6 +238,9 @@ void rank() {
 
     /* util.c - free all nodes in the layout ranking list */
     free_list();
+
+    clock_gettime(CLOCK_MONOTONIC, &compute_end);
+    elapsed_compute_time += (compute_end.tv_sec - compute_start.tv_sec) + (compute_end.tv_nsec - compute_start.tv_nsec) / 1e9;
 }
 
 /*
@@ -456,6 +480,11 @@ void generate() {
  * Returns: void.
  */
 void improve(int shuffle) {
+    /* Work for timing total/real layouts/second */
+    layouts_analyzed = 0;
+    struct timespec compute_start, compute_end;
+    clock_gettime(CLOCK_MONOTONIC, &compute_start);
+
     layout *lt;
 
     /* io.c - prints the current pins */
@@ -496,6 +525,8 @@ void improve(int shuffle) {
     log_print('n',L"\n");
 
     int iterations = repetitions / threads;
+    layouts_analyzed += (iterations + 1) * threads;
+    layouts_analyzed += 2;
 
     /* Allocate memory for thread data and thread IDs */
     thread_data *thread_data_array = (thread_data *)malloc(threads * sizeof(thread_data));
@@ -558,6 +589,8 @@ void improve(int shuffle) {
     free(thread_data_array);
     free(thread_ids);
     free(best_layouts);
+    clock_gettime(CLOCK_MONOTONIC, &compute_end);
+    elapsed_compute_time += (compute_end.tv_sec - compute_start.tv_sec) + (compute_end.tv_nsec - compute_start.tv_nsec) / 1e9;
 }
 
 /*
@@ -617,6 +650,10 @@ char* read_source_file(const char* filename, size_t* length) {
  * Returns: void.
  */
 void cl_improve(int shuffle) {
+    /* Work for timing total/real layouts/second */
+    layouts_analyzed += ((int) repetitions / threads) * threads;
+    layouts_analyzed += 2;
+    struct timespec compute_start, compute_end;
 
     log_print('v', L"Pins: \n");
     print_pins();
@@ -857,6 +894,7 @@ void cl_improve(int shuffle) {
     double elapsed;
 
     clock_gettime(CLOCK_MONOTONIC, &start);
+    clock_gettime(CLOCK_MONOTONIC, &compute_start);
 
     /* Enqueue kernel */
     log_print('v', L"6/9: Enqueueing kernel... ");
@@ -954,6 +992,8 @@ void cl_improve(int shuffle) {
     free(layouts);
     free_layout(lt);
     free(reps_data);
+    clock_gettime(CLOCK_MONOTONIC, &compute_end);
+    elapsed_compute_time += (compute_end.tv_sec - compute_start.tv_sec) + (compute_end.tv_nsec - compute_start.tv_nsec) / 1e9;
 }
 
 /*
@@ -1008,14 +1048,14 @@ void gen_benchmark()
         struct timespec start, end;
         clock_gettime(CLOCK_MONOTONIC, &start);
 
-        cl_generate();
+        generate();
 
         clock_gettime(CLOCK_MONOTONIC, &end);
         double elapsed = (end.tv_sec - start.tv_sec) +
                          (end.tv_nsec - start.tv_nsec) / 1e9;
         double time_per_repetition = elapsed / repetitions;
         results[i] = 1.0 / time_per_repetition;
-        log_print('q',L"Done\n\n", i+1, total);
+        log_print('q',L"Done\n\n");
     }
 
     /* reset output mode */
@@ -1164,7 +1204,7 @@ void cl_gen_benchmark()
                          (end.tv_nsec - start.tv_nsec) / 1e9;
         double time_per_repetition = elapsed / repetitions;
         results[i] = 1.0 / time_per_repetition;
-        log_print('q',L"Done\n\n", i+1, total);
+        log_print('q',L"Done\n\n");
     }
 
     /* reset output mode */

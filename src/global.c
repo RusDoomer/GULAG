@@ -65,8 +65,8 @@ int threads = 8;
 char output_mode = 'v';
 char backend_mode = 'c';
 
-double layouts_per_second_real = 0;
-double layouts_per_second_total = 0;
+double layouts_analyzed = 0;
+double elapsed_compute_time = 0;
 
 /* The selected language's character set. */
 wchar_t *lang_arr;
