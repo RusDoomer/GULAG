@@ -1274,7 +1274,7 @@ void print_help() {
     log_print('q',L"    b;bench;benchmark    : Prints the optimal number of threads for generation\n");
     log_print('q',L"                           performance on this system.\n");
     log_print('q',L"    h;help               : Prints this message.\n");
-    log_print('q',L"    if;info;information  : Prints more in-depth information about this program.\n");
+    log_print('q',L"    f;info;information   : Prints more in-depth information about this program.\n");
     // 80           @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
     log_print('q',L"  -o <mode>     : decides how verbose the output is.\n");
     log_print('q',L"    q;quiet;SHUTUP       : The most concise; prints only the essential stats.\n");
@@ -1305,7 +1305,7 @@ void print_info() {
     struct timespec compute_start, compute_end;
     clock_gettime(CLOCK_MONOTONIC, &compute_start);
 
-    log_print('q',L"Welcome to GULAG v0.1 (AKA CULAG)\n");
+    log_print('q',L"Welcome to GULAG v1.0\n");
     return;
 
     clock_gettime(CLOCK_MONOTONIC, &compute_end);

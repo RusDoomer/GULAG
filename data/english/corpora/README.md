@@ -1,1 +1,3 @@
-this will be BYOC because of the file sizes
+# Corpora
+
+Because of the large file sizes for corpora this project is BYOC (Bring Your Own Corpus)

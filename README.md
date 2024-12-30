@@ -2,7 +2,7 @@
 
 ## Overview
 
-GULAG is a GPU-accelerated keyboard layout optimizer designed to analyze and generate keyboard layouts based on n-gram frequency analysis. It leverages the power of OpenCL to perform computations in parallel, significantly speeding up the process of finding optimal layouts.
+GULAG is a GPU-accelerated keyboard layout optimizer designed to analyze and generate keyboard layouts based on n-gram frequency analysis. It leverages the power of OpenCL to perform computations in parallel, possibly speeding up the process of finding optimal layouts.
 
 ## Table of Contents
 
@@ -31,7 +31,7 @@ GULAG is a GPU-accelerated keyboard layout optimizer designed to analyze and gen
 
 ## Features
 
--   **GPU Acceleration:** (FUTURE) Utilizes OpenCL for parallel computation, enabling faster analysis and generation of keyboard layouts.
+-   **GPU Acceleration:** Utilizes OpenCL for parallel computation, enabling faster analysis and generation of keyboard layouts.
 -   **N-gram Analysis:** Supports analysis based on monograms, bigrams, trigrams, quadgrams, and skipgrams.
 -   **Multiple Modes:** Offers various modes of operation, including analysis, comparison, ranking, generation, and optimization of layouts.
 -   **Language Support:** Designed to work with different languages, each with its own set of characters and corpus data.
@@ -51,7 +51,7 @@ GULAG is a GPU-accelerated keyboard layout optimizer designed to analyze and gen
 1. Clone the repository:
 
     ```bash
-    git clone https://github.com/your-username/GULAG.git
+    git clone https://github.com/RusDoomer/GULAG.git
     cd GULAG
     ```
 
@@ -77,7 +77,7 @@ The `config.conf` file allows you to set default parameters for the program. You
 -   `repetitions`: Number of iterations for generation/improvement.
 -   `threads`: Number of threads for parallel execution.
 -   `output_mode`: Verbosity level ('q' (quiet), 'n' (normal), 'v' (verbose)).
--   `backen_mode`: Which backend to use for optimization ('c' (cpu), 'o' (opencl)).
+-   `backend_mode`: Which backend to use for optimization ('c' (cpu), 'o' (opencl)).
 
 Command line arguments can override all of these settings, except `pins`.
 

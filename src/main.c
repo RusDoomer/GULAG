@@ -445,6 +445,7 @@ int main(int argc, char **argv) {
     elapsed = (end.tv_sec - start.tv_sec) + (end.tv_nsec - start.tv_nsec) / 1e9;
     log_print('q',L"----- Shut Down Complete : %.9lf seconds -----\n\n", elapsed);
 
+    if (elapsed_compute_time == 0) {elapsed_compute_time = 1;}
     log_print('q',L"Layouts per second........................: %lf\n", layouts_analyzed / elapsed_compute_time);
 
     clock_gettime(CLOCK_MONOTONIC, &full_end);
