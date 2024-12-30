@@ -339,14 +339,6 @@ int is_pinky_stretch_bi(int row0, int col0, int row1, int col1)
 /* not explaining all of these this is too much work */
 /*                                                   */
 
-int is_alt(int row0, int col0, int row1, int col1, int row2, int col2)
-{
-    return !is_same_hand_bi(row0, col0, row1, col1)
-        && !is_same_hand_bi(row1, col1, row2, col2)
-        && !is_same_finger_bi(row0, col0, row2, col2)
-        && !is_same_pos_bi(row0, col0, row2, col2);
-}
-
 int is_redirect(int row0, int col0, int row1, int col1, int row2, int col2)
 {
     return is_same_hand_tri(row0, col0, row1, col1, row2, col2)
@@ -368,6 +360,85 @@ int is_bad_redirect(int row0, int col0, int row1, int col1, int row2, int col2)
         && finger(row1, col1) != 3 && finger(row1, col1) != 4
         && finger(row2, col2) != 3 && finger(row2, col2) != 4;
 }
+
+int is_alt(int row0, int col0, int row1, int col1, int row2, int col2)
+{
+    return !is_same_hand_bi(row0, col0, row1, col1)
+        && !is_same_hand_bi(row1, col1, row2, col2)
+        && !is_same_finger_bi(row0, col0, row2, col2)
+        && !is_same_pos_bi(row0, col0, row2, col2);
+}
+
+int is_alt_in(int row0, int col0, int row1, int col1, int row2, int col2)
+{
+    return is_alt(row0, col0, row1, col1, row2, col2)
+        && is_roll_in(row0, col0, row2, col2, row1, col1);
+}
+
+int is_alt_out(int row0, int col0, int row1, int col1, int row2, int col2)
+{
+    return is_alt(row0, col0, row1, col1, row2, col2)
+        && !is_alt_in(row0, col0, row1, col1, row2, col2);
+}
+
+
+int is_same_row_alt(int row0, int col0, int row1, int col1, int row2, int col2)
+{
+    return is_alt(row0, col0, row1, col1, row2, col2)
+        && is_same_row_bi(row0, col0, row2, col2);
+}
+
+int is_same_row_alt_in(int row0, int col0, int row1, int col1, int row2, int col2)
+{
+    return is_same_row_alt(row0, col0, row1, col1, row2, col2)
+        && is_roll_in(row0, col0, row2, col2, row1, col1);
+}
+
+int is_same_row_alt_out(int row0, int col0, int row1, int col1, int row2, int col2)
+{
+    return is_same_row_alt(row0, col0, row1, col1, row2, col2)
+        && !is_same_row_alt_in(row0, col0, row1, col1, row2, col2);
+}
+
+
+int is_adjacent_finger_alt(int row0, int col0, int row1, int col1, int row2, int col2)
+{
+    return is_alt(row0, col0, row1, col1, row2, col2)
+        && is_adjacent_finger_bi(row0, col0, row2, col2);
+}
+
+int is_adjacent_finger_alt_in(int row0, int col0, int row1, int col1, int row2, int col2)
+{
+    return is_adjacent_finger_alt(row0, col0, row1, col1, row2, col2)
+        && is_roll_in(row0, col0, row2, col2, row1, col1);
+}
+
+int is_adjacent_finger_alt_out(int row0, int col0, int row1, int col1, int row2, int col2)
+{
+    return is_adjacent_finger_alt(row0, col0, row1, col1, row2, col2)
+        && !is_adjacent_finger_alt_in(row0, col0, row1, col1, row2, col2);
+}
+
+
+int is_same_row_adjacent_finger_alt(int row0, int col0, int row1, int col1, int row2, int col2)
+{
+    return is_alt(row0, col0, row1, col1, row2, col2)
+        && is_same_row_bi(row0, col0, row2, col2)
+        && is_adjacent_finger_bi(row0, col0, row2, col2);
+}
+
+int is_same_row_adjacent_finger_alt_in(int row0, int col0, int row1, int col1, int row2, int col2)
+{
+    return is_same_row_adjacent_finger_alt(row0, col0, row1, col1, row2, col2)
+        && is_roll_in(row0, col0, row2, col2, row1, col1);
+}
+
+int is_same_row_adjacent_finger_alt_out(int row0, int col0, int row1, int col1, int row2, int col2)
+{
+    return is_same_row_adjacent_finger_alt(row0, col0, row1, col1, row2, col2)
+        && !is_same_row_adjacent_finger_alt_in(row0, col0, row1, col1, row2, col2);
+}
+
 
 int is_onehand(int row0, int col0, int row1, int col1, int row2, int col2)
 {
@@ -552,12 +623,6 @@ int is_same_row_adjacent_finger_roll_out(int row0, int col0, int row1, int col1,
         && is_same_row_adjacent_finger_roll(row0, col0, row1, col1, row2, col2);
 }
 
-
-int is_chained_alt(int row0, int col0, int row1, int col1, int row2, int col2, int row3, int col3)
-{
-    return is_alt(row0, col0, row1, col1, row2, col2) && is_alt(row1, col1, row2, col2, row3, col3);
-}
-
 int is_chained_redirect(int row0, int col0, int row1, int col1, int row2, int col2, int row3, int col3)
 {
     return is_redirect(row0, col0, row1, col1, row2, col2) && is_redirect(row1, col1, row2, col2, row3, col3);
@@ -567,6 +632,94 @@ int is_bad_chained_redirect(int row0, int col0, int row1, int col1, int row2, in
 {
     return is_bad_redirect(row0, col0, row1, col1, row2, col2) && is_bad_redirect(row1, col1, row2, col2, row3, col3);
 }
+
+int is_chained_alt(int row0, int col0, int row1, int col1, int row2, int col2, int row3, int col3)
+{
+    return is_alt(row0, col0, row1, col1, row2, col2) && is_alt(row1, col1, row2, col2, row3, col3);
+}
+
+int is_chained_alt_in(int row0, int col0, int row1, int col1, int row2, int col2, int row3, int col3)
+{
+    return is_alt_in(row0, col0, row1, col1, row2, col2) && is_alt_in(row1, col1, row2, col2, row3, col3);
+}
+
+int is_chained_alt_out(int row0, int col0, int row1, int col1, int row2, int col2, int row3, int col3)
+{
+    return is_alt_out(row0, col0, row1, col1, row2, col2) && is_alt_out(row1, col1, row2, col2, row3, col3);
+}
+
+int is_chained_alt_mix(int row0, int col0, int row1, int col1, int row2, int col2, int row3, int col3)
+{
+    return (is_alt_in(row0, col0, row1, col1, row2, col2) && is_alt_out(row1, col1, row2, col2, row3, col3))
+        || (is_alt_out(row0, col0, row1, col1, row2, col2) && is_alt_in(row1, col1, row2, col2, row3, col3));
+}
+
+
+int is_chained_same_row_alt(int row0, int col0, int row1, int col1, int row2, int col2, int row3, int col3)
+{
+    return is_same_row_alt(row0, col0, row1, col1, row2, col2) && is_same_row_alt(row1, col1, row2, col2, row3, col3);
+}
+
+int is_chained_same_row_alt_in(int row0, int col0, int row1, int col1, int row2, int col2, int row3, int col3)
+{
+    return is_same_row_alt_in(row0, col0, row1, col1, row2, col2) && is_same_row_alt_in(row1, col1, row2, col2, row3, col3);
+}
+
+int is_chained_same_row_alt_out(int row0, int col0, int row1, int col1, int row2, int col2, int row3, int col3)
+{
+    return is_same_row_alt_out(row0, col0, row1, col1, row2, col2) && is_same_row_alt_out(row1, col1, row2, col2, row3, col3);
+}
+
+int is_chained_same_row_alt_mix(int row0, int col0, int row1, int col1, int row2, int col2, int row3, int col3)
+{
+    return (is_same_row_alt_in(row0, col0, row1, col1, row2, col2) && is_same_row_alt_out(row1, col1, row2, col2, row3, col3))
+        || (is_same_row_alt_out(row0, col0, row1, col1, row2, col2) && is_same_row_alt_in(row1, col1, row2, col2, row3, col3));
+}
+
+
+int is_chained_adjacent_finger_alt(int row0, int col0, int row1, int col1, int row2, int col2, int row3, int col3)
+{
+    return is_adjacent_finger_alt(row0, col0, row1, col1, row2, col2) && is_adjacent_finger_alt(row1, col1, row2, col2, row3, col3);
+}
+
+int is_chained_adjacent_finger_alt_in(int row0, int col0, int row1, int col1, int row2, int col2, int row3, int col3)
+{
+    return is_adjacent_finger_alt_in(row0, col0, row1, col1, row2, col2) && is_adjacent_finger_alt_in(row1, col1, row2, col2, row3, col3);
+}
+
+int is_chained_adjacent_finger_alt_out(int row0, int col0, int row1, int col1, int row2, int col2, int row3, int col3)
+{
+    return is_adjacent_finger_alt_out(row0, col0, row1, col1, row2, col2) && is_adjacent_finger_alt_out(row1, col1, row2, col2, row3, col3);
+}
+
+int is_chained_adjacent_finger_alt_mix(int row0, int col0, int row1, int col1, int row2, int col2, int row3, int col3)
+{
+    return (is_adjacent_finger_alt_in(row0, col0, row1, col1, row2, col2) && is_adjacent_finger_alt_out(row1, col1, row2, col2, row3, col3))
+        || (is_adjacent_finger_alt_out(row0, col0, row1, col1, row2, col2) && is_adjacent_finger_alt_in(row1, col1, row2, col2, row3, col3));
+}
+
+
+int is_chained_same_row_adjacent_finger_alt(int row0, int col0, int row1, int col1, int row2, int col2, int row3, int col3)
+{
+    return is_same_row_adjacent_finger_alt(row0, col0, row1, col1, row2, col2) && is_same_row_adjacent_finger_alt(row1, col1, row2, col2, row3, col3);
+}
+
+int is_chained_same_row_adjacent_finger_alt_in(int row0, int col0, int row1, int col1, int row2, int col2, int row3, int col3)
+{
+    return is_same_row_adjacent_finger_alt_in(row0, col0, row1, col1, row2, col2) && is_same_row_adjacent_finger_alt_in(row1, col1, row2, col2, row3, col3);
+}
+
+int is_chained_same_row_adjacent_finger_alt_out(int row0, int col0, int row1, int col1, int row2, int col2, int row3, int col3)
+{
+    return is_same_row_adjacent_finger_alt_out(row0, col0, row1, col1, row2, col2) && is_same_row_adjacent_finger_alt_out(row1, col1, row2, col2, row3, col3);
+}
+
+int is_chained_same_row_adjacent_finger_alt_mix(int row0, int col0, int row1, int col1, int row2, int col2, int row3, int col3)
+{
+    return (is_same_row_adjacent_finger_alt_in(row0, col0, row1, col1, row2, col2) && is_same_row_adjacent_finger_alt_out(row1, col1, row2, col2, row3, col3))
+        || (is_same_row_adjacent_finger_alt_out(row0, col0, row1, col1, row2, col2) && is_same_row_adjacent_finger_alt_in(row1, col1, row2, col2, row3, col3));
+}
+
 
 int is_onehand_quad(int row0, int col0, int row1, int col1, int row2, int col2, int row3, int col3)
 {

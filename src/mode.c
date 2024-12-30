@@ -990,7 +990,8 @@ void gen_benchmark()
     thread_array[count + 2] = num_cpus * 2;
 
     /* print the tests to be done */
-    for (int i = 0; i < total; i++) {log_print('v',L"%d ", thread_array[i]);}
+    log_print('v',L"Planned runs... ");
+    for (int i = 0; i < total; i++) {log_print('v',L"%d, ", thread_array[i]);}
     log_print('v',L"\n\n");
 
     /* temporarily set output mode to quiet */
@@ -1001,19 +1002,20 @@ void gen_benchmark()
     for (int i = 0; i < total; i++)
     {
 
-        log_print('q',L"BENCHMARK RUN %d/%d\n\n", i+1, total);
+        log_print('q',L"BENCHMARK RUN %d/%d\n", i+1, total);
         threads = thread_array[i];
 
         struct timespec start, end;
         clock_gettime(CLOCK_MONOTONIC, &start);
 
-        generate();
+        cl_generate();
 
         clock_gettime(CLOCK_MONOTONIC, &end);
         double elapsed = (end.tv_sec - start.tv_sec) +
                          (end.tv_nsec - start.tv_nsec) / 1e9;
         double time_per_repetition = elapsed / repetitions;
         results[i] = 1.0 / time_per_repetition;
+        log_print('q',L"Done\n\n", i+1, total);
     }
 
     /* reset output mode */
@@ -1138,7 +1140,7 @@ void cl_gen_benchmark()
 
     /* print the tests to be done */
     log_print('v',L"    Planned runs... ");
-    for (int i = 0; i < total; i++) {log_print('v',L"%d ", thread_array[i]);}
+    for (int i = 0; i < total; i++) {log_print('v',L"%d, ", thread_array[i]);}
     log_print('v',L"\n\n");
 
     /* temporarily set output mode to quiet */

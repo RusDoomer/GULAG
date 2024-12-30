@@ -38,9 +38,20 @@ Half Russor Bigram : 1
 Index Stretch Bigram : 1
 Pinky Stretch Bigram : 1
 Same Finger Trigram : 1
-Alternation : 1
 Redirect : 1
 Bad Redirect : 1
+Alternation : 1
+Alternation In : 1
+Alternation Out : 1
+Same Row Alternation : 1
+Same Row Alternation In : 1
+Same Row Alternation Out : 1
+Adjacent Finger Alternation : 1
+Adjacent Finger Alternation In : 1
+Adjacent Finger Alternation Out : 1
+Same Row Adjacent Finger Alternation : 1
+Same Row Adjacent Finger Alternation In : 1
+Same Row Adjacent Finger Alternation Out : 1
 One Hand : 1
 One Hand In : 1
 One Hand Out : 1
@@ -66,9 +77,24 @@ Same Row Adjacent Finger Roll : 1
 Same Row Adjacent Finger Roll In : 1
 Same Row Adjacent Finger Roll Out : 1
 Same Finger Quadgram : 1
-Chained Alternation : 1
 Chained Redirect : 1
 Bad Chained Redirect : 1
+Chained Alternation : 1
+Chained Alternation In : 1
+Chained Alternation Out : 1
+Chained Alternation Mix : 1
+Same Row Chained Alternation : 1
+Same Row Chained Alternation In : 1
+Same Row Chained Alternation Out : 1
+Same Row Chained Alternation Mix : 1
+Adjacent Finger Chained Alternation : 1
+Adjacent Finger Chained Alternation In : 1
+Adjacent Finger Chained Alternation Out : 1
+Adjacent Finger Chained Alternation Mix : 1
+Same Row Adjacent Finger Chained Alternation : 1
+Same Row Adjacent Finger Chained Alternation In : 1
+Same Row Adjacent Finger Chained Alternation Out : 1
+Same Row Adjacent Finger Chained Alternation Mix : 1
 Quad One Hand : 1
 Quad One Hand In : 1
 Quad One Hand Out : 1
