@@ -377,22 +377,39 @@ int main(int argc, char **argv) {
             break;
         case 'g':
             /* generate a new layout */
-            log_print('n',L"Running generation\n");
-            generate();
-            log_print('n',L"Done\n\n");
+            if (backend_mode == 'c') {
+                log_print('n',L"Running cpu generation\n");
+                generate();
+                log_print('n',L"Done\n\n");
+            } else if (backend_mode == 'o') {
+                log_print('n',L"Running opencl generation\n");
+                cl_generate();
+                log_print('n',L"Done\n\n");
+            }
             break;
         case 'i':
             /* improve a layout */
-            log_print('n',L"Running optimization\n");
-            //improve(0);
-            cl_improve(0);
-            log_print('n',L"Done\n\n");
+            if (backend_mode == 'c') {
+                log_print('n',L"Running cpu optimization\n");
+                improve(0);
+                log_print('n',L"Done\n\n");
+            } else if (backend_mode == 'o') {
+                log_print('n',L"Running opencl optimization\n");
+                cl_improve(0);
+                log_print('n',L"Done\n\n");
+            }
             break;
         case 'b':
             /* benchmark to find ideal number of threads */
-            log_print('n',L"Running benchmark\n");
-            gen_benchmark();
-            log_print('n',L"Done\n\n");
+            if (backend_mode == 'c') {
+                log_print('n',L"Running cpu benchmark\n");
+                gen_benchmark();
+                log_print('n',L"Done\n\n");
+            } else if (backend_mode == 'o') {
+                log_print('n',L"Running opencl benchmark\n");
+                cl_gen_benchmark();
+                log_print('n',L"Done\n\n");
+            }
             break;
         case 'h':
             /* print help info */

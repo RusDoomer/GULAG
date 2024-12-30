@@ -53,6 +53,7 @@ extern char run_mode;
 extern int repetitions;
 extern int threads;
 extern char output_mode;
+extern char backend_mode;
 
 extern double layouts_per_second_real;
 extern double layouts_per_second_total;

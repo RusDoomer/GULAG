@@ -560,6 +560,31 @@ void improve(int shuffle) {
     free(best_layouts);
 }
 
+/*
+ * Generates a new layout using OpenCL.
+ *
+ * Returns: void.
+ */
+void cl_generate() {
+    /* No specific layout used, so unpin all positions for a fresh start */
+    for (int i = 0; i < ROW; i++) {
+        for (int j = 0; j < COL; j++) {
+            pins[i][j] = 0;
+        }
+    }
+    cl_improve(1);
+}
+
+/*
+ * Reads the content of a file into a dynamically allocated string.
+ *
+ * Parameters:
+ *   filename: The path to the file.
+ *   length: Pointer to size_t to store the length of the file content.
+ *
+ * Returns:
+ *   A pointer to the string containing the file content, or NULL on failure.
+ */
 char* read_source_file(const char* filename, size_t* length) {
     FILE *file = fopen(filename, "r");
     if (file == NULL) {
@@ -583,6 +608,14 @@ char* read_source_file(const char* filename, size_t* length) {
     return source;
 }
 
+/*
+ * Improves an existing layout using OpenCL.
+ *
+ * Parameters:
+ *   shuffle: A flag indicating whether to shuffle the layout before starting (1) or not (0).
+ *
+ * Returns: void.
+ */
 void cl_improve(int shuffle) {
 
     log_print('v', L"Pins: \n");
@@ -616,6 +649,7 @@ void cl_improve(int shuffle) {
     print_layout(lt);
     log_print('n', L"\n");
 
+    /* Find the "ideal" amount of work items you can do based on the stats you're using */
     WORKERS = -1;
     if (MONO_END > WORKERS) {WORKERS = MONO_END;}
     if (BI_END > WORKERS) {WORKERS = BI_END;}
@@ -624,7 +658,7 @@ void cl_improve(int shuffle) {
     if (SKIP_END > WORKERS) {WORKERS = SKIP_END;}
     if (WORKERS == -1) {error("Something went wrong with finding correct amount of work-items");}
 
-    // OpenCL setup
+    /* OpenCL setup */
     cl_platform_id *platforms;
     cl_uint num_platforms;
     cl_device_id device;
@@ -634,7 +668,7 @@ void cl_improve(int shuffle) {
     cl_kernel kernel;
     cl_int err;
 
-    // Get all platforms
+    /* Get all platforms */
     log_print('v', L"5/9: Initializing OpenCL...\n");
     log_print('v', L"     Getting platforms... ");
     err = clGetPlatformIDs(0, NULL, &num_platforms);
@@ -648,7 +682,7 @@ void cl_improve(int shuffle) {
     }
     log_print('v', L"Done\n");
 
-    // Attempt to find a GPU device across all platforms
+    /* Attempt to find a GPU device across all platforms */
     log_print('v', L"     Finding a suitable device... ");
     int device_found = 0;
     for (int i = 0; i < num_platforms; i++) {
@@ -659,7 +693,7 @@ void cl_improve(int shuffle) {
         }
     }
 
-    // If no GPU is found, try to get any other available device
+    /* If no GPU is found, try to get any other available device */
     if (!device_found) {
         for (int i = 0; i < num_platforms; i++) {
             err = clGetDeviceIDs(platforms[i], CL_DEVICE_TYPE_ALL, 1, &device, NULL);
@@ -675,41 +709,43 @@ void cl_improve(int shuffle) {
         error("OpenCL Error: No suitable device found.");
     }
     log_print('v', L"Done\n");
-    free(platforms); // Free platforms array after use
+    free(platforms);
 
-    // Create context
+    /* Create context */
     log_print('v', L"     Creating context... ");
     context = clCreateContext(NULL, 1, &device, NULL, NULL, &err);
     if (err != CL_SUCCESS) {error("OpenCL Error: Failed to create context.");}
     log_print('v', L"Done\n");
 
-    // Create command queue (using the non-deprecated function)
+    /* Create command queue (using the non-deprecated function) */
     log_print('v', L"     Creating command queue... ");
-    cl_queue_properties props[] = {0}; // No special properties needed
+    /* no special properties */
+    cl_queue_properties props[] = {0};
     queue = clCreateCommandQueueWithProperties(context, device, props, &err);
     if (err != CL_SUCCESS) {error("OpenCL Error: Failed to create command queue.");}
     log_print('v', L"Done\n");
 
-    // Read kernel source
+    /* Read kernel source */
     log_print('v', L"     Reading kernel source... ");
     size_t source_length;
     char* kernel_source = read_source_file("src/kernel.cl", &source_length);
     if (kernel_source == NULL) {error("Failed to read kernel source file.");}
     log_print('v', L"Done\n");
 
-    // Create and build program
+    /* Create and build program */
     log_print('v', L"     Creating and building program... ");
     program = clCreateProgramWithSource(context, 1, (const char**)&kernel_source, &source_length, &err);
     if (err != CL_SUCCESS) {error("OpenCL Error: Failed to create program from source.");}
 
-    // Find mono_stat indexes for Hand Balance Meta Stat
+    /* Find mono_stat indexes for Hand Balance Meta Stat */
     int index_left_hand_usage = find_stat_index("Left Hand Usage", 'm', lt);
     int index_right_hand_usage = find_stat_index("Right Hand Usage", 'm', lt);
     if (index_left_hand_usage == -1 || index_right_hand_usage == -1) {error("hand usage stats must have non-zero weight even if you don't care, sorry :)");}
     if (index_left_hand_usage >= MONO_END || index_right_hand_usage >= MONO_END) {error("the index of left hand usage or right hand usage is out of bounds, idk what you did");}
 
-    // Compiler options to pass constants to the kernel using #define
-    char options[512]; // Ensure this is large enough for all defines
+    /* Compiler options to pass constants to the kernel using compiler flags */
+    /* Ensure this is large enough for all defines */
+    char options[512];
     sprintf(options, "-D MONO_END=%d -D BI_END=%d -D TRI_END=%d -D QUAD_END=%d -D SKIP_END=%d -D META_END=%d -D THREADS=%d -D REPETITIONS=%d -D MAX_SWAPS=%d -D WORKERS=%d -D LEFT_HAND=%d -D RIGHT_HAND=%d",
             MONO_END, BI_END, TRI_END, QUAD_END, SKIP_END, META_END, threads, repetitions, MAX_SWAPS, WORKERS, index_left_hand_usage, index_right_hand_usage);
 
@@ -725,13 +761,14 @@ void cl_improve(int shuffle) {
     }
     log_print('v', L"Done\n");
 
-    // Create kernel
+    /* Create kernel */
     log_print('v', L"     Creating kernel... ");
     kernel = clCreateKernel(program, "improve_kernel", &err);
     if (err != CL_SUCCESS) {error("OpenCL Error: Failed to create kernel.");}
     log_print('v', L"Done\n");
 
-    // Create an array of layouts on the host - NOT FULL LAYOUTS ONLY MATRIX, NAME, AND OVERALL SCORE
+    /* Create an array of layouts on the host */
+    /* NOT FULL LAYOUTS ONLY MATRIX, NAME, AND OVERALL SCORE */
     log_print('v', L"     Creating array of layouts on host... ");
     layout *layouts = (layout *)malloc(sizeof(layout) * threads);
     if (layouts == NULL) {error("Failed to allocate memory for layouts.");}
@@ -741,7 +778,10 @@ void cl_improve(int shuffle) {
     }
     log_print('v', L"Done\n");
 
-    // Allocate and copy data to device buffers
+    int *reps_data = (int *)malloc(sizeof(int) * threads);
+    for (int i = 0; i < threads; i++) {reps_data[i] = 0;}
+
+    /* Allocate and copy data to device buffers */
     log_print('v', L"     Allocating and copying data to device buffers...\n");
     cl_mem buffer_linear_mono = clCreateBuffer(context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, sizeof(float) * LANG_LENGTH, linear_mono, &err);
     if (err != CL_SUCCESS) {error("OpenCL Error: Failed to create buffer for linear_mono.");}
@@ -765,30 +805,20 @@ void cl_improve(int shuffle) {
     if (err != CL_SUCCESS) {error("OpenCL Error: Failed to create buffer for stats_skip.");}
     cl_mem buffer_stats_meta = clCreateBuffer(context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, sizeof(meta_stat) * META_END, stats_meta, &err);
     if (err != CL_SUCCESS) {error("OpenCL Error: Failed to create buffer for stats_meta.");}
-    // **(2) Create a buffer for the array of layouts**
     cl_mem buffer_layouts = clCreateBuffer(context, CL_MEM_READ_WRITE, sizeof(layout) * threads, NULL, &err);
     if (err != CL_SUCCESS) {error("OpenCL Error: Failed to create buffer for layouts.");}
-
-    // **(3) Write the array of layouts to the buffer**
     err = clEnqueueWriteBuffer(queue, buffer_layouts, CL_TRUE, 0, sizeof(layout) * threads, layouts, 0, NULL, NULL);
     if (err != CL_SUCCESS) {error("OpenCL Error: Failed to write layouts to buffer.");}
-
     cl_mem buffer_pins = clCreateBuffer(context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, sizeof(int) * ROW * COL, pins, &err);
     if (err != CL_SUCCESS) {error("OpenCL Error: Failed to create buffer for pins.");}
-
-    // Create a buffer to hold the iteration counts from each work item
-    int *reps_data = (int *)malloc(sizeof(int) * threads);
-    if (reps_data == NULL) { error("Failed to allocate memory for reps_data."); }
-    for (int i = 0; i < threads; i++) {reps_data[i] = 0;}
-
     cl_mem buffer_reps = clCreateBuffer(context, CL_MEM_WRITE_ONLY, sizeof(int) * threads, NULL, &err);
     if (err != CL_SUCCESS) { error("OpenCL Error: Failed to create buffer for reps."); }
     log_print('v', L"     Done\n");
 
-    // Generate a seed on the host
+    /* Generate a seed on the host */
     unsigned int seed = (unsigned int)time(NULL);
 
-    // Set kernel arguments
+    /* Set kernel arguments */
     log_print('v', L"     Setting kernel arguments... ");
     err = clSetKernelArg(kernel, 0, sizeof(cl_mem), &buffer_linear_mono);
     if (err != CL_SUCCESS) {error("OpenCL Error: Failed to set kernel argument 0.");}
@@ -812,25 +842,23 @@ void cl_improve(int shuffle) {
     if (err != CL_SUCCESS) {error("OpenCL Error: Failed to set kernel argument 9.");}
     err = clSetKernelArg(kernel, 10, sizeof(cl_mem), &buffer_stats_meta);
     if (err != CL_SUCCESS) {error("OpenCL Error: Failed to set kernel argument 10.");}
-    // **(4) Set the buffer for the layout array as a kernel argument**
     err = clSetKernelArg(kernel, 11, sizeof(cl_mem), &buffer_layouts);
     if (err != CL_SUCCESS) {error("OpenCL Error: Failed to set kernel argument 11.");}
     err = clSetKernelArg(kernel, 12, sizeof(cl_mem), &buffer_pins);
     if (err != CL_SUCCESS) {error("OpenCL Error: Failed to set kernel argument 12.");}
     err = clSetKernelArg(kernel, 13, sizeof(int), &seed);
     if (err != CL_SUCCESS) {error("OpenCL Error: Failed to set kernel argument 13.");}
-
-    // Set the buffer_reps as the 15th argument (index 14)
     err = clSetKernelArg(kernel, 14, sizeof(cl_mem), &buffer_reps);
     if (err != CL_SUCCESS) { error("OpenCL Error: Failed to set kernel argument 14."); }
     log_print('v', L"Done\n");
 
+    /* timing opencl execution time */
     struct timespec start, end;
     double elapsed;
 
     clock_gettime(CLOCK_MONOTONIC, &start);
 
-    // Enqueue kernel
+    /* Enqueue kernel */
     log_print('v', L"6/9: Enqueueing kernel... ");
     size_t global_size = threads * WORKERS; // Example: same number of threads as your C code
     size_t local_size = WORKERS; // Example: one workgroup
@@ -838,47 +866,55 @@ void cl_improve(int shuffle) {
     if (err != CL_SUCCESS) {error("OpenCL Error: Failed to enqueue kernel.");}
     log_print('v', L"Done\n");
 
-    // Wait for kernel to finish (for now)
+    /* Wait for kernel to finish */
     log_print('v', L"     Waiting for kernel to finish... ");
     clFinish(queue);
     log_print('v', L"Done\n");
 
-    // **(5) Read back the array of layouts from the buffer**
+    /* Read back the array of layouts from the buffer */
     err = clEnqueueReadBuffer(queue, buffer_layouts, CL_TRUE, 0, sizeof(layout) * threads, layouts, 0, NULL, NULL);
     if (err != CL_SUCCESS) {error("OpenCL Error: Failed to read buffer for layouts.");}
 
-    // Read back the iteration counts from the device
+    /* Read back the iteration counts from the device */
     err = clEnqueueReadBuffer(queue, buffer_reps, CL_TRUE, 0, sizeof(int) * threads, reps_data, 0, NULL, NULL);
     if (err != CL_SUCCESS) { error("OpenCL Error: Failed to read buffer for reps."); }
 
+    /* calculate opencl execution time */
     clock_gettime(CLOCK_MONOTONIC, &end);
     elapsed = (end.tv_sec - start.tv_sec) + (end.tv_nsec - start.tv_nsec) / 1e9;
 
-    // **(6) Find the best layout among all threads**
+    /* Find the best layout among all threads */
     log_print('n', L"7/9: Selecting best layout... ");
-    log_print('v', L"\n\n PRINTING LAYOUTS\n\n");
-    char temp = output_mode;
-    output_mode = 'q';
     layout *best_layout;
     alloc_layout(&best_layout);
-    best_layout->score = -INFINITY;
-    for (int i = 0; i < threads; i++) {
-        log_print('q', L"Layout %d: CL Results - REPS COMPLETED: %d\n", i, reps_data[i]);
-        print_layout(&layouts[i]);
-        log_print('q', L"Layout %d: Real Results\n", i);
-        skeleton_copy(lt, &layouts[i]);
-        single_analyze(lt);
-        get_score(lt);
-        print_layout(lt);
-        if (layouts[i].score > best_layout->score) {
-            skeleton_copy(best_layout, &layouts[i]);
+    skeleton_copy(best_layout, lt);
+    if (output_mode == 'v') {
+        log_print('v', L"\n\n PRINTING LAYOUTS\n\n");
+        /* make output mode quiet so we don't spam */
+        char temp = output_mode;
+        output_mode = 'q';
+        for (int i = 0; i < threads; i++) {
+            log_print('q', L"Layout %d: CL Results - REPS COMPLETED: %d\n", i, reps_data[i]);
+            strcat(layouts[i].name, " \"improved\"");
+            print_layout(&layouts[i]);
+            if (layouts[i].score > best_layout->score) {
+                skeleton_copy(best_layout, &layouts[i]);
+            }
+            log_print('q', L"\n");
         }
-        log_print('q', L"\n");
+        /* reset output mode */
+        output_mode = temp;
+    } else {
+        for (int i = 0; i < threads; i++) {
+            strcat(layouts[i].name, " \"improved\"");
+            if (layouts[i].score > best_layout->score) {
+                skeleton_copy(best_layout, &layouts[i]);
+            }
+        }
     }
-    output_mode = temp;
     log_print('n',L"Done\n\n");
 
-    // Cleanup
+    /* Cleanup */
     log_print('v', L"8/9: Cleaning up OpenCL...\n");
     clReleaseMemObject(buffer_linear_mono);
     clReleaseMemObject(buffer_linear_bi);
@@ -904,7 +940,7 @@ void cl_improve(int shuffle) {
     log_print('v', L"time per layout : %.9lf seconds\n", elapsed / repetitions);
     log_print('v', L"layouts / sec   : %.9lf\n\n", repetitions / elapsed);
 
-    // ... rest of your improve logic (print best layout, etc.) ...
+    /* print final layout */
     log_print('v', L"9/9: Printing layout...\n\n");
     /* analyze.c - perform a single layout analysis */
     log_print('n',L"8/9: Analyzing best layout... ");
@@ -921,7 +957,7 @@ void cl_improve(int shuffle) {
 }
 
 /*
- * Performs a benchmark to determine the optimal number of threads for layout generation.
+ * Performs a benchmark to determine the optimal number of threads for layout generation on pure cpu.
  * It runs the generation process with different numbers of threads and measures performance.
  *
  * Returns: void.
@@ -1007,6 +1043,155 @@ void gen_benchmark()
 }
 
 /*
+ * Performs a benchmark to determine the optimal number of threads for layout generation on opencl.
+ * It runs the generation process with different numbers of threads and measures performance.
+ *
+ * Returns: void.
+ */
+void cl_gen_benchmark()
+{
+    repetitions = 10000;
+
+    /* OpenCL setup (same as in cl_improve) */
+    cl_platform_id *platforms;
+    cl_uint num_platforms;
+    cl_device_id device;
+    cl_int err;
+
+    /* Get all platforms */
+    log_print('v', L"     Getting platforms... ");
+    err = clGetPlatformIDs(0, NULL, &num_platforms);
+    if (err != CL_SUCCESS) {error("OpenCL Error: Failed to get number of platforms.");}
+
+    platforms = (cl_platform_id *)malloc(sizeof(cl_platform_id) * num_platforms);
+    err = clGetPlatformIDs(num_platforms, platforms, NULL);
+    if (err != CL_SUCCESS) {
+        free(platforms);
+        error("OpenCL Error: Failed to get platform IDs.");
+    }
+    log_print('v', L"Done\n");
+
+    /* Attempt to find a GPU device across all platforms */
+    log_print('v', L"     Finding a suitable device... ");
+    int device_found = 0;
+    for (int i = 0; i < num_platforms; i++) {
+        err = clGetDeviceIDs(platforms[i], CL_DEVICE_TYPE_GPU, 1, &device, NULL);
+        if (err == CL_SUCCESS) {
+            device_found = 1;
+            break;
+        }
+    }
+
+    /* If no GPU is found, try to get any other available device */
+    if (!device_found) {
+        for (int i = 0; i < num_platforms; i++) {
+            err = clGetDeviceIDs(platforms[i], CL_DEVICE_TYPE_ALL, 1, &device, NULL);
+            if (err == CL_SUCCESS) {
+                device_found = 1;
+                break;
+            }
+        }
+    }
+
+    if (!device_found) {
+        free(platforms);
+        error("OpenCL Error: No suitable device found.");
+    }
+    log_print('v', L"Done\n");
+    free(platforms); // Free platforms after we found a device
+
+    /* Get device information */
+    cl_uint num_compute_units;
+    char device_name[512];
+
+    err = clGetDeviceInfo(device, CL_DEVICE_MAX_COMPUTE_UNITS, sizeof(num_compute_units), &num_compute_units, NULL);
+    if (err != CL_SUCCESS) {error("OpenCL Error: Failed to get number of compute units.");}
+
+    err = clGetDeviceInfo(device, CL_DEVICE_NAME, sizeof(device_name), &device_name, NULL);
+    if (err != CL_SUCCESS) {error("OpenCL Error: Failed to get device name.");}
+
+    log_print('v', L"     OpenCL Device Info:\n");
+    log_print('v', L"       Device Name: %s\n", device_name);
+    log_print('v', L"       Compute Units: %u\n", num_compute_units);
+    int power_of_2 = 1;
+    int count = 1;
+
+    /* find the highest power of 2 that does not exceed the number of CPU threads */
+    while (power_of_2 <= num_compute_units) {
+        power_of_2 *= 2;
+        count++;
+    }
+
+    /* for cpu threads */
+    int total = count + 3;
+
+    /* allocate arrays for test cases */
+    int *thread_array = (int *)calloc(total, sizeof(int));
+    double *results = (double *)calloc(total, sizeof(double));
+
+    /* fill in thread counts based on powers of 2 and cores */
+    thread_array[0] = 1;
+    for (int i = 1; i < count; i++) {thread_array[i] = thread_array[i-1] * 2;}
+    thread_array[count] = num_compute_units / 2;
+    thread_array[count + 1] = num_compute_units;
+    thread_array[count + 2] = num_compute_units * 2;
+
+    /* print the tests to be done */
+    log_print('v',L"    Planned runs... ");
+    for (int i = 0; i < total; i++) {log_print('v',L"%d ", thread_array[i]);}
+    log_print('v',L"\n\n");
+
+    /* temporarily set output mode to quiet */
+    char temp = output_mode;
+    output_mode = 'q';
+
+    /* run benchmark for each thread count */
+    for (int i = 0; i < total; i++)
+    {
+
+        log_print('q',L"BENCHMARK RUN %d/%d\n", i+1, total);
+        threads = thread_array[i];
+
+        struct timespec start, end;
+        clock_gettime(CLOCK_MONOTONIC, &start);
+
+        cl_generate();
+
+        clock_gettime(CLOCK_MONOTONIC, &end);
+        double elapsed = (end.tv_sec - start.tv_sec) +
+                         (end.tv_nsec - start.tv_nsec) / 1e9;
+        double time_per_repetition = elapsed / repetitions;
+        results[i] = 1.0 / time_per_repetition;
+        log_print('q',L"Done\n\n", i+1, total);
+    }
+
+    /* reset output mode */
+    output_mode = temp;
+
+    /* print benchmark results */
+    log_print('q',L"\nBENCHMARK RESULTS:\n\n");
+    log_print('q',L"Threads - Layouts/Second:\n\n");
+    log_print('q',L"Powers of 2:\n");
+    for (int i = 0; i < count; i++)
+    {
+        log_print('q',L"%7d - %lf\n", thread_array[i], results[i]);
+    }
+    log_print('q',L"\n");
+    log_print('q',L"Based on CUs/SMs/Cores:\n");
+    for (int i = count; i < total; i++)
+    {
+        log_print('q',L"%7d - %lf\n", thread_array[i], results[i]);
+    }
+    log_print('q',L"\n");
+    log_print('q',L"Choose the lowest number of threads with acceptable Layouts/Second for best results.");
+    log_print('q',L"\n\n");
+
+    /* free allocated memory */
+    free(thread_array);
+    free(results);
+}
+
+/*
  * Prints a help message providing usage instructions for the program's command line arguments.
  *
  * Returns: void.
@@ -1049,6 +1234,10 @@ void print_help() {
     log_print('q',L"    q;quiet;SHUTUP       : The most concise; prints only the essential stats.\n");
     log_print('q',L"    n;norm;normal        : Prints most stats; ignores the most pedantic.\n");
     log_print('q',L"    v;loud;verbose       : The most verbose; prints all stats.\n");
+    // 80           @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+    log_print('q',L"  -b <mode>     : decides which backend to use.\n");
+    log_print('q',L"    c;cpu                : Uses a pure C cpu backend, best for CPU.\n");
+    log_print('q',L"    o;ocl;opencl         : Uses an opencl backend, best for GPU, worse for CPU.\n");
     // 80           @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
     log_print('q',L"Config:\n");
     log_print('q',L"  All of these options can be set in config.conf but command line arguments will\n");

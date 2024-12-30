@@ -63,6 +63,7 @@ char run_mode = 'a';
 int repetitions = 10000;
 int threads = 8;
 char output_mode = 'v';
+char backend_mode = 'c';
 
 double layouts_per_second_real = 0;
 double layouts_per_second_total = 0;

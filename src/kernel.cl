@@ -1,4 +1,12 @@
-// kernel.cl
+/*
+ * kernel.cl - CL implementation of improve and single_analyze functions for the GULAG.
+ *
+ * Author: Rus Doomer
+ *
+ * Description: Implements the simulated annealing loop and analysis from
+ *              improve() in mode.c with opencl acceleration.
+ */
+
 
 #include "structs.h"
 
@@ -10,24 +18,28 @@
 #define DIM4 DIM3 * DIM1
 #define LANG_LENGTH 51
 
-//global variables we have access to
 /*
- * MONO_END - 0 to infinite
- * BI_END - 0 to infinite
- * TRI_END - 0 to infinite
- * QUAD_END - 0 to infinite
- * SKIP_END - 0 to infinite
- * META_END - 0 to infinite
- * THREADS - 1 to infinite
- * REPETITIONS - THREADS to infinite
- * MAX_SWAPS - 1 to DIM1 / 2
- * WORKERS - 1 to idk?
- * LEFT_HAND - 0 to MONO_END
- * RIGHT_HAND - 0 to MONO_END
+ * Global variables accessible to the kernel, defined in mode.c: [0 - infinite]
+ * MONO_END, BI_END, TRI_END, QUAD_END, SKIP_END, META_END:
+ *     Define the number of statistics for each ngram type.
+ * THREADS: [1 - infinite]
+ *     Number of threads to use for parallel processing.
+ * REPETITIONS: [THREADS - infinite]
+ *     Total number of layouts to analyze during generation.
+ * MAX_SWAPS: [1 - DIM1/2]
+ *     Maximum number of key swaps to perform in each iteration.
+ * WORKERS: [Max of X_ENDs]
+ *     Number of work items per work group.
+ * LEFT_HAND, RIGHT_HAND:
+ *     Indices for hand usage statistics.
  */
 
-// New layout struct specific for opencl
-typedef struct cl_layout {
+/*
+ * New layout struct specific for OpenCL.
+ * It's a simplified version of the host-side layout struct,
+ * containing only necessary information for computation.
+ */
+typedef struct {
     int matrix[ROW][COL];
     float mono_score[MONO_END];
     float bi_score[BI_END];
@@ -38,7 +50,13 @@ typedef struct cl_layout {
     float score;
 } cl_layout;
 
-// Copy matrix from normal layout to cl_layout
+/*
+ * Copy matrix and score from normal layout to cl_layout.
+ * Parameters:
+ *   lt_dest: Pointer to the destination cl_layout.
+ *   lt_src:  Pointer to the source layout.
+ * Returns: void.
+ */
 inline void copy_host_to_cl(__local cl_layout *lt_dest, __global layout *lt_src)
 {
     for (int i = 0; i < ROW; i++)
@@ -52,7 +70,13 @@ inline void copy_host_to_cl(__local cl_layout *lt_dest, __global layout *lt_src)
     lt_dest->score = lt_src->score;
 }
 
-// Copy matrix from cl_layout to normal layout
+/*
+ * Copy matrix and score from cl_layout to normal layout.
+ * Parameters:
+ *   lt_dest: Pointer to the destination layout.
+ *   lt_src:  Pointer to the source cl_layout.
+ * Returns: void.
+ */
 inline void copy_cl_to_host(__global layout *lt_dest, __local cl_layout *lt_src)
 {
     for (int i = 0; i < ROW; i++)
@@ -66,7 +90,13 @@ inline void copy_cl_to_host(__global layout *lt_dest, __local cl_layout *lt_src)
     lt_dest->score = lt_src->score;
 }
 
-// Copy matrix from cl_layout to  cl_layout
+/*
+ * Copy matrix and score from cl_layout to cl_layout.
+ * Parameters:
+ *   lt_dest: Pointer to the destination cl_layout.
+ *   lt_src:  Pointer to the source cl_layout.
+ * Returns: void.
+ */
 inline void copy_cl_to_cl(__local cl_layout *lt_dest, __local cl_layout *lt_src)
 {
     for (int i = 0; i < ROW; i++)
@@ -81,27 +111,11 @@ inline void copy_cl_to_cl(__local cl_layout *lt_dest, __local cl_layout *lt_src)
 }
 
 /*
- * Flattens an 8D matrix coordinate into a 1D index.
+ * Unflattens a 1D index into an 8D matrix coordinate.
  * Parameters:
- *   row0, col0, row1, col1, row2, col2, row3, col3: Row and column indices.
- *   i: Pointer to store the flattened index.
- * Returns: void.
- */
-inline void flat_quad(int row0, int col0, int row1, int col1, int row2, int col2,
-    int row3, int col3, int *i)
-{
-    *i = ((row0 * COL + col0) * DIM3) +
-         ((row1 * COL + col1) * DIM2) +
-         ((row2 * COL + col2) * DIM1) +
-         (row3 * COL + col3);
-}
-
-/*
- * Unflattens a 1D index into a 8D matrix coordinate.
- * Parameters:
- *   i: The flattened index.
- *   row0, col0, row1, col1, row2, col2, row3, col3: Pointers to store the
- *                                                   row and column indices.
+ *   i: The flattened index.
+ *   row0, col0, row1, col1, row2, col2, row3, col3: Pointers to store the
+ *                                                 row and column indices.
  * Returns: void.
  */
 inline void unflat_quad(int i, int *row0, int *col0, int *row1, int *col1,
@@ -124,26 +138,10 @@ inline void unflat_quad(int i, int *row0, int *col0, int *row1, int *col1,
 }
 
 /*
- * Flattens a 6D matrix coordinate into a 1D index.
- * Parameters:
- *   row0, col0, row1, col1, row2, col2: Row and column indices.
- *   i: Pointer to store the flattened index.
- * Returns: void.
- */
-inline void flat_tri(int row0, int col0, int row1, int col1, int row2, int col2,
-    int *i)
-{
-    *i = ((row0 * COL + col0) * DIM2) +
-         ((row1 * COL + col1) * DIM1) +
-         (row2 * COL + col2);
-}
-
-/*
  * Unflattens a 1D index into a 6D matrix coordinate.
  * Parameters:
- *   i: The flattened index.
- *   row0, col0, row1, col1, row2, col2: Pointers to store the row and
- *                                       column indices.
+ *   i: The flattened index.
+ *   row0, col0, row1, col1, row2, col2: Pointers to store the row and column indices.
  * Returns: void.
  */
 inline void unflat_tri(int i, int *row0, int *col0, int *row1, int *col1,
@@ -162,23 +160,10 @@ inline void unflat_tri(int i, int *row0, int *col0, int *row1, int *col1,
 }
 
 /*
- * Flattens a 4D matrix coordinate into a 1D index.
- * Parameters:
- *   row0, col0, row1, col1: Row and column indices.
- *   i: Pointer to store the flattened index.
- * Returns: void.
- */
-inline void flat_bi(int row0, int col0, int row1, int col1, int *i)
-{
-    *i = ((row0 * COL + col0) * DIM1) +
-         (row1 * COL + col1);
-}
-
-/*
  * Unflattens a 1D index into a 4D matrix coordinate.
  * Parameters:
- *   i: The flattened index.
- *   row0, col0, row1, col1: Pointers to store the row and column indices.
+ *   i: The flattened index.
+ *   row0, col0, row1, col1: Pointers to store the row and column indices.
  * Returns: void.
  */
 inline void unflat_bi(int i, int *row0, int *col0, int *row1, int *col1)
@@ -192,22 +177,10 @@ inline void unflat_bi(int i, int *row0, int *col0, int *row1, int *col1)
 }
 
 /*
- * Flattens a 2D matrix coordinate into a 1D index.
- * Parameters:
- *   row0, col0: Row and column indices.
- *   i: Pointer to store the flattened index.
- * Returns: void.
- */
-inline void flat_mono(int row0, int col0, int *i)
-{
-    *i = row0 * COL + col0;
-}
-
-/*
  * Unflattens a 1D index into a 2D matrix coordinate.
  * Parameters:
- *   i: The flattened index.
- *   row0, col0: Pointers to store the row and column indices.
+ *   i: The flattened index.
+ *   row0, col0: Pointers to store the row and column indices.
  * Returns: void.
  */
 inline void unflat_mono(int i, int *row0, int *col0)
@@ -219,7 +192,7 @@ inline void unflat_mono(int i, int *row0, int *col0)
 /*
  * Calculates the index for a monogram in a linearized array.
  * Parameters:
- *   i: The index of the character in the language array.
+ *   i: The index of the character in the language array.
  * Returns: The index in the linearized monogram array.
  */
 size_t index_mono(int i) {
@@ -229,7 +202,7 @@ size_t index_mono(int i) {
 /*
  * Calculates the index for a bigram in a linearized array.
  * Parameters:
- *   i, j: The indices of the characters in the language array.
+ *   i, j: The indices of the characters in the language array.
  * Returns: The index in the linearized bigram array.
  */
 size_t index_bi(int i, int j) {
@@ -239,7 +212,7 @@ size_t index_bi(int i, int j) {
 /*
  * Calculates the index for a trigram in a linearized array.
  * Parameters:
- *   i, j, k: The indices of the characters in the language array.
+ *   i, j, k: The indices of the characters in the language array.
  * Returns: The index in the linearized trigram array.
  */
 size_t index_tri(int i, int j, int k) {
@@ -249,7 +222,7 @@ size_t index_tri(int i, int j, int k) {
 /*
  * Calculates the index for a quadgram in a linearized array.
  * Parameters:
- *   i, j, k, l: The indices of the characters in the language array.
+ *   i, j, k, l: The indices of the characters in the language array.
  * Returns: The index in the linearized quadgram array.
  */
 size_t index_quad(int i, int j, int k, int l) {
@@ -259,16 +232,21 @@ size_t index_quad(int i, int j, int k, int l) {
 /*
  * Calculates the index for a skipgram in a linearized array.
  * Parameters:
- *   skip_index: The skip distance (1-9).
- *   j, k: The indices of the characters in the language array.
+ *   skip_index: The skip distance (1-9).
+ *   j, k: The indices of the characters in the language array.
  * Returns: The index in the linearized skipgram array.
  */
 size_t index_skip(int skip_index, int j, int k) {
     return skip_index * LANG_LENGTH * LANG_LENGTH + j * LANG_LENGTH + k;
 }
 
-// Basic version of meta analysis only for hand balance
-// I hope no one ever wants more complicated stats for meta analysis
+/*
+ * Performs meta-analysis on a layout.
+ * Currently, only calculates hand balance.
+ * Parameters:
+ *   lt: Pointer to the cl_layout to analyze.
+ * Returns: void.
+ */
 inline void cl_meta_analysis(__local cl_layout *lt)
 {
     lt->meta_score[0] = 0;
@@ -281,7 +259,9 @@ inline void cl_meta_analysis(__local cl_layout *lt)
 /*
  * Calculates and assigns the overall score to a cl_layout based on its statistics.
  * Parameters:
- *   lt: Pointer to the cl_layout.
+ *   lt: Pointer to the cl_layout.
+ *   stats_mono, stats_bi, stats_tri, stats_quad, stats_skip, stats_meta:
+ *       Constant pointers to the respective statistic arrays.
  * Returns: void.
  */
 inline void cl_get_score(__local cl_layout *lt,
@@ -322,62 +302,68 @@ inline void cl_get_score(__local cl_layout *lt,
     }
 }
 
-// State (needs to be persistent)
+/* Define a struct for PCG32 state. */
 typedef struct {
     ulong state;
     ulong inc;
-} PCG32State;
+} pcg32_state_t;
 
-uint pcg32(PCG32State *state) {
-    ulong oldstate = state->state;
-    state->state = oldstate * 6364136223846793005ULL + state->inc;
+/*
+ * PCG32 random number generator function.
+ * Parameters:
+ *   rng: Pointer to the state of the PRNG.
+ * Returns: A pseudo-random 32-bit unsigned integer.
+ */
+uint pcg32_random_r(pcg32_state_t *rng) {
+    ulong oldstate = rng->state;
+    rng->state = oldstate * 6364136223846793005UL + rng->inc;
     uint xorshifted = ((oldstate >> 18u) ^ oldstate) >> 27u;
     uint rot = oldstate >> 59u;
     return (xorshifted >> rot) | (xorshifted << ((-rot) & 31));
 }
 
-// Function to shuffle the layout matrix (within the kernel)
-void shuffle_layout(__global layout *lt, PCG32State *rng_state, int global_id) {
-    for (int i = DIM1 - 1; i > 0; i--) {
-        int j = pcg32(rng_state) % (i + 1);
-
-        int i_row = i / COL;
-        int i_col = i % COL;
-        int j_row = j / COL;
-        int j_col = j % COL;
-
-        // Swap elements
-        int temp = lt->matrix[i_row][i_col];
-        lt->matrix[i_row][i_col] = lt->matrix[j_row][j_col];
-        lt->matrix[j_row][j_col] = temp;
+/*
+ * Initializes the internal state of the random number generator.
+ * Parameters:
+ *   global_id: The global ID of the work item.
+ *   seed:      The initial seed value.
+ *   offset:    An offset to ensure different states for different work items.
+ * Returns: A pcg32_state_t structure representing the initialized state.
+ */
+pcg32_state_t initialize_rng(int global_id, int seed, int offset) {
+    pcg32_state_t rng;
+    rng.state = (ulong)seed + (ulong)offset;
+    rng.inc = (ulong)global_id * 2 + 1;
+    /* Discard first 10 values */
+    for (int i = 0; i < 10; i++) {
+        pcg32_random_r(&rng);
     }
+    return rng;
 }
 
-// Function to shuffle a cl_layout matrix (within the kernel)
-void shuffle_cl_layout(__local cl_layout *lt, PCG32State *rng_state, int global_id) {
-    for (int i = DIM1 - 1; i > 0; i--) {
-        int j = pcg32(rng_state) % (i + 1);
-
-        int i_row = i / COL;
-        int i_col = i % COL;
-        int j_row = j / COL;
-        int j_col = j % COL;
-
-        // Swap elements
-        int temp = lt->matrix[i_row][i_col];
-        lt->matrix[i_row][i_col] = lt->matrix[j_row][j_col];
-        lt->matrix[j_row][j_col] = temp;
-    }
-}
-
-// Simplified swap function for OpenCL kernel
+/*
+ * Simplified swap function for OpenCL kernel.
+ * Parameters:
+ *   lt: Pointer to the cl_layout.
+ *   row1, col1: Row and column of the first key.
+ *   row2, col2: Row and column of the second key.
+ * Returns: void.
+ */
 inline void swap_keys(__local cl_layout *lt, int row1, int col1, int row2, int col2) {
     int temp = lt->matrix[row1][col1];
     lt->matrix[row1][col1] = lt->matrix[row2][col2];
     lt->matrix[row2][col2] = temp;
 }
 
-// Calculate monogram statistics
+/*
+ * Calculate monogram statistics for a given layout.
+ * Parameters:
+ *   working: Pointer to the cl_layout being analyzed.
+ *   local_id: The local ID of the work item.
+ *   stats_mono: Constant pointer to the array of mono_stat structures.
+ *   linear_mono: Constant pointer to the linearized monogram frequency data.
+ * Returns: void.
+ */
 inline void calculate_mono_stats(__local cl_layout *working,
                                  size_t local_id,
                                  __constant mono_stat *stats_mono,
@@ -396,7 +382,15 @@ inline void calculate_mono_stats(__local cl_layout *working,
     }
 }
 
-// Calculate bigram statistics
+/*
+ * Calculate bigram statistics for a given layout.
+ * Parameters:
+ *   working: Pointer to the cl_layout being analyzed.
+ *   local_id: The local ID of the work item.
+ *   stats_bi: Constant pointer to the array of bi_stat structures.
+ *   linear_bi: Constant pointer to the linearized bigram frequency data.
+ * Returns: void.
+ */
 inline void calculate_bi_stats(__local cl_layout *working,
                                size_t local_id,
                                __constant bi_stat *stats_bi,
@@ -415,7 +409,15 @@ inline void calculate_bi_stats(__local cl_layout *working,
     }
 }
 
-// Calculate trigram statistics
+/*
+ * Calculate trigram statistics for a given layout.
+ * Parameters:
+ *   working: Pointer to the cl_layout being analyzed.
+ *   local_id: The local ID of the work item.
+ *   stats_tri: Constant pointer to the array of tri_stat structures.
+ *   linear_tri: Constant pointer to the linearized trigram frequency data.
+ * Returns: void.
+ */
 inline void calculate_tri_stats(__local cl_layout *working,
                                 size_t local_id,
                                 __constant tri_stat *stats_tri,
@@ -434,7 +436,15 @@ inline void calculate_tri_stats(__local cl_layout *working,
     }
 }
 
-// Calculate quadgram statistics
+/*
+ * Calculate quadgram statistics for a given layout.
+ * Parameters:
+ *   working: Pointer to the cl_layout being analyzed.
+ *   local_id: The local ID of the work item.
+ *   stats_quad: Constant pointer to the array of quad_stat structures.
+ *   linear_quad: Constant pointer to the linearized quadgram frequency data.
+ * Returns: void.
+ */
 inline void calculate_quad_stats(__local cl_layout *working,
                                  size_t local_id,
                                  __constant quad_stat *stats_quad,
@@ -453,7 +463,15 @@ inline void calculate_quad_stats(__local cl_layout *working,
     }
 }
 
-// Calculate skipgram statistics
+/*
+ * Calculate skipgram statistics for a given layout.
+ * Parameters:
+ *   working: Pointer to the cl_layout being analyzed.
+ *   local_id: The local ID of the work item.
+ *   stats_skip: Constant pointer to the array of skip_stat structures.
+ *   linear_skip: Constant pointer to the linearized skipgram frequency data.
+ * Returns: void.
+ */
 inline void calculate_skip_stats(__local cl_layout *working,
                                  size_t local_id,
                                  __constant skip_stat *stats_skip,
@@ -474,7 +492,9 @@ inline void calculate_skip_stats(__local cl_layout *working,
     }
 }
 
-// Kernel function
+/*
+ * Main kernel for layout improvement using simulated annealing.
+ */
 __kernel void improve_kernel(__constant float *linear_mono,
                              __constant float *linear_bi,
                              __constant float *linear_tri,
@@ -490,33 +510,26 @@ __kernel void improve_kernel(__constant float *linear_mono,
                              __constant int *pins,
                              int seed,
                              __global int *reps) {
+    /* Identify the work item */
     size_t global_id = get_global_id(0);
     size_t group_id = get_group_id(0);
     size_t local_id = get_local_id(0);
 
-    PCG32State rng_state;
-    rng_state.state = seed + get_global_id(0) + (get_group_id(0) * get_global_size(0));
-    rng_state.inc = (seed * 2) + 1; // Ensure increment is odd
+    /* Initialize the random number generator */
+    pcg32_state_t rng = initialize_rng(global_id, seed, 0);
 
-
-
-    // Each workgroup gets a copy of the initial layout in local memory
+    /* Each workgroup gets a copy of the initial layout in local memory */
     __local cl_layout working;
-    // Keep track of the best layout found by the workgroup
     __local cl_layout best_layout;
 
     if (local_id == 0) {
-        // Only the first worker in the group copies the layout from global to local memory
         copy_host_to_cl(&working, &layouts[group_id]);
         copy_cl_to_cl(&best_layout, &working);
     }
-    barrier(CLK_LOCAL_MEM_FENCE); // Ensure the copy is complete before proceeding
+    barrier(CLK_LOCAL_MEM_FENCE);
 
-    // *** Simulated Annealing Logic ***
-
-    // Initial temperature and other parameters are now defined using #define from build options
+    /* Simulated Annealing Logic */
     float T = 1000;
-    int reheating_count = 0;
     int initial_swap_count = MAX_SWAPS;
     int swap_count;
     float max_T = T;
@@ -524,44 +537,44 @@ __kernel void improve_kernel(__constant float *linear_mono,
 
     for (int i = 0; i < REPETITIONS / THREADS; i++)
     {
-        // Temperature-dependent swap count
+        /* Temperature-dependent swap count */
         swap_count = (int)(initial_swap_count * (T / max_T));
         swap_count = swap_count < 1 ? 1 : swap_count;
         swap_count = swap_count > initial_swap_count ? initial_swap_count : swap_count;
 
-        // Store swaps for potential reversal
+        /* Store swaps for potential reversal */
         int swap_rows1[MAX_SWAPS];
         int swap_cols1[MAX_SWAPS];
         int swap_rows2[MAX_SWAPS];
         int swap_cols2[MAX_SWAPS];
-        // Make MAX_SWAPS number of swaps
-        if (local_id == 0) { // Only one work-item per group needs to perform swaps
+
+        /* Make MAX_SWAPS number of swaps */
+        if (local_id == 0) {
             reps[get_group_id(0)] = i+1;
             for (int j = 0; j < MAX_SWAPS; j++) {
                 int row1, col1, row2, col2;
                 do {
-                    // Generate random indices within the valid range
-                    row1 = pcg32(&rng_state) % ROW;
-                    col1 = pcg32(&rng_state) % COL;
-                    row2 = pcg32(&rng_state) % ROW;
-                    col2 = pcg32(&rng_state) % COL;
-
-                // Check for pins and ensure we don't swap the same key with itself
+                    /* Generate random indices within the valid range */
+                    row1 = pcg32_random_r(&rng) % ROW;
+                    col1 = pcg32_random_r(&rng) % COL;
+                    row2 = pcg32_random_r(&rng) % ROW;
+                    col2 = pcg32_random_r(&rng) % COL;
+                /* Check for pins and ensure we don't swap the same key with itself */
                 } while (pins[row1 * COL + col1] || pins[row2 * COL + col2] || (row1 == row2 && col1 == col2));
 
-                // Store swap locations
+                /* Store swap locations */
                 swap_rows1[j] = row1;
                 swap_cols1[j] = col1;
                 swap_rows2[j] = row2;
                 swap_cols2[j] = col2;
 
-                // Perform the swap
+                /* Perform the swap */
                 swap_keys(&working, row1, col1, row2, col2);
             }
         }
         barrier(CLK_LOCAL_MEM_FENCE);
 
-        // Calculate statistics
+        /* Calculate statistics */
         calculate_mono_stats(&working, local_id, stats_mono, linear_mono);
         calculate_bi_stats(&working, local_id, stats_bi, linear_bi);
         calculate_tri_stats(&working, local_id, stats_tri, linear_tri);
@@ -570,24 +583,24 @@ __kernel void improve_kernel(__constant float *linear_mono,
 
         barrier(CLK_LOCAL_MEM_FENCE);
 
-        // Only the first worker runs meta_analysis and get_score
+        /* Only the first worker runs meta_analysis and get_score */
         if (local_id == 0) {
             cl_meta_analysis(&working);
             cl_get_score(&working, stats_mono, stats_bi, stats_tri, stats_quad, stats_skip, stats_meta);
 
-            // Exponentiate the score difference for acceptance probability (using sigmoid)
+            /* Exponentiate the score difference for acceptance probability */
             float delta_score = working.score - best_layout.score;
-            if (delta_score > 0 || (1.0 / (1.0 + exp(-10 * delta_score / T))) > (float)pcg32(&rng_state) / 4294967295.0) {
+            if (delta_score > 0 || (1.0 / (1.0 + native_exp(-10 * delta_score / T))) > (float)pcg32_random_r(&rng) / 4294967295.0f) {
                 copy_cl_to_cl(&best_layout, &working);
                 improvement_counter++;
             } else {
-                // Revert the swaps
+                /* Revert the swaps */
                 for (int j = swap_count - 1; j >= 0; j--) {
                     swap_keys(&working, swap_rows1[j], swap_cols1[j], swap_rows2[j], swap_cols2[j]);
                 }
             }
 
-            // Adaptive cooling
+            /* Adaptive cooling */
             if (i > 0 && i % (REPETITIONS / (20 * THREADS)) == 0) {
                 float improvement_rate = (float)improvement_counter / (REPETITIONS / (20 * THREADS));
                 if (improvement_rate > 0.2) {
@@ -600,21 +613,20 @@ __kernel void improve_kernel(__constant float *linear_mono,
                 improvement_counter = 0;
             }
 
-            // Reheating
+            /* Reheating */
             if (i > 0 && i % (REPETITIONS / (10 * THREADS)) == 0) {
                 T = max_T;
-                reheating_count++;
             }
 
-            // Non-monotonic "jolt"
+            /* Non-monotonic "jolt" */
             if (i > 0 && i % (REPETITIONS / (50 * THREADS)) == 0) {
-                T *= (1.0 + (float)pcg32(&rng_state) / 4294967295.0 * 0.3); // Random float between 0 and 0.3
+                T *= (1.0 + (float)pcg32_random_r(&rng) / 4294967295.0f * 0.3);
                 if (T > max_T) {
                     T = max_T;
                 }
             }
 
-            // Temperature cooling
+            /* Temperature cooling */
             float progress = (float)i / (REPETITIONS / THREADS);
             T = max_T * (1.0 - progress);
             T = T < 1.0 ? 1.0 : T;
@@ -622,8 +634,7 @@ __kernel void improve_kernel(__constant float *linear_mono,
         barrier(CLK_LOCAL_MEM_FENCE);
     }
 
-    barrier(CLK_GLOBAL_MEM_FENCE);
-
+    /* Copy layout back to global memory */
     if (local_id ==0) {
         copy_cl_to_host(&layouts[group_id], &best_layout);
     }
