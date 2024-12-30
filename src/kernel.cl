@@ -370,6 +370,13 @@ void shuffle_cl_layout(__local cl_layout *lt, PCG32State *rng_state, int global_
     }
 }
 
+// Simplified swap function for OpenCL kernel
+inline void swap_keys(__local cl_layout *lt, int row1, int col1, int row2, int col2) {
+    int temp = lt->matrix[row1][col1];
+    lt->matrix[row1][col1] = lt->matrix[row2][col2];
+    lt->matrix[row2][col2] = temp;
+}
+
 // Calculate monogram statistics
 inline void calculate_mono_stats(__local cl_layout *working,
                                  size_t local_id,
@@ -497,20 +504,47 @@ __kernel void improve_kernel(__constant float *linear_mono,
     __local cl_layout working;
     // Keep track of the best layout found by the workgroup
     __local cl_layout best_layout;
-    best_layout.score = -__builtin_inff();
 
     if (local_id == 0) {
         // Only the first worker in the group copies the layout from global to local memory
         copy_host_to_cl(&working, &layouts[group_id]);
+        best_layout.score = -INFINITY;
+        // Each thread modifies its layout (e.g., using shuffling or other logic)
+        shuffle_cl_layout(&working, &rng_state, global_id);
     }
     barrier(CLK_LOCAL_MEM_FENCE); // Ensure the copy is complete before proceeding
 
     for (int i = 0; i < REPETITIONS / THREADS; i++)
     {
-        if (local_id == 0) {
-            // Each thread modifies its layout (e.g., using shuffling or other logic)
-            shuffle_cl_layout(&working, &rng_state, global_id);
+        // Store swaps for potential reversal
+        int swap_rows1[MAX_SWAPS];
+        int swap_cols1[MAX_SWAPS];
+        int swap_rows2[MAX_SWAPS];
+        int swap_cols2[MAX_SWAPS];
+        // Make MAX_SWAPS number of swaps
+        if (local_id == 0) { // Only one work-item per group needs to perform swaps
             reps[get_group_id(0)] = i+1;
+            for (int j = 0; j < MAX_SWAPS; j++) {
+                int row1, col1, row2, col2;
+                do {
+                    // Generate random indices within the valid range
+                    row1 = pcg32(&rng_state) % ROW;
+                    col1 = pcg32(&rng_state) % COL;
+                    row2 = pcg32(&rng_state) % ROW;
+                    col2 = pcg32(&rng_state) % COL;
+
+                // Check for pins and ensure we don't swap the same key with itself
+                } while (pins[row1 * COL + col1] || pins[row2 * COL + col2] || (row1 == row2 && col1 == col2));
+
+                // Store swap locations
+                swap_rows1[j] = row1;
+                swap_cols1[j] = col1;
+                swap_rows2[j] = row2;
+                swap_cols2[j] = col2;
+
+                // Perform the swap
+                swap_keys(&working, row1, col1, row2, col2);
+            }
         }
         barrier(CLK_LOCAL_MEM_FENCE);
 
@@ -532,6 +566,13 @@ __kernel void improve_kernel(__constant float *linear_mono,
             {
                 copy_cl_to_cl(&best_layout, &working);
                 copy_cl_to_host(&layouts[group_id], &working);
+            }
+            else
+            {
+                // Revert the swaps
+                for (int j = MAX_SWAPS - 1; j >= 0; j--) {
+                    swap_keys(&working, swap_rows1[j], swap_cols1[j], swap_rows2[j], swap_cols2[j]);
+                }
             }
             //if (working.score > best_layout.score) {copy_cl_to_cl(&best_layout, &working);}
         }

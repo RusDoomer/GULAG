@@ -616,6 +616,14 @@ void cl_improve(int shuffle) {
     print_layout(lt);
     log_print('n', L"\n");
 
+    WORKERS = -1;
+    if (MONO_END > WORKERS) {WORKERS = MONO_END;}
+    if (BI_END > WORKERS) {WORKERS = BI_END;}
+    if (TRI_END > WORKERS) {WORKERS = TRI_END;}
+    if (QUAD_END > WORKERS) {WORKERS = QUAD_END;}
+    if (SKIP_END > WORKERS) {WORKERS = SKIP_END;}
+    if (WORKERS == -1) {error("Something went wrong with finding correct amount of work-items");}
+
     // OpenCL setup
     cl_platform_id *platforms;
     cl_uint num_platforms;
