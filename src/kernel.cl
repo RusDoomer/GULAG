@@ -508,9 +508,7 @@ __kernel void improve_kernel(__constant float *linear_mono,
     if (local_id == 0) {
         // Only the first worker in the group copies the layout from global to local memory
         copy_host_to_cl(&working, &layouts[group_id]);
-        best_layout.score = -INFINITY;
-        // Each thread modifies its layout (e.g., using shuffling or other logic)
-        shuffle_cl_layout(&working, &rng_state, global_id);
+        copy_cl_to_cl(&best_layout, &working);
     }
     barrier(CLK_LOCAL_MEM_FENCE); // Ensure the copy is complete before proceeding
 
@@ -565,7 +563,6 @@ __kernel void improve_kernel(__constant float *linear_mono,
             if (working.score > best_layout.score)
             {
                 copy_cl_to_cl(&best_layout, &working);
-                copy_cl_to_host(&layouts[group_id], &working);
             }
             else
             {
@@ -574,14 +571,13 @@ __kernel void improve_kernel(__constant float *linear_mono,
                     swap_keys(&working, swap_rows1[j], swap_cols1[j], swap_rows2[j], swap_cols2[j]);
                 }
             }
-            //if (working.score > best_layout.score) {copy_cl_to_cl(&best_layout, &working);}
         }
         barrier(CLK_LOCAL_MEM_FENCE);
     }
 
     barrier(CLK_GLOBAL_MEM_FENCE);
 
-    //if (local_id ==0) {
-    //    copy_cl_to_host(&layouts[group_id], &best_layout);
-    //}
+    if (local_id ==0) {
+        copy_cl_to_host(&layouts[group_id], &best_layout);
+    }
 }
