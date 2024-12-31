@@ -825,7 +825,7 @@ void cl_improve(int shuffle) {
     for (int i = 0; i < threads; i++) {reps_data[i] = 0;}
 
     /* Allocate and copy data to device buffers */
-    log_print('v', L"     Allocating and copying data to device buffers...\n");
+    log_print('v', L"     Allocating and copying data to device buffers...");
     cl_mem buffer_linear_mono = clCreateBuffer(context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, sizeof(float) * LANG_LENGTH, linear_mono, &err);
     if (err != CL_SUCCESS) {error("OpenCL Error: Failed to create buffer for linear_mono.");}
     cl_mem buffer_linear_bi = clCreateBuffer(context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, sizeof(float) * LANG_LENGTH * LANG_LENGTH, linear_bi, &err);
@@ -895,6 +895,8 @@ void cl_improve(int shuffle) {
     if (err != CL_SUCCESS) { error("OpenCL Error: Failed to set kernel argument 14."); }
     log_print('v', L"Done\n");
 
+    log_print('v', L"     Done\n\n");
+
     /* timing opencl execution time */
     struct timespec start, end;
     double elapsed;
@@ -914,6 +916,7 @@ void cl_improve(int shuffle) {
     log_print('v', L"     Waiting for kernel to finish... ");
     clFinish(queue);
     log_print('v', L"Done\n");
+    log_print('v', L"     Done\n\n");
 
     /* Read back the array of layouts from the buffer */
     err = clEnqueueReadBuffer(queue, buffer_layouts, CL_TRUE, 0, sizeof(layout) * threads, layouts, 0, NULL, NULL);
@@ -959,7 +962,7 @@ void cl_improve(int shuffle) {
     log_print('n',L"Done\n\n");
 
     /* Cleanup */
-    log_print('v', L"8/9: Cleaning up OpenCL...\n");
+    log_print('v', L"8/9: Cleaning up OpenCL...");
     clReleaseMemObject(buffer_linear_mono);
     clReleaseMemObject(buffer_linear_bi);
     clReleaseMemObject(buffer_linear_tri);
