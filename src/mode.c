@@ -1169,8 +1169,8 @@ void cl_gen_benchmark()
     log_print('n',L"Done\n\n");
 
     log_print('n',L"2/6: Planning runs... ");
-    int power_of_2 = 1;
-    int count = 16;
+    int power_of_2 = 16;
+    int count = 1;
 
     /* find the highest power of 2 that does not exceed the number of CPU threads */
     while (power_of_2 <= num_compute_units * 16) {
