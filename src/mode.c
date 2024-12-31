@@ -1169,11 +1169,12 @@ void cl_gen_benchmark()
     log_print('n',L"Done\n\n");
 
     log_print('n',L"2/6: Planning runs... ");
-    int power_of_2 = 16;
+    int starting_power = 16
+    int power_of_2 = starting_power;
     int count = 1;
 
     /* find the highest power of 2 that does not exceed the number of CPU threads */
-    while (power_of_2 <= num_compute_units * 16) {
+    while (power_of_2 <= num_compute_units * starting_power) {
         power_of_2 *= 2;
         count++;
     }
@@ -1186,7 +1187,7 @@ void cl_gen_benchmark()
     double *results = (double *)calloc(total, sizeof(double));
 
     /* fill in thread counts based on powers of 2 and cores */
-    thread_array[0] = 1;
+    thread_array[0] = starting_power;
     for (int i = 1; i < count; i++) {thread_array[i] = thread_array[i-1] * 2;}
     thread_array[count] = num_compute_units / 2;
     thread_array[count + 1] = num_compute_units;
