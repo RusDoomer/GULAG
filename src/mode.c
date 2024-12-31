@@ -936,7 +936,7 @@ void cl_improve(int shuffle) {
     alloc_layout(&best_layout);
     skeleton_copy(best_layout, lt);
     if (output_mode == 'v') {
-        log_print('v', L"\n\n PRINTING LAYOUTS\n\n");
+        log_print('v', L"\n\nPRINTING LAYOUTS\n\n");
         /* make output mode quiet so we don't spam */
         char temp = output_mode;
         output_mode = 'q';
@@ -1109,6 +1109,7 @@ void cl_gen_benchmark()
     cl_device_id device;
     cl_int err;
 
+    log_print('n',L"1/6: Setting up OpenCL... \n");
     /* Get all platforms */
     log_print('v', L"     Getting platforms... ");
     err = clGetPlatformIDs(0, NULL, &num_platforms);
@@ -1164,17 +1165,21 @@ void cl_gen_benchmark()
     log_print('v', L"     OpenCL Device Info:\n");
     log_print('v', L"       Device Name: %s\n", device_name);
     log_print('v', L"       Compute Units: %u\n", num_compute_units);
+
+    log_print('n',L"Done\n\n");
+
+    log_print('n',L"2/6: Planning runs... ");
     int power_of_2 = 1;
-    int count = 1;
+    int count = 16;
 
     /* find the highest power of 2 that does not exceed the number of CPU threads */
-    while (power_of_2 <= num_compute_units) {
+    while (power_of_2 <= num_compute_units * 16) {
         power_of_2 *= 2;
         count++;
     }
 
     /* for cpu threads */
-    int total = count + 3;
+    int total = count + 6;
 
     /* allocate arrays for test cases */
     int *thread_array = (int *)calloc(total, sizeof(int));
@@ -1186,12 +1191,17 @@ void cl_gen_benchmark()
     thread_array[count] = num_compute_units / 2;
     thread_array[count + 1] = num_compute_units;
     thread_array[count + 2] = num_compute_units * 2;
+    thread_array[count + 3] = num_compute_units * 4;
+    thread_array[count + 4] = num_compute_units * 8;
+    thread_array[count + 5] = num_compute_units * 16;
 
     /* print the tests to be done */
-    log_print('v',L"    Planned runs... ");
     for (int i = 0; i < total; i++) {log_print('v',L"%d ", thread_array[i]);}
-    log_print('v',L"\n\n");
+    log_print('v',L"\n");
+    log_print('n',L"Done\n\n");
 
+
+    log_print('n',L"3/6: Benchmarking... \n");
     /* temporarily set output mode to quiet */
     char temp = output_mode;
     output_mode = 'q';
@@ -1235,7 +1245,9 @@ void cl_gen_benchmark()
     }
     log_print('q',L"\n");
     log_print('q',L"Choose the lowest number of threads with acceptable Layouts/Second for best results.");
-    log_print('q',L"\n\n");
+    log_print('q',L"\n");
+    log_print('n',L"Done\n");
+    log_print('q',L"\n");
 
     /* free allocated memory */
     free(thread_array);
