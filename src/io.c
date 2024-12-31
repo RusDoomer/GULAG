@@ -223,7 +223,7 @@ void read_args(int argc, char **argv)
             /* util.c - error handling */
             error("Improper Usage: %s -l lang_name -c corpus_name "
                 "-1 layout_name -2 layout2_name -w weight_name -r repetitions "
-                "-t threads -m run_mode -o output_mode -b backen_mode");
+                "-t threads -m run_mode -o output_mode -b backend_mode");
         default:
             abort();
         }

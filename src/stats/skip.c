@@ -436,8 +436,7 @@ void initialize_skip_stats()
  * This is done by iterating through each statistic's ngrams array and
  * reordering elements to place all valid entries at the beginning
  * of the array. This process ensures memory efficiency by eliminating
- * gaps in the array. It is somewhat analagous to a correctional officer
- * ordering prisoners to form an orderly line, ensuring no gaps or disorder.
+ * gaps in the array.
  */
 void trim_skip_stats()
 {
@@ -497,8 +496,7 @@ int all_zeroes(skip_stat *stat)
 
 /*
  * Cleans the skipgram statistics linked list by removing statistics with zero length or zero weight.
- * This function ensures that only relevant statistics are kept for analysis,
- * similar to weeding out unnecessary files from a meticulously organized archive.
+ * This function ensures that only relevant statistics are kept for analysis.
  * It updates the SKIP_END global variable to reflect the new count of valid statistics.
  */
 void clean_skip_stats()
@@ -534,8 +532,7 @@ void clean_skip_stats()
 /*
  * Converts the linked list of skipgram statistics to a contiguous array for easier access.
  * This function allocates memory for an array of skip_stat structures and copies
- * data from the linked list to the array. This is akin to transferring data from
- * individual files to a consolidated ledger for streamlined processing.
+ * data from the linked list to the array.
  */
 void skip_to_array()
 {
@@ -551,8 +548,7 @@ void skip_to_array()
 
 /*
  * Frees the memory allocated for the skipgram statistics linked list.
- * This function iterates through the list, freeing each node's memory,
- * similar to the careful archiving of documents that are no longer needed.
+ * This function iterates through the list, freeing each node's memory.
  */
 void free_skip_stats()
 {
