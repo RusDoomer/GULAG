@@ -34,7 +34,7 @@ Bad Right Middle Bigram : 0
 Bad Right Ring Bigram : -5
 Bad Right Pinky Bigram : -10
 Full Russor Bigram : -2.5
-Half Russor Bigram : 0
+Half Russor Bigram : -0.5
 Index Stretch Bigram : -2.5
 Pinky Stretch Bigram : -5
 Same Finger Trigram : -25
@@ -136,7 +136,7 @@ Chained Roll In : 0
 Chained Roll Out : 0
 Chained Roll Mix : 0
 Same Row Chained Roll : 0
-Same Row Chained Roll In : 10
+Same Row Chained Roll In : 0
 Same Row Chained Roll Out : 0
 Same Row Chained Roll Mix : 0
 Adjacent Finger Chained Roll : 0

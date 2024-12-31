@@ -223,13 +223,15 @@ void rank() {
             /* util.c - frees the memory occupied by a layout data structure */
             log_print('n',L"Freeing... ");
             free_layout(lt);
-            log_print('n',L"Done\n\n");
+            log_print('n',L"Done\n");
             layouts_analyzed++;
         }
     }
+    log_print('n',L"\n");
 
     /* io.c - print the ranked list of layouts */
     print_ranking();
+    log_print('q',L"Done\n\n");
 
     /* Reset layout_name to a safe state */
     layout_name = (char *)malloc(1);
@@ -1310,7 +1312,7 @@ void print_info() {
     struct timespec compute_start, compute_end;
     clock_gettime(CLOCK_MONOTONIC, &compute_start);
 
-    log_print('q',L"Welcome to GULAG v1.0\n");
+    log_print('q',L"Welcome to GULAG v1.0\n\n");
     return;
 
     clock_gettime(CLOCK_MONOTONIC, &compute_end);

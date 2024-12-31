@@ -463,11 +463,11 @@ int main(int argc, char **argv) {
     log_print('q',L"----- Shut Down Complete : %.9lf seconds -----\n\n", elapsed);
 
     if (elapsed_compute_time == 0) {elapsed_compute_time = 1;}
-    log_print('q',L"Layouts per second........................: %lf\n", layouts_analyzed / elapsed_compute_time);
+    log_print('n',L"Layouts per second........................: %lf\n", layouts_analyzed / elapsed_compute_time);
 
     clock_gettime(CLOCK_MONOTONIC, &full_end);
     double elapsed_total = (full_end.tv_sec - full_start.tv_sec) + (full_end.tv_nsec - full_start.tv_nsec) / 1e9;
-    log_print('q',L"Layouts per second w/ startup and shutdown: %lf\n\n", layouts_analyzed / elapsed_total);
+    log_print('n',L"Layouts per second w/ startup and shutdown: %lf\n\n", layouts_analyzed / elapsed_total);
     log_print('q',L"You are free to go.\n\n");
     return 0;
 }
