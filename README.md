@@ -120,7 +120,7 @@ To rank all layouts in a language directory, use the `r` mode argument:
 
 ### Generating Layouts
 
-To generate a new layout, use the `g` mode argumen:
+To generate a new layout, use the `g` mode argument:
 
 ```bash
 ./gulag -m g -b <backend> -l <language> -c <corpus> -w <weights> -r <repetitions> -t <threads>
@@ -157,7 +157,7 @@ Each language has its own subdirectory under `data/`, named after the language (
 
 ### Corpora
 
-Corpora are text files located within the `data/<language>/corpora` directory. They are essential for providing the raw data from which n-gram frequencies are calculated. Each corpus represents a collection of text in a specific language. The first time a corpora is used GULAG will create a cache to increase processing times on future uses of the same corpus.
+Corpora are text files located within the `data/<language>/corpora` directory. They are essential for providing the raw data from which n-gram frequencies are calculated. Each corpus represents a collection of text in a specific language. The first time a corpus is used GULAG will create a cache to increase processing times on future uses of the same corpus.
 
 ### Layouts
 
