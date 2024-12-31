@@ -789,7 +789,7 @@ void cl_improve(int shuffle) {
     /* Compiler options to pass constants to the kernel using compiler flags */
     /* Ensure this is large enough for all defines */
     char options[512];
-    sprintf(options, "-cl-fast-relaxed-math -D MONO_END=%d -D BI_END=%d -D TRI_END=%d -D QUAD_END=%d -D SKIP_END=%d -D META_END=%d -D THREADS=%d -D REPETITIONS=%d -D MAX_SWAPS=%d -D WORKERS=%d -D LEFT_HAND=%d -D RIGHT_HAND=%d",
+    sprintf(options, "-Iinclude -cl-fast-relaxed-math -D MONO_END=%d -D BI_END=%d -D TRI_END=%d -D QUAD_END=%d -D SKIP_END=%d -D META_END=%d -D THREADS=%d -D REPETITIONS=%d -D MAX_SWAPS=%d -D WORKERS=%d -D LEFT_HAND=%d -D RIGHT_HAND=%d",
             MONO_END, BI_END, TRI_END, QUAD_END, SKIP_END, META_END, threads, repetitions, MAX_SWAPS, WORKERS, index_left_hand_usage, index_right_hand_usage);
 
     err = clBuildProgram(program, 1, &device, options, NULL, NULL);

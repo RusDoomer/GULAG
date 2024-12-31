@@ -8,7 +8,7 @@
  */
 
 
-#include "structs.h"
+#include "include/structs.h"
 
 #define ROW 3
 #define COL 12
