@@ -1018,6 +1018,7 @@ void gen_benchmark()
     int power_of_2 = 1;
     int count = 1;
 
+    log_print('n',L"1/2: Planning runs... ");
     /* find the highest power of 2 that does not exceed the number of CPU threads */
     while (power_of_2 <= num_cpus) {
         power_of_2 *= 2;
@@ -1039,10 +1040,11 @@ void gen_benchmark()
     thread_array[count + 2] = num_cpus * 2;
 
     /* print the tests to be done */
-    log_print('v',L"Planned runs... ");
     for (int i = 0; i < total; i++) {log_print('v',L"%d ", thread_array[i]);}
-    log_print('v',L"\n\n");
+    log_print('v',L"\n");
+    log_print('n',L"Done\n\n");
 
+    log_print('n',L"2/2: Benchmarking... \n");
     /* temporarily set output mode to quiet */
     char temp = output_mode;
     output_mode = 'q';
@@ -1085,8 +1087,7 @@ void gen_benchmark()
         log_print('q',L"%7d - %lf\n", thread_array[i], results[i]);
     }
     log_print('q',L"\n");
-    log_print('q',L"Choose the lowest number of threads with acceptable Layouts/Second for best results.");
-    log_print('q',L"\n\n");
+    log_print('q',L"Choose the lowest number of threads with acceptable Layouts/Second for best results.\n\n");
 
     /* free allocated memory */
     free(thread_array);
@@ -1109,7 +1110,7 @@ void cl_gen_benchmark()
     cl_device_id device;
     cl_int err;
 
-    log_print('n',L"1/6: Setting up OpenCL... \n");
+    log_print('n',L"1/3: Setting up OpenCL... \n");
     /* Get all platforms */
     log_print('v', L"     Getting platforms... ");
     err = clGetPlatformIDs(0, NULL, &num_platforms);
@@ -1168,8 +1169,8 @@ void cl_gen_benchmark()
 
     log_print('n',L"Done\n\n");
 
-    log_print('n',L"2/6: Planning runs... ");
-    int starting_power = 16
+    log_print('n',L"2/3: Planning runs... ");
+    int starting_power = 16;
     int power_of_2 = starting_power;
     int count = 1;
 
@@ -1202,7 +1203,7 @@ void cl_gen_benchmark()
     log_print('n',L"Done\n\n");
 
 
-    log_print('n',L"3/6: Benchmarking... \n");
+    log_print('n',L"3/3: Benchmarking... \n");
     /* temporarily set output mode to quiet */
     char temp = output_mode;
     output_mode = 'q';
@@ -1245,10 +1246,7 @@ void cl_gen_benchmark()
         log_print('q',L"%7d - %lf\n", thread_array[i], results[i]);
     }
     log_print('q',L"\n");
-    log_print('q',L"Choose the lowest number of threads with acceptable Layouts/Second for best results.");
-    log_print('q',L"\n");
-    log_print('n',L"Done\n");
-    log_print('q',L"\n");
+    log_print('q',L"Choose the lowest number of threads with acceptable Layouts/Second for best results.\n\n");
 
     /* free allocated memory */
     free(thread_array);
@@ -1328,8 +1326,24 @@ void print_info() {
     struct timespec compute_start, compute_end;
     clock_gettime(CLOCK_MONOTONIC, &compute_start);
 
-    log_print('q',L"Welcome to GULAG v1.0\n\n");
-    return;
+    log_print('q', L"Welcome to GULAG v1.0\n\n");
+    log_print('q', L"GULAG is a tool designed to analyze and optimize keyboard layouts based on statistical analysis of language corpora.\n\n");
+    log_print('q', L"It evaluates layouts using various ngram metrics:\n");
+    log_print('q', L"  - Monogram, Bigram, Trigram, Quadgram, and Skipgram statistics\n");
+    log_print('q', L"  - Same Row, Adjacent Finger, and Directional metrics\n\n");
+    log_print('q', L"GULAG can be used to:\n");
+    log_print('q', L"  - Analyze existing layouts\n");
+    log_print('q', L"  - Compare two layouts\n");
+    log_print('q', L"  - Rank multiple layouts\n");
+    log_print('q', L"  - Generate new layouts using a simulated annealing algorithm\n");
+    log_print('q', L"  - Improve existing layouts through optimization\n");
+    log_print('q', L"  - Benchmark different settings for optimal performance\n\n");
+    log_print('q', L"Key features:\n");
+    log_print('q', L"  - Multithreading support for faster processing\n");
+    log_print('q', L"  - OpenCL support for GPU acceleration\n");
+    log_print('q', L"  - Customizable weights for different statistics\n");
+    log_print('q', L"  - Configurable options via command line and config.conf\n\n");
+    log_print('q', L"To get started, use the \"-m h\" flag for help on command line arguments or run the default benchmark with \"-m b\".\n\n");
 
     clock_gettime(CLOCK_MONOTONIC, &compute_end);
     elapsed_compute_time += (compute_end.tv_sec - compute_start.tv_sec) + (compute_end.tv_nsec - compute_start.tv_nsec) / 1e9;
