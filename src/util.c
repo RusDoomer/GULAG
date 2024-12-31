@@ -1,10 +1,10 @@
 /*
- * util.c - Utility functions for the GULAG project.
+ * util.c - Utility functions for the GULAG.
  *
  * Author: Rus Doomer
  *
  * Description: This file contains various utility functions used throughout
- *              the GULAG project, including error handling, data structure
+ *              the GULAG, including error handling, data structure
  *              manipulation, and other generic helper functions.
  */
 
@@ -16,6 +16,7 @@
 
 #include "util.h"
 #include "global.h"
+#include "structs.h"
 #include "io.h"
 #include "io_util.h"
 
@@ -566,6 +567,26 @@ void copy(layout *lt_dest, layout *lt_src)
             lt_dest->skip_score[j][i] = lt_src->skip_score[j][i];
         }
     }
+}
+
+/*
+ * Copies the matrix, name, and overall score only of one layout to another.
+ * Parameters:
+ *   lt_dest: Pointer to the destination layout.
+ *   lt_src: Pointer to the source layout.
+ * Returns: void.
+ */
+void skeleton_copy(layout *lt_dest, layout *lt_src)
+{
+    strcpy(lt_dest->name, lt_src->name);
+    for (int i = 0; i < ROW; i++)
+    {
+        for (int j = 0; j < COL; j++)
+        {
+            lt_dest->matrix[i][j] = lt_src->matrix[i][j];
+        }
+    }
+    lt_dest->score = lt_src->score;
 }
 
 /*

@@ -2,7 +2,7 @@
 
 ## Overview
 
-GULAG is a GPU-accelerated keyboard layout optimizer designed to analyze and generate keyboard layouts based on n-gram frequency analysis. It leverages the power of OpenCL to perform computations in parallel, significantly speeding up the process of finding optimal layouts.
+GULAG is a GPU-accelerated keyboard layout optimizer designed to analyze and generate keyboard layouts based on n-gram frequency analysis. It leverages the power of OpenCL to perform computations in parallel, possibly speeding up the process of finding optimal layouts.
 
 ## Table of Contents
 
@@ -31,7 +31,7 @@ GULAG is a GPU-accelerated keyboard layout optimizer designed to analyze and gen
 
 ## Features
 
--   **GPU Acceleration:** (FUTURE) Utilizes OpenCL for parallel computation, enabling faster analysis and generation of keyboard layouts.
+-   **GPU Acceleration:** Utilizes OpenCL for parallel computation, enabling faster analysis and generation of keyboard layouts.
 -   **N-gram Analysis:** Supports analysis based on monograms, bigrams, trigrams, quadgrams, and skipgrams.
 -   **Multiple Modes:** Offers various modes of operation, including analysis, comparison, ranking, generation, and optimization of layouts.
 -   **Language Support:** Designed to work with different languages, each with its own set of characters and corpus data.
@@ -41,25 +41,24 @@ GULAG is a GPU-accelerated keyboard layout optimizer designed to analyze and gen
 
 ### Prerequisites
 
--   A system with OpenCL-compatible GPU and drivers.
+-   A linux system with OpenCL-compatible device and appropriate drivers.
 -   OpenCL development package (e.g., `opencl-headers`, `ocl-icd-opencl-dev`).
 -   A C compiler (e.g., GCC).
 -   `make` utility for building the project.
--   `getopt` for command line arguments parsing.
 
 ### Installation
 
 1. Clone the repository:
 
     ```bash
-    git clone https://github.com/your-username/GULAG.git
+    git clone https://github.com/RusDoomer/GULAG.git
     cd GULAG
     ```
 
 2. Compile the project:
 
     ```bash
-    make
+    make clean && make
     ```
 
 ## Usage
@@ -74,12 +73,13 @@ The `config.conf` file allows you to set default parameters for the program. You
 -   `layout`: Default primary layout.
 -   `layout2`: Default secondary layout.
 -   `weights`: Default weights file.
--   `run_mode`: Default running mode ('a', 'c', 'r', 'g', 'i', 'b', 'h', 'f').
+-   `run_mode`: Default running mode (see [Running Modes](#running-modes)).
 -   `repetitions`: Number of iterations for generation/improvement.
 -   `threads`: Number of threads for parallel execution.
--   `output_mode`: Verbosity level ('q', 'n', 'v').
+-   `output_mode`: Verbosity level ('q' (quiet), 'n' (normal), 'v' (verbose)).
+-   `backend_mode`: Which backend to use for optimization ('c' (cpu), 'o' (opencl)).
 
-Command line arguments can override these settings.
+Command line arguments can override all of these settings, except `pins`.
 
 ### Running Modes
 The program supports the following running modes, selectable via the `-m` option:
@@ -123,7 +123,7 @@ To rank all layouts in a language directory, use the `r` mode argument:
 To generate a new layout, use the `g` mode argumen:
 
 ```bash
-./gulag -m g -l <language> -c <corpus> -w <weights> -r <repetitions> -t <threads>
+./gulag -m g -b <backend> -l <language> -c <corpus> -w <weights> -r <repetitions> -t <threads>
 ```
 
 ### Improving Layouts
@@ -131,7 +131,7 @@ To generate a new layout, use the `g` mode argumen:
 To improve an existing layout, use the `i` mode argument:
 
 ```bash
-./gulag -m i -l <language> -1 <layout> -c <corpus> -w <weights> -r <repetitions> -t <threads>
+./gulag -m i -b <backend> -l <language> -1 <layout> -c <corpus> -w <weights> -r <repetitions> -t <threads>
 ```
 You can use the config.conf file to specify pinned keys that should not be changed during optimization.
 
@@ -140,7 +140,7 @@ You can use the config.conf file to specify pinned keys that should not be chang
 To benchmark and find the optimal number of threads, use the `b` mode argument:
 
 ```bash
-./gulag -m b -l <language> -c <corpus> -w <weights>
+./gulag -m b -b <backend> -l <language> -c <corpus> -w <weights>
 ```
 
 ## Data

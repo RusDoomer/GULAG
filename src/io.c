@@ -1,10 +1,10 @@
 /*
- * io.c - Input/output operations for the GULAG project.
+ * io.c - Input/output operations for the GULAG.
  *
  * Author: Rus Doomer
  *
  * Description: This file handles file operations, argument parsing,
- *              and user interaction for the GULAG project. It includes functions
+ *              and user interaction for the GULAG. It includes functions
  *              for reading configuration files, processing command-line arguments,
  *              handling corpus data, and managing layout input/output.
  */
@@ -21,6 +21,7 @@
 #include "io_util.h"
 #include "util.h"
 #include "global.h"
+#include "structs.h"
 
 #define UNICODE_MAX 65535
 #define BUFFER_SIZE 10000
@@ -61,7 +62,7 @@ void log_print(char required_level, const wchar_t *format, ...) {
  * This function parses 'config.conf' to initialize various settings
  * such as pinned key positions, language, corpus, layout names,
  * weights file, run mode, number of repetitions, number of threads,
- * and output mode.
+ * output mode, and backend mode.
  *
  * Returns: void.
  */
@@ -84,7 +85,9 @@ void read_config()
     int i = 0;
 
     /* Read and set pinned key positions. */
-    fscanf(config, " %s", discard);
+    if (fscanf(config, " %s", discard) != 1) {
+        error("Failed to read from config file.");
+    }
     if (strcmp(discard, "pins:") != 0) {
         error("Expected 'pins:' at the start of the config file.");
     }
@@ -99,39 +102,63 @@ void read_config()
     }
 
     /* Read and set various parameters from the configuration file. */
-    fscanf(config, "%s %s", discard, buff);
+    if (fscanf(config, "%s %s", discard, buff) != 2) {
+        error("Failed to read language name from config file.");
+    }
     lang_name = (char *)malloc((sizeof(char) * strlen(buff)) + 1);
     strcpy(lang_name, buff);
 
-    fscanf(config, "%s %s", discard, buff);
+    if (fscanf(config, "%s %s", discard, buff) != 2) {
+        error("Failed to read corpus name from config file.");
+    }
     corpus_name = (char *)malloc((sizeof(char) * strlen(buff)) + 1);
     strcpy(corpus_name, buff);
 
-    fscanf(config, "%s %s", discard, buff);
+    if (fscanf(config, "%s %s", discard, buff) != 2) {
+        error("Failed to read layout name from config file.");
+    }
     layout_name = (char *)malloc((sizeof(char) * strlen(buff)) + 1);
     strcpy(layout_name, buff);
 
-    fscanf(config, "%s %s", discard, buff);
+    if (fscanf(config, "%s %s", discard, buff) != 2) {
+        error("Failed to read layout2 name from config file.");
+    }
     layout2_name = (char *)malloc((sizeof(char) * strlen(buff)) + 1);
     strcpy(layout2_name, buff);
 
-    fscanf(config, "%s %s", discard, buff);
+    if (fscanf(config, "%s %s", discard, buff) != 2) {
+        error("Failed to read weight name from config file.");
+    }
     weight_name = (char *)malloc((sizeof(char) * strlen(buff)) + 1);
     strcpy(weight_name, buff);
 
     /* io_util.c - validates and converts run mode */
-    fscanf(config, "%s %s", discard, buff);
+    if (fscanf(config, "%s %s", discard, buff) != 2) {
+        error("Failed to read run mode from config file.");
+    }
     run_mode = check_run_mode(buff);
 
-    fscanf(config, "%s %s", discard, buff);
+    if (fscanf(config, "%s %s", discard, buff) != 2) {
+        error("Failed to read repetitions from config file.");
+    }
     repetitions = atoi(buff);
 
-    fscanf(config, "%s %s", discard, buff);
+    if (fscanf(config, "%s %s", discard, buff) != 2) {
+        error("Failed to read threads from config file.");
+    }
     threads = atoi(buff);
 
     /* io_util.c - validates and converts output mode */
-    fscanf(config, "%s %s", discard, buff);
+    if (fscanf(config, "%s %s", discard, buff) != 2) {
+        error("Failed to read output mode from config file.");
+    }
     output_mode = check_output_mode(buff);
+
+    /* io_util.c - validates and converts backend mode */
+    if (fscanf(config, "%s %s", discard, buff) != 2) {
+        error("Failed to read backend mode from config file.");
+    }
+    backend_mode = check_backend_mode(buff);
 
     fclose(config);
 }
@@ -140,7 +167,8 @@ void read_config()
  * Processes command line arguments to override configuration settings.
  * It parses arguments passed to the main function and updates
  * corresponding global variables such as language name, corpus name,
- * layout names, weight file, repetitions, threads, run mode, and output mode.
+ * layout names, weight file, repetitions, threads, run mode, output mode,
+ * and backend mode.
  *
  * Parameters:
  *   argc: The number of command line arguments.
@@ -151,7 +179,7 @@ void read_args(int argc, char **argv)
 {
     int opt;
     /* Parse command line arguments. */
-    while ((opt = getopt(argc, argv, "l:c:1:2:w:r:t:m:o:")) != -1) {
+    while ((opt = getopt(argc, argv, "l:c:1:2:w:r:t:m:o:b:")) != -1) {
     switch (opt) {
         case 'l':
             free(lang_name);
@@ -187,11 +215,15 @@ void read_args(int argc, char **argv)
             /* io_util.c - validates and converts output mode */
             output_mode = check_output_mode(optarg);
             break;
+        case 'b':
+            /* io_util.c - validates and converts backend mode */
+            backend_mode = check_backend_mode(optarg);
+            break;
         case '?':
             /* util.c - error handling */
             error("Improper Usage: %s -l lang_name -c corpus_name "
                 "-1 layout_name -2 layout2_name -w weight_name -r repetitions "
-                "-t threads -m run_mode -o output_mode");
+                "-t threads -m run_mode -o output_mode -b backen_mode");
         default:
             abort();
         }
@@ -223,8 +255,12 @@ void check_setup()
     {
         error("invalid output mode selected");
     }
+    if (backend_mode != 'c' && backend_mode != 'o')
+    {
+        error("invalid backend mode selected");
+    }
     if (threads < 1) {error("invalid threads selected");}
-    if (repetitions < 1) {error("invalid repetitions selected");}
+    if (repetitions < threads) {error("invalid repetitions selected");}
 }
 
 /*
@@ -729,7 +765,7 @@ void quiet_print(layout *lt)
         log_print('q',L"\n");
     }
 
-    log_print('q',L"score : %f\n", lt->score);
+    log_print('q',L"score : %f\n\n", lt->score);
     return;
 }
 

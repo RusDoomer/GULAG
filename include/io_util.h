@@ -2,6 +2,7 @@
 #define IO_UTIL_H
 
 #include "global.h"
+#include "structs.h"
 
 /*
  * Converts a character to its corresponding index in the language array.
@@ -51,5 +52,13 @@ char check_run_mode(char *optarg);
  * Returns: The character representing the validated output mode, or 'n' if invalid.
  */
 char check_output_mode(char *optarg);
+
+/*
+ * Validates and converts a backend mode string to its corresponding character representation.
+ * Parameters:
+ *   optarg: The string representing the backend mode.
+ * Returns: The character representing the validated output mode, or 'c' if invalid.
+ */
+char check_backend_mode(char *optarg);
 
 #endif

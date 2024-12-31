@@ -1,0 +1,168 @@
+Left Outer Usage : 1
+Left Pinky Usage : 1
+Left Ring Usage : 1
+Left Middle Usage : 1
+Left Index Usage : 1
+Left Inner Usage : 1
+Right Inner Usage : 1
+Right Index Usage : 1
+Right Middle Usage : 1
+Right Ring Usage : 1
+Right Pinky Usage : 1
+Right Outer Usage : 1
+Left Hand Usage : 1
+Right Hand Usage : 1
+Top Row Usage : 1
+Home Row Usage : 1
+Bottom Row Usage : 1
+Same Finger Bigram : 1
+Left Pinky Bigram : 1
+Left Ring Bigram : 1
+Left Middle Bigram : 1
+Left Index Bigram : 1
+Right Index Bigram : 1
+Right Middle Bigram : 1
+Right Ring Bigram : 1
+Right Pinky Bigram : 1
+Bad Same Finger Bigram : 1
+Bad Left Pinky Bigram : 1
+Bad Left Ring Bigram : 1
+Bad Left Middle Bigram : 1
+Bad Left Index Bigram : 1
+Bad Right Index Bigram : 1
+Bad Right Middle Bigram : 1
+Bad Right Ring Bigram : 1
+Bad Right Pinky Bigram : 1
+Full Russor Bigram : 1
+Half Russor Bigram : 1
+Index Stretch Bigram : 1
+Pinky Stretch Bigram : 1
+Same Finger Trigram : 1
+Redirect : 1
+Bad Redirect : 1
+Alternation : 1
+Alternation In : 1
+Alternation Out : 1
+Same Row Alternation : 1
+Same Row Alternation In : 1
+Same Row Alternation Out : 1
+Adjacent Finger Alternation : 1
+Adjacent Finger Alternation In : 1
+Adjacent Finger Alternation Out : 1
+Same Row Adjacent Finger Alternation : 1
+Same Row Adjacent Finger Alternation In : 1
+Same Row Adjacent Finger Alternation Out : 1
+One Hand : 1
+One Hand In : 1
+One Hand Out : 1
+Same Row One Hand : 1
+Same Row One Hand In : 1
+Same Row One Hand Out : 1
+Adjacent Finger One Hand : 1
+Adjacent Finger One Hand In : 1
+Adjacent Finger One Hand Out : 1
+Same Row Adjacent Finger One Hand : 1
+Same Row Adjacent Finger One Hand In : 1
+Same Row Adjacent Finger One Hand Out : 1
+Roll : 1
+Roll In : 1
+Roll Out : 1
+Same Row Roll : 1
+Same Row Roll In : 1
+Same Row Roll Out : 1
+Adjacent Finger Roll : 1
+Adjacent Finger Roll In : 1
+Adjacent Finger Roll Out : 1
+Same Row Adjacent Finger Roll : 1
+Same Row Adjacent Finger Roll In : 1
+Same Row Adjacent Finger Roll Out : 1
+Same Finger Quadgram : 1
+Chained Redirect : 1
+Bad Chained Redirect : 1
+Chained Alternation : 1
+Chained Alternation In : 1
+Chained Alternation Out : 1
+Chained Alternation Mix : 1
+Same Row Chained Alternation : 1
+Same Row Chained Alternation In : 1
+Same Row Chained Alternation Out : 1
+Same Row Chained Alternation Mix : 1
+Adjacent Finger Chained Alternation : 1
+Adjacent Finger Chained Alternation In : 1
+Adjacent Finger Chained Alternation Out : 1
+Adjacent Finger Chained Alternation Mix : 1
+Same Row Adjacent Finger Chained Alternation : 1
+Same Row Adjacent Finger Chained Alternation In : 1
+Same Row Adjacent Finger Chained Alternation Out : 1
+Same Row Adjacent Finger Chained Alternation Mix : 1
+Quad One Hand : 1
+Quad One Hand In : 1
+Quad One Hand Out : 1
+Quad Same Row One Hand : 1
+Quad Same Row One Hand In : 1
+Quad Same Row One Hand Out : 1
+Quad Adjacent Finger One Hand : 1
+Quad Adjacent Finger One Hand In : 1
+Quad Adjacent Finger One Hand Out : 1
+Quad Same Row Adjacent Finger One Hand : 1
+Quad Same Row Adjacent Finger One Hand In : 1
+Quad Same Row Adjacent Finger One Hand Out : 1
+Quad Roll : 1
+Quad Roll In : 1
+Quad Roll Out : 1
+Quad Same Row Roll : 1
+Quad Same Row Roll In : 1
+Quad Same Row Roll Out : 1
+Quad Adjacent Finger Roll : 1
+Quad Adjacent Finger Roll In : 1
+Quad Adjacent Finger Roll Out : 1
+Quad Same Row Adjacent Finger Roll : 1
+Quad Same Row Adjacent Finger Roll In : 1
+Quad Same Row Adjacent Finger Roll Out : 1
+True Roll : 1
+True Roll In : 1
+True Roll Out : 1
+Same Row True Roll : 1
+Same Row True Roll In : 1
+Same Row True Roll Out : 1
+Adjacent Finger True Roll : 1
+Adjacent Finger True Roll In : 1
+Adjacent Finger True Roll Out : 1
+Same Row Adjacent Finger True Roll : 1
+Same Row Adjacent Finger True Roll In : 1
+Same Row Adjacent Finger True Roll Out : 1
+Chained Roll : 1
+Chained Roll In : 1
+Chained Roll Out : 1
+Chained Roll Mix : 1
+Same Row Chained Roll : 1
+Same Row Chained Roll In : 1
+Same Row Chained Roll Out : 1
+Same Row Chained Roll Mix : 1
+Adjacent Finger Chained Roll : 1
+Adjacent Finger Chained Roll In : 1
+Adjacent Finger Chained Roll Out : 1
+Adjacent Finger Chained Roll Mix : 1
+Same Row Adjacent Finger Chained Roll : 1
+Same Row Adjacent Finger Chained Roll In : 1
+Same Row Adjacent Finger Chained Roll Out : 1
+Same Row Adjacent Finger Chained Roll Mix : 1
+Same Finger Skipgram : 1 1 1 1 1 1 1 1 1
+Left Pinky Skipgram : 1 1 1 1 1 1 1 1 1
+Left Ring Skipgram : 1 1 1 1 1 1 1 1 1
+Left Middle Skipgram : 1 1 1 1 1 1 1 1 1
+Left Index Skipgram : 1 1 1 1 1 1 1 1 1
+Right Index Skipgram : 1 1 1 1 1 1 1 1 1
+Right Middle Skipgram : 1 1 1 1 1 1 1 1 1
+Right Ring Skipgram : 1 1 1 1 1 1 1 1 1
+Right Pinky Skipgram : 1 1 1 1 1 1 1 1 1
+Bad Same Finger Skipgram : 1 1 1 1 1 1 1 1 1
+Bad Left Pinky Skipgram : 1 1 1 1 1 1 1 1 1
+Bad Left Ring Skipgram : 1 1 1 1 1 1 1 1 1
+Bad Left Middle Skipgram : 1 1 1 1 1 1 1 1 1
+Bad Left Index Skipgram : 1 1 1 1 1 1 1 1 1
+Bad Right Index Skipgram : 1 1 1 1 1 1 1 1 1
+Bad Right Middle Skipgram : 1 1 1 1 1 1 1 1 1
+Bad Right Ring Skipgram : 1 1 1 1 1 1 1 1 1
+Bad Right Pinky Skipgram : 1 1 1 1 1 1 1 1 1
+Hand Balance : 1

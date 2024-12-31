@@ -1,5 +1,5 @@
 /*
- * stats.c - Statistic management for the GULAG project.
+ * stats.c - Statistic management for the GULAG.
  *
  * Author: Rus Doomer
  *
@@ -20,11 +20,8 @@
 #include "meta.h"
 
 #include "global.h"
+#include "structs.h"
 #include "io.h"
-#include <stdio.h>
-#include <stdlib.h>
-#include <locale.h>
-#include <time.h>
 
 /*
  * Initializes all statistical data structures for the GULAG.
@@ -39,6 +36,7 @@ void initialize_stats()
      * stats/mono.c - initializes linked list for monogram stats
      *                trims the length of the linked list
      */
+    log_print('v',L"\n");
     log_print('v',L"     Initializing monogram stats... ");
     initialize_mono_stats();
     log_print('v',L"trimming monogram stats... ");

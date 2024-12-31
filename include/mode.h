@@ -50,12 +50,37 @@ void generate();
 void improve(int shuffle);
 
 /*
- * Performs a benchmark to determine the optimal number of threads for layout generation.
+ * Generates a new layout using OpenCL.
+ *
+ * Returns: void.
+ */
+void cl_generate();
+
+/*
+ * Improves an existing layout using OpenCL.
+ *
+ * Parameters:
+ *   shuffle: A flag indicating whether to shuffle the layout before starting (1) or not (0).
+ *
+ * Returns: void.
+ */
+void cl_improve(int shuffle);
+
+/*
+ * Performs a benchmark to determine the optimal number of threads for layout generation on pure cpu.
  * It runs the generation process with different numbers of threads and measures performance.
  *
  * Returns: void.
  */
 void gen_benchmark();
+
+/*
+ * Performs a benchmark to determine the optimal number of threads for layout generation on opencl.
+ * It runs the generation process with different numbers of threads and measures performance.
+ *
+ * Returns: void.
+ */
+void cl_gen_benchmark();
 
 /*
  * Prints a help message providing usage instructions for the program's command line arguments.
@@ -65,7 +90,7 @@ void gen_benchmark();
 void print_help();
 
 /*
- * Prints an introductory message and information about the GULAG project.
+ * Prints an introductory message and information about the GULAG.
  *
  * Returns: void.
  */

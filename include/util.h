@@ -2,6 +2,7 @@
 #define UTIL_H
 
 #include "global.h"
+#include "structs.h"
 
 /*
  * Error handling function.
@@ -197,6 +198,15 @@ void shuffle_layout(layout *lt);
  * Returns: void.
  */
 void copy(layout *lt_dest, layout *lt_src);
+
+/*
+ * Copies the matrix, name, and overall score only of one layout to another.
+ * Parameters:
+ *   lt_dest: Pointer to the destination layout.
+ *   lt_src: Pointer to the source layout.
+ * Returns: void.
+ */
+void skeleton_copy(layout *lt_dest, layout *lt_src);
 
 /*
  * Generates a random float between 0 and 1.

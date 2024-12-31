@@ -1,10 +1,10 @@
 /*
- * global.c - Global variable definitions and constants for the GULAG project.
+ * global.c - Global variable definitions and constants for the GULAG.
  *
  * Author: Rus Doomer
  *
  * Description: This file contains the definitions of global variables and constants used
- *              throughout the GULAG project. These variables manage configuration settings,
+ *              throughout the GULAG. These variables manage configuration settings,
  *              language data, corpus statistics, and layout information. Management
  *              of these resources is crucial for the efficient operation of the GULAG.
  */
@@ -12,6 +12,7 @@
 #include <wchar.h>
 
 #include "global.h"
+#include "structs.h"
 
 /* Defining dimensions for the layout grid. */
 #define row 3
@@ -34,6 +35,9 @@ int DIM1 = dim1;
 int DIM2 = dim2;
 int DIM3 = dim3;
 int DIM4 = dim4;
+
+int MAX_SWAPS = dim1 / 2;
+int WORKERS = 16;
 
 /*
  * Number of tracked statistics for each ngram type.
@@ -59,6 +63,10 @@ char run_mode = 'a';
 int repetitions = 10000;
 int threads = 8;
 char output_mode = 'v';
+char backend_mode = 'c';
+
+double layouts_analyzed = 0;
+double elapsed_compute_time = 0;
 
 /* The selected language's character set. */
 wchar_t *lang_arr;

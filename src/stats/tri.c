@@ -1,5 +1,5 @@
 /*
- * stats/tri.c - Trigram statistic definitions for the GULAG project.
+ * stats/tri.c - Trigram statistic definitions for the GULAG.
  *
  * Author: Rus Doomer
  *
@@ -29,6 +29,7 @@
 #include "util.h"
 #include "stats_util.h"
 #include "global.h"
+#include "structs.h"
 
 
 /*
@@ -65,27 +66,8 @@ void initialize_tri_stats()
     }
 
     /* standard trigram stats after this */
-    tri_stat *alt = (tri_stat *)malloc(sizeof(tri_stat));
-    same_finger->next = alt;
-    strcpy(alt->name, "Alternation");
-    alt->weight = -INFINITY;
-    alt->length = 0;
-    for (int i = 0; i < DIM3; i++)
-    {
-        unflat_tri(i, &row0, &col0, &row1, &col1, &row2, &col2);
-        if (is_alt(row0, col0, row1, col1, row2, col2))
-        {
-            alt->ngrams[i] = i;
-            alt->length++;
-        }
-        else
-        {
-            alt->ngrams[i] = -1;
-        }
-    }
-
     tri_stat *redirect = (tri_stat *)malloc(sizeof(tri_stat));
-    alt->next = redirect;
+    same_finger->next = redirect;
     strcpy(redirect->name, "Redirect");
     redirect->weight = -INFINITY;
     redirect->length = 0;
@@ -122,8 +104,236 @@ void initialize_tri_stats()
         }
     }
 
+    tri_stat *alt = (tri_stat *)malloc(sizeof(tri_stat));
+    bad_redirect->next = alt;
+    strcpy(alt->name, "Alternation");
+    alt->weight = -INFINITY;
+    alt->length = 0;
+    for (int i = 0; i < DIM3; i++)
+    {
+        unflat_tri(i, &row0, &col0, &row1, &col1, &row2, &col2);
+        if (is_alt(row0, col0, row1, col1, row2, col2))
+        {
+            alt->ngrams[i] = i;
+            alt->length++;
+        }
+        else
+        {
+            alt->ngrams[i] = -1;
+        }
+    }
+
+    tri_stat *alt_in = (tri_stat *)malloc(sizeof(tri_stat));
+    alt->next = alt_in;
+    strcpy(alt_in->name, "Alternation In");
+    alt_in->weight = -INFINITY;
+    alt_in->length = 0;
+    for (int i = 0; i < DIM3; i++)
+    {
+        unflat_tri(i, &row0, &col0, &row1, &col1, &row2, &col2);
+        if (is_alt_in(row0, col0, row1, col1, row2, col2))
+        {
+            alt_in->ngrams[i] = i;
+            alt_in->length++;
+        }
+        else
+        {
+            alt_in->ngrams[i] = -1;
+        }
+    }
+
+    tri_stat *alt_out = (tri_stat *)malloc(sizeof(tri_stat));
+    alt_in->next = alt_out;
+    strcpy(alt_out->name, "Alternation Out");
+    alt_out->weight = -INFINITY;
+    alt_out->length = 0;
+    for (int i = 0; i < DIM3; i++)
+    {
+        unflat_tri(i, &row0, &col0, &row1, &col1, &row2, &col2);
+        if (is_alt_out(row0, col0, row1, col1, row2, col2))
+        {
+            alt_out->ngrams[i] = i;
+            alt_out->length++;
+        }
+        else
+        {
+            alt_out->ngrams[i] = -1;
+        }
+    }
+
+    tri_stat *same_row_alt = (tri_stat *)malloc(sizeof(tri_stat));
+    alt_out->next = same_row_alt;
+    strcpy(same_row_alt->name, "Same Row Alternation");
+    same_row_alt->weight = -INFINITY;
+    same_row_alt->length = 0;
+    for (int i = 0; i < DIM3; i++)
+    {
+        unflat_tri(i, &row0, &col0, &row1, &col1, &row2, &col2);
+        if (is_same_row_alt(row0, col0, row1, col1, row2, col2))
+        {
+            same_row_alt->ngrams[i] = i;
+            same_row_alt->length++;
+        }
+        else
+        {
+            same_row_alt->ngrams[i] = -1;
+        }
+    }
+
+    tri_stat *same_row_alt_in = (tri_stat *)malloc(sizeof(tri_stat));
+    same_row_alt->next = same_row_alt_in;
+    strcpy(same_row_alt_in->name, "Same Row Alternation In");
+    same_row_alt_in->weight = -INFINITY;
+    same_row_alt_in->length = 0;
+    for (int i = 0; i < DIM3; i++)
+    {
+        unflat_tri(i, &row0, &col0, &row1, &col1, &row2, &col2);
+        if (is_same_row_alt_in(row0, col0, row1, col1, row2, col2))
+        {
+            same_row_alt_in->ngrams[i] = i;
+            same_row_alt_in->length++;
+        }
+        else
+        {
+            same_row_alt_in->ngrams[i] = -1;
+        }
+    }
+
+    tri_stat *same_row_alt_out = (tri_stat *)malloc(sizeof(tri_stat));
+    same_row_alt_in->next = same_row_alt_out;
+    strcpy(same_row_alt_out->name, "Same Row Alternation Out");
+    same_row_alt_out->weight = -INFINITY;
+    same_row_alt_out->length = 0;
+    for (int i = 0; i < DIM3; i++)
+    {
+        unflat_tri(i, &row0, &col0, &row1, &col1, &row2, &col2);
+        if (is_same_row_alt_out(row0, col0, row1, col1, row2, col2))
+        {
+            same_row_alt_out->ngrams[i] = i;
+            same_row_alt_out->length++;
+        }
+        else
+        {
+            same_row_alt_out->ngrams[i] = -1;
+        }
+    }
+
+    tri_stat *adjacent_finger_alt = (tri_stat *)malloc(sizeof(tri_stat));
+    same_row_alt_out->next = adjacent_finger_alt;
+    strcpy(adjacent_finger_alt->name, "Adjacent Finger Alternation");
+    adjacent_finger_alt->weight = -INFINITY;
+    adjacent_finger_alt->length = 0;
+    for (int i = 0; i < DIM3; i++)
+    {
+        unflat_tri(i, &row0, &col0, &row1, &col1, &row2, &col2);
+        if (is_adjacent_finger_alt(row0, col0, row1, col1, row2, col2))
+        {
+            adjacent_finger_alt->ngrams[i] = i;
+            adjacent_finger_alt->length++;
+        }
+        else
+        {
+            adjacent_finger_alt->ngrams[i] = -1;
+        }
+    }
+
+    tri_stat *adjacent_finger_alt_in = (tri_stat *)malloc(sizeof(tri_stat));
+    adjacent_finger_alt->next = adjacent_finger_alt_in;
+    strcpy(adjacent_finger_alt_in->name, "Adjacent Finger Alternation In");
+    adjacent_finger_alt_in->weight = -INFINITY;
+    adjacent_finger_alt_in->length = 0;
+    for (int i = 0; i < DIM3; i++)
+    {
+        unflat_tri(i, &row0, &col0, &row1, &col1, &row2, &col2);
+        if (is_adjacent_finger_alt_in(row0, col0, row1, col1, row2, col2))
+        {
+            adjacent_finger_alt_in->ngrams[i] = i;
+            adjacent_finger_alt_in->length++;
+        }
+        else
+        {
+            adjacent_finger_alt_in->ngrams[i] = -1;
+        }
+    }
+
+    tri_stat *adjacent_finger_alt_out = (tri_stat *)malloc(sizeof(tri_stat));
+    adjacent_finger_alt_in->next = adjacent_finger_alt_out;
+    strcpy(adjacent_finger_alt_out->name, "Adjacent Finger Alternation Out");
+    adjacent_finger_alt_out->weight = -INFINITY;
+    adjacent_finger_alt_out->length = 0;
+    for (int i = 0; i < DIM3; i++)
+    {
+        unflat_tri(i, &row0, &col0, &row1, &col1, &row2, &col2);
+        if (is_adjacent_finger_alt_out(row0, col0, row1, col1, row2, col2))
+        {
+            adjacent_finger_alt_out->ngrams[i] = i;
+            adjacent_finger_alt_out->length++;
+        }
+        else
+        {
+            adjacent_finger_alt_out->ngrams[i] = -1;
+        }
+    }
+
+    tri_stat *same_row_adjacent_finger_alt = (tri_stat *)malloc(sizeof(tri_stat));
+    adjacent_finger_alt_out->next = same_row_adjacent_finger_alt;
+    strcpy(same_row_adjacent_finger_alt->name, "Same Row Adjacent Finger Alternation");
+    same_row_adjacent_finger_alt->weight = -INFINITY;
+    same_row_adjacent_finger_alt->length = 0;
+    for (int i = 0; i < DIM3; i++)
+    {
+        unflat_tri(i, &row0, &col0, &row1, &col1, &row2, &col2);
+        if (is_same_row_adjacent_finger_alt(row0, col0, row1, col1, row2, col2))
+        {
+            same_row_adjacent_finger_alt->ngrams[i] = i;
+            same_row_adjacent_finger_alt->length++;
+        }
+        else
+        {
+            same_row_adjacent_finger_alt->ngrams[i] = -1;
+        }
+    }
+
+    tri_stat *same_row_adjacent_finger_alt_in = (tri_stat *)malloc(sizeof(tri_stat));
+    same_row_adjacent_finger_alt->next = same_row_adjacent_finger_alt_in;
+    strcpy(same_row_adjacent_finger_alt_in->name, "Same Row Adjacent Finger Alternation In");
+    same_row_adjacent_finger_alt_in->weight = -INFINITY;
+    same_row_adjacent_finger_alt_in->length = 0;
+    for (int i = 0; i < DIM3; i++)
+    {
+        unflat_tri(i, &row0, &col0, &row1, &col1, &row2, &col2);
+        if (is_same_row_adjacent_finger_alt_in(row0, col0, row1, col1, row2, col2))
+        {
+            same_row_adjacent_finger_alt_in->ngrams[i] = i;
+            same_row_adjacent_finger_alt_in->length++;
+        }
+        else
+        {
+            same_row_adjacent_finger_alt_in->ngrams[i] = -1;
+        }
+    }
+
+    tri_stat *same_row_adjacent_finger_alt_out = (tri_stat *)malloc(sizeof(tri_stat));
+    same_row_adjacent_finger_alt_in->next = same_row_adjacent_finger_alt_out;
+    strcpy(same_row_adjacent_finger_alt_out->name, "Same Row Adjacent Finger Alternation Out");
+    same_row_adjacent_finger_alt_out->weight = -INFINITY;
+    same_row_adjacent_finger_alt_out->length = 0;
+    for (int i = 0; i < DIM3; i++)
+    {
+        unflat_tri(i, &row0, &col0, &row1, &col1, &row2, &col2);
+        if (is_same_row_adjacent_finger_alt_out(row0, col0, row1, col1, row2, col2))
+        {
+            same_row_adjacent_finger_alt_out->ngrams[i] = i;
+            same_row_adjacent_finger_alt_out->length++;
+        }
+        else
+        {
+            same_row_adjacent_finger_alt_out->ngrams[i] = -1;
+        }
+    }
+
     tri_stat *onehand = (tri_stat *)malloc(sizeof(tri_stat));
-    bad_redirect->next = onehand;
+    same_row_adjacent_finger_alt_out->next = onehand;
     strcpy(onehand->name, "One Hand");
     onehand->weight = -INFINITY;
     onehand->length = 0;

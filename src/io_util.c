@@ -1,11 +1,11 @@
 /*
- * io_util.c - Utility functions related to input/output operations for the GULAG project.
+ * io_util.c - Utility functions related to input/output operations for the GULAG.
  *
  * Author: Rus Doomer
  *
  * Description: This file provides utility functions for handling character conversions,
  *              validating run and output modes, and other I/O related operations
- *              within the GULAG project.
+ *              within the GULAG.
  */
 
 #include <stdio.h>
@@ -114,7 +114,8 @@ char check_run_mode(char *optarg)
     } else if (strcmp(optarg, "h") == 0
         || strcmp(optarg, "help") == 0) {
         return 'h';
-    } else if (strcmp(optarg, "if") == 0
+    } else if (strcmp(optarg, "f") == 0
+        || strcmp(optarg, "if") == 0
         || strcmp(optarg, "info") == 0
         || strcmp(optarg, "information") == 0) {
         return 'f';
@@ -148,5 +149,26 @@ char check_output_mode(char *optarg)
         /* util.c - error handling */
         error("Invalid output mode in arguments.");
         return 'n';
+    }
+}
+
+/*
+ * Validates and converts a backend mode string to its corresponding character representation.
+ * Parameters:
+ *   optarg: The string representing the backend mode.
+ * Returns: The character representing the validated output mode, or 'c' if invalid.
+ */
+char check_backend_mode(char *optarg)
+{
+    if (strcmp(optarg, "c") == 0 || strcmp(optarg, "cpu") == 0) {
+        return 'c';
+    } else if (strcmp(optarg, "o") == 0
+        || strcmp(optarg, "ocl") == 0
+        || strcmp(optarg, "opencl") == 0) {
+        return 'o';
+    } else {
+        /* util.c - error handling */
+        error("Invalid output mode in arguments.");
+        return 'c';
     }
 }

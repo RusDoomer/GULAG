@@ -1,5 +1,5 @@
 /*
- * stats/bi.c - Bigram statistic definitions for the GULAG project.
+ * stats/bi.c - Bigram statistic definitions for the GULAG.
  *
  * Author: Rus Doomer
  *
@@ -29,6 +29,7 @@
 #include "util.h"
 #include "stats_util.h"
 #include "global.h"
+#include "structs.h"
 
 /*
  * Initializes the linked list of bigram statistics.

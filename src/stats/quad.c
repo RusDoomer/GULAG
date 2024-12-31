@@ -1,5 +1,5 @@
 /*
- * stats/quad.c - Quadgram statistic definitions for the GULAG project.
+ * stats/quad.c - Quadgram statistic definitions for the GULAG.
  *
  * Author: Rus Doomer
  *
@@ -29,6 +29,7 @@
 #include "util.h"
 #include "stats_util.h"
 #include "global.h"
+#include "structs.h"
 
 /*
  * Initializes the linked list of quadgram statistics.
@@ -62,28 +63,8 @@ void initialize_quad_stats()
         }
     }
 
-    /* the rest are quad stats, I won't explain them */
-    quad_stat *alt = (quad_stat *)malloc(sizeof(quad_stat));
-    same_finger->next = alt;
-    strcpy(alt->name, "Chained Alternation");
-    alt->weight = -INFINITY;
-    alt->length = 0;
-    for (int i = 0; i < DIM4; i++)
-    {
-        unflat_quad(i, &row0, &col0, &row1, &col1, &row2, &col2, &row3, &col3);
-        if (is_chained_alt(row0, col0, row1, col1, row2, col2, row3, col3))
-        {
-            alt->ngrams[i] = i;
-            alt->length++;
-        }
-        else
-        {
-            alt->ngrams[i] = -1;
-        }
-    }
-
     quad_stat *redirect = (quad_stat *)malloc(sizeof(quad_stat));
-    alt->next = redirect;
+    same_finger->next = redirect;
     strcpy(redirect->name, "Chained Redirect");
     redirect->weight = -INFINITY;
     redirect->length = 0;
@@ -120,8 +101,312 @@ void initialize_quad_stats()
         }
     }
 
+    quad_stat *alt = (quad_stat *)malloc(sizeof(quad_stat));
+    bad_redirect->next = alt;
+    strcpy(alt->name, "Chained Alternation");
+    alt->weight = -INFINITY;
+    alt->length = 0;
+    for (int i = 0; i < DIM4; i++)
+    {
+        unflat_quad(i, &row0, &col0, &row1, &col1, &row2, &col2, &row3, &col3);
+        if (is_chained_alt(row0, col0, row1, col1, row2, col2, row3, col3))
+        {
+            alt->ngrams[i] = i;
+            alt->length++;
+        }
+        else
+        {
+            alt->ngrams[i] = -1;
+        }
+    }
+
+    quad_stat *alt_in = (quad_stat *)malloc(sizeof(quad_stat));
+    alt->next = alt_in;
+    strcpy(alt_in->name, "Chained Alternation In");
+    alt_in->weight = -INFINITY;
+    alt_in->length = 0;
+    for (int i = 0; i < DIM4; i++)
+    {
+        unflat_quad(i, &row0, &col0, &row1, &col1, &row2, &col2, &row3, &col3);
+        if (is_chained_alt_in(row0, col0, row1, col1, row2, col2, row3, col3))
+        {
+            alt_in->ngrams[i] = i;
+            alt_in->length++;
+        }
+        else
+        {
+            alt_in->ngrams[i] = -1;
+        }
+    }
+
+    quad_stat *alt_out = (quad_stat *)malloc(sizeof(quad_stat));
+    alt_in->next = alt_out;
+    strcpy(alt_out->name, "Chained Alternation Out");
+    alt_out->weight = -INFINITY;
+    alt_out->length = 0;
+    for (int i = 0; i < DIM4; i++)
+    {
+        unflat_quad(i, &row0, &col0, &row1, &col1, &row2, &col2, &row3, &col3);
+        if (is_chained_alt_out(row0, col0, row1, col1, row2, col2, row3, col3))
+        {
+            alt_out->ngrams[i] = i;
+            alt_out->length++;
+        }
+        else
+        {
+            alt_out->ngrams[i] = -1;
+        }
+    }
+
+    quad_stat *alt_mix = (quad_stat *)malloc(sizeof(quad_stat));
+    alt_out->next = alt_mix;
+    strcpy(alt_mix->name, "Chained Alternation Mix");
+    alt_mix->weight = -INFINITY;
+    alt_mix->length = 0;
+    for (int i = 0; i < DIM4; i++)
+    {
+        unflat_quad(i, &row0, &col0, &row1, &col1, &row2, &col2, &row3, &col3);
+        if (is_chained_alt_mix(row0, col0, row1, col1, row2, col2, row3, col3))
+        {
+            alt_mix->ngrams[i] = i;
+            alt_mix->length++;
+        }
+        else
+        {
+            alt_mix->ngrams[i] = -1;
+        }
+    }
+
+    quad_stat *same_row_alt = (quad_stat *)malloc(sizeof(quad_stat));
+    alt_mix->next = same_row_alt;
+    strcpy(same_row_alt->name, "Same Row Chained Alternation");
+    same_row_alt->weight = -INFINITY;
+    same_row_alt->length = 0;
+    for (int i = 0; i < DIM4; i++)
+    {
+        unflat_quad(i, &row0, &col0, &row1, &col1, &row2, &col2, &row3, &col3);
+        if (is_chained_same_row_alt(row0, col0, row1, col1, row2, col2, row3, col3))
+        {
+            same_row_alt->ngrams[i] = i;
+            same_row_alt->length++;
+        }
+        else
+        {
+            same_row_alt->ngrams[i] = -1;
+        }
+    }
+
+    quad_stat *same_row_alt_in = (quad_stat *)malloc(sizeof(quad_stat));
+    same_row_alt->next = same_row_alt_in;
+    strcpy(same_row_alt_in->name, "Same Row Chained Alternation In");
+    same_row_alt_in->weight = -INFINITY;
+    same_row_alt_in->length = 0;
+    for (int i = 0; i < DIM4; i++)
+    {
+        unflat_quad(i, &row0, &col0, &row1, &col1, &row2, &col2, &row3, &col3);
+        if (is_chained_same_row_alt_in(row0, col0, row1, col1, row2, col2, row3, col3))
+        {
+            same_row_alt_in->ngrams[i] = i;
+            same_row_alt_in->length++;
+        }
+        else
+        {
+            same_row_alt_in->ngrams[i] = -1;
+        }
+    }
+
+    quad_stat *same_row_alt_out = (quad_stat *)malloc(sizeof(quad_stat));
+    same_row_alt_in->next = same_row_alt_out;
+    strcpy(same_row_alt_out->name, "Same Row Chained Alternation Out");
+    same_row_alt_out->weight = -INFINITY;
+    same_row_alt_out->length = 0;
+    for (int i = 0; i < DIM4; i++)
+    {
+        unflat_quad(i, &row0, &col0, &row1, &col1, &row2, &col2, &row3, &col3);
+        if (is_chained_same_row_alt_out(row0, col0, row1, col1, row2, col2, row3, col3))
+        {
+            same_row_alt_out->ngrams[i] = i;
+            same_row_alt_out->length++;
+        }
+        else
+        {
+            same_row_alt_out->ngrams[i] = -1;
+        }
+    }
+
+    quad_stat *same_row_alt_mix = (quad_stat *)malloc(sizeof(quad_stat));
+    same_row_alt_out->next = same_row_alt_mix;
+    strcpy(same_row_alt_mix->name, "Same Row Chained Alternation Mix");
+    same_row_alt_mix->weight = -INFINITY;
+    same_row_alt_mix->length = 0;
+    for (int i = 0; i < DIM4; i++)
+    {
+        unflat_quad(i, &row0, &col0, &row1, &col1, &row2, &col2, &row3, &col3);
+        if (is_chained_same_row_alt_mix(row0, col0, row1, col1, row2, col2, row3, col3))
+        {
+            same_row_alt_mix->ngrams[i] = i;
+            same_row_alt_mix->length++;
+        }
+        else
+        {
+            same_row_alt_mix->ngrams[i] = -1;
+        }
+    }
+
+    quad_stat *adjacent_finger_alt = (quad_stat *)malloc(sizeof(quad_stat));
+    same_row_alt_mix->next = adjacent_finger_alt;
+    strcpy(adjacent_finger_alt->name, "Adjacent Finger Chained Alternation");
+    adjacent_finger_alt->weight = -INFINITY;
+    adjacent_finger_alt->length = 0;
+    for (int i = 0; i < DIM4; i++)
+    {
+        unflat_quad(i, &row0, &col0, &row1, &col1, &row2, &col2, &row3, &col3);
+        if (is_chained_adjacent_finger_alt(row0, col0, row1, col1, row2, col2, row3, col3))
+        {
+            adjacent_finger_alt->ngrams[i] = i;
+            adjacent_finger_alt->length++;
+        }
+        else
+        {
+            adjacent_finger_alt->ngrams[i] = -1;
+        }
+    }
+
+    quad_stat *adjacent_finger_alt_in = (quad_stat *)malloc(sizeof(quad_stat));
+    adjacent_finger_alt->next = adjacent_finger_alt_in;
+    strcpy(adjacent_finger_alt_in->name, "Adjacent Finger Chained Alternation In");
+    adjacent_finger_alt_in->weight = -INFINITY;
+    adjacent_finger_alt_in->length = 0;
+    for (int i = 0; i < DIM4; i++)
+    {
+        unflat_quad(i, &row0, &col0, &row1, &col1, &row2, &col2, &row3, &col3);
+        if (is_chained_adjacent_finger_alt_in(row0, col0, row1, col1, row2, col2, row3, col3))
+        {
+            adjacent_finger_alt_in->ngrams[i] = i;
+            adjacent_finger_alt_in->length++;
+        }
+        else
+        {
+            adjacent_finger_alt_in->ngrams[i] = -1;
+        }
+    }
+
+    quad_stat *adjacent_finger_alt_out = (quad_stat *)malloc(sizeof(quad_stat));
+    adjacent_finger_alt_in->next = adjacent_finger_alt_out;
+    strcpy(adjacent_finger_alt_out->name, "Adjacent Finger Chained Alternation Out");
+    adjacent_finger_alt_out->weight = -INFINITY;
+    adjacent_finger_alt_out->length = 0;
+    for (int i = 0; i < DIM4; i++)
+    {
+        unflat_quad(i, &row0, &col0, &row1, &col1, &row2, &col2, &row3, &col3);
+        if (is_chained_adjacent_finger_alt_out(row0, col0, row1, col1, row2, col2, row3, col3))
+        {
+            adjacent_finger_alt_out->ngrams[i] = i;
+            adjacent_finger_alt_out->length++;
+        }
+        else
+        {
+            adjacent_finger_alt_out->ngrams[i] = -1;
+        }
+    }
+
+    quad_stat *adjacent_finger_alt_mix = (quad_stat *)malloc(sizeof(quad_stat));
+    adjacent_finger_alt_out->next = adjacent_finger_alt_mix;
+    strcpy(adjacent_finger_alt_mix->name, "Adjacent Finger Chained Alternation Mix");
+    adjacent_finger_alt_mix->weight = -INFINITY;
+    adjacent_finger_alt_mix->length = 0;
+    for (int i = 0; i < DIM4; i++)
+    {
+        unflat_quad(i, &row0, &col0, &row1, &col1, &row2, &col2, &row3, &col3);
+        if (is_chained_adjacent_finger_alt_mix(row0, col0, row1, col1, row2, col2, row3, col3))
+        {
+            adjacent_finger_alt_mix->ngrams[i] = i;
+            adjacent_finger_alt_mix->length++;
+        }
+        else
+        {
+            adjacent_finger_alt_mix->ngrams[i] = -1;
+        }
+    }
+
+    quad_stat *same_row_adjacent_finger_alt = (quad_stat *)malloc(sizeof(quad_stat));
+    adjacent_finger_alt_mix->next = same_row_adjacent_finger_alt;
+    strcpy(same_row_adjacent_finger_alt->name, "Same Row Adjacent Finger Chained Alternation");
+    same_row_adjacent_finger_alt->weight = -INFINITY;
+    same_row_adjacent_finger_alt->length = 0;
+    for (int i = 0; i < DIM4; i++)
+    {
+        unflat_quad(i, &row0, &col0, &row1, &col1, &row2, &col2, &row3, &col3);
+        if (is_chained_same_row_adjacent_finger_alt(row0, col0, row1, col1, row2, col2, row3, col3))
+        {
+            same_row_adjacent_finger_alt->ngrams[i] = i;
+            same_row_adjacent_finger_alt->length++;
+        }
+        else
+        {
+            same_row_adjacent_finger_alt->ngrams[i] = -1;
+        }
+    }
+
+    quad_stat *same_row_adjacent_finger_alt_in = (quad_stat *)malloc(sizeof(quad_stat));
+    same_row_adjacent_finger_alt->next = same_row_adjacent_finger_alt_in;
+    strcpy(same_row_adjacent_finger_alt_in->name, "Same Row Adjacent Finger Chained Alternation In");
+    same_row_adjacent_finger_alt_in->weight = -INFINITY;
+    same_row_adjacent_finger_alt_in->length = 0;
+    for (int i = 0; i < DIM4; i++)
+    {
+        unflat_quad(i, &row0, &col0, &row1, &col1, &row2, &col2, &row3, &col3);
+        if (is_chained_same_row_adjacent_finger_alt_in(row0, col0, row1, col1, row2, col2, row3, col3))
+        {
+            same_row_adjacent_finger_alt_in->ngrams[i] = i;
+            same_row_adjacent_finger_alt_in->length++;
+        }
+        else
+        {
+            same_row_adjacent_finger_alt_in->ngrams[i] = -1;
+        }
+    }
+
+    quad_stat *same_row_adjacent_finger_alt_out = (quad_stat *)malloc(sizeof(quad_stat));
+    same_row_adjacent_finger_alt_in->next = same_row_adjacent_finger_alt_out;
+    strcpy(same_row_adjacent_finger_alt_out->name, "Same Row Adjacent Finger Chained Alternation Out");
+    same_row_adjacent_finger_alt_out->weight = -INFINITY;
+    same_row_adjacent_finger_alt_out->length = 0;
+    for (int i = 0; i < DIM4; i++)
+    {
+        unflat_quad(i, &row0, &col0, &row1, &col1, &row2, &col2, &row3, &col3);
+        if (is_chained_same_row_adjacent_finger_alt_out(row0, col0, row1, col1, row2, col2, row3, col3))
+        {
+            same_row_adjacent_finger_alt_out->ngrams[i] = i;
+            same_row_adjacent_finger_alt_out->length++;
+        }
+        else
+        {
+            same_row_adjacent_finger_alt_out->ngrams[i] = -1;
+        }
+    }
+
+    quad_stat *same_row_adjacent_finger_alt_mix = (quad_stat *)malloc(sizeof(quad_stat));
+    same_row_adjacent_finger_alt_out->next = same_row_adjacent_finger_alt_mix;
+    strcpy(same_row_adjacent_finger_alt_mix->name, "Same Row Adjacent Finger Chained Alternation Mix");
+    same_row_adjacent_finger_alt_mix->weight = -INFINITY;
+    same_row_adjacent_finger_alt_mix->length = 0;
+    for (int i = 0; i < DIM4; i++)
+    {
+        unflat_quad(i, &row0, &col0, &row1, &col1, &row2, &col2, &row3, &col3);
+        if (is_chained_same_row_adjacent_finger_alt_mix(row0, col0, row1, col1, row2, col2, row3, col3))
+        {
+            same_row_adjacent_finger_alt_mix->ngrams[i] = i;
+            same_row_adjacent_finger_alt_mix->length++;
+        }
+        else
+        {
+            same_row_adjacent_finger_alt_mix->ngrams[i] = -1;
+        }
+    }
+
     quad_stat *onehand = (quad_stat *)malloc(sizeof(quad_stat));
-    bad_redirect->next = onehand;
+    same_row_adjacent_finger_alt_mix->next = onehand;
     strcpy(onehand->name, "Quad One Hand");
     onehand->weight = -INFINITY;
     onehand->length = 0;
