@@ -398,10 +398,6 @@ int main(int argc, char **argv) {
                 log_print('n',L"Running cpu generation\n\n");
                 generate();
                 log_print('n',L"Done\n\n");
-            } else if (backend_mode == 'o') {
-                log_print('n',L"Running opencl generation\n");
-                cl_generate();
-                log_print('n',L"Done\n\n");
             }
             break;
         case 'i':
@@ -410,10 +406,6 @@ int main(int argc, char **argv) {
                 log_print('n',L"Running cpu optimization\n\n");
                 improve(0);
                 log_print('n',L"Done\n\n");
-            } else if (backend_mode == 'o') {
-                log_print('n',L"Running opencl optimization\n\n");
-                cl_improve(0);
-                log_print('n',L"Done\n\n");
             }
             break;
         case 'b':
@@ -421,10 +413,6 @@ int main(int argc, char **argv) {
             if (backend_mode == 'c') {
                 log_print('n',L"Running cpu benchmark\n\n");
                 gen_benchmark();
-                log_print('n',L"Done\n\n");
-            } else if (backend_mode == 'o') {
-                log_print('n',L"Running opencl benchmark\n\n");
-                cl_gen_benchmark();
                 log_print('n',L"Done\n\n");
             }
             break;

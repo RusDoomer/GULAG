@@ -255,7 +255,7 @@ void check_setup()
     {
         error("invalid output mode selected");
     }
-    if (backend_mode != 'c' && backend_mode != 'o')
+    if (backend_mode != 'c')
     {
         error("invalid backend mode selected");
     }
@@ -760,9 +760,9 @@ void quiet_print(layout *lt)
     log_print('q',L"%s\n", lt->name);
     for (int i = 0; i < ROW; i++) {
         for (int j = 0; j < COL; j++) {
-            log_print('q',L"%lc ", convert_back(lt->matrix[i][j]));
+            wprintf(L"%lc ", convert_back(lt->matrix[i][j]));
         }
-        log_print('q',L"\n");
+        wprintf(L"\n");
     }
 
     log_print('q',L"score : %f\n\n", lt->score);
