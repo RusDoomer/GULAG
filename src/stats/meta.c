@@ -40,12 +40,9 @@ void initialize_meta_stats()
 {
     /* Allocate and initialize hand balance. */
     meta_stat *hand_balance = (meta_stat *)malloc(sizeof(meta_stat));
-    /* Ensure you set the head on the first stat of each type. */
-    meta_head = hand_balance;
+    add_meta_stat(hand_balance);
     strcpy(hand_balance->name, "Hand Balance");
     hand_balance->weight = -INFINITY;
-
-    hand_balance->next = NULL;
 }
 
 /*

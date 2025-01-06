@@ -16,6 +16,97 @@
 #include "util.h"
 
 /*
+ * Inserts a new monogram statistic into the monogram linked list
+ */
+void add_mono_stat(mono_stat *stat)
+{
+    stat->next = NULL;
+    if (mono_head == NULL) {mono_head = stat;}
+    else
+    {
+        mono_stat *ptr = mono_head;
+        while (ptr->next != NULL) {ptr = ptr->next;}
+        ptr->next = stat;
+    }
+}
+
+/*
+ * Inserts a new bigram statistic into the bigram linked list
+ */
+void add_bi_stat(bi_stat *stat)
+{
+    stat->next = NULL;
+    if (bi_head == NULL) {bi_head = stat;}
+    else
+    {
+        bi_stat *ptr = bi_head;
+        while (ptr->next != NULL) {ptr = ptr->next;}
+        ptr->next = stat;
+    }
+}
+
+/*
+ * Inserts a new trigram statistic into the trigram linked list
+ */
+void add_tri_stat(tri_stat *stat)
+{
+    stat->next = NULL;
+    if (tri_head == NULL) {tri_head = stat;}
+    else
+    {
+        tri_stat *ptr = tri_head;
+        while (ptr->next != NULL) {ptr = ptr->next;}
+        ptr->next = stat;
+    }
+}
+
+/*
+ * Inserts a new quadgram statistic into the quadgram linked list
+ */
+void add_quad_stat(quad_stat *stat)
+{
+    stat->next = NULL;
+    if (quad_head == NULL) {quad_head = stat;}
+    else
+    {
+        quad_stat *ptr = quad_head;
+        while (ptr->next != NULL) {ptr = ptr->next;}
+        ptr->next = stat;
+    }
+}
+
+/*
+ * Inserts a new skipgram statistic into the skipgram linked list
+ */
+void add_skip_stat(skip_stat *stat)
+{
+    stat->next = NULL;
+    if (skip_head == NULL) {skip_head = stat;}
+    else
+    {
+        skip_stat *ptr = skip_head;
+        while (ptr->next != NULL) {ptr = ptr->next;}
+        ptr->next = stat;
+    }
+}
+
+/*
+ * Inserts a new meta statistic into the meta linked list
+ */
+void add_meta_stat(meta_stat *stat)
+{
+    stat->next = NULL;
+    if (meta_head == NULL) {meta_head = stat;}
+    else
+    {
+        meta_stat *ptr = meta_head;
+        while (ptr->next != NULL) {ptr = ptr->next;}
+        ptr->next = stat;
+    }
+}
+
+
+/*
  * Finds the index of a specific statistic in a given layout.
  * The function searches for the statistic by name and type within the layout's
  * statistical data.

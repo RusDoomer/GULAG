@@ -44,8 +44,8 @@ void initialize_mono_stats()
 
     /* Allocate and initialize a new stats for column/finger usage. */
     mono_stat *left_outer = (mono_stat *)malloc(sizeof(mono_stat));
-    /* Ensure you set the head on the first stat of each type */
-    mono_head = left_outer;
+    /* Ensure you add each stat to the linked list */
+    add_mono_stat(left_outer);
     strcpy(left_outer->name, "Left Outer Usage");
     left_outer->weight = -INFINITY;
     left_outer->length = 0;
@@ -65,7 +65,7 @@ void initialize_mono_stats()
     }
 
     mono_stat *left_pinky = (mono_stat *)malloc(sizeof(mono_stat));
-    left_outer->next = left_pinky;
+    add_mono_stat(left_pinky);
     strcpy(left_pinky->name, "Left Pinky Usage");
     left_pinky->weight = -INFINITY;
     left_pinky->length = 0;
@@ -84,7 +84,7 @@ void initialize_mono_stats()
     }
 
     mono_stat *left_ring = (mono_stat *)malloc(sizeof(mono_stat));
-    left_pinky->next = left_ring;
+    add_mono_stat(left_ring);
     strcpy(left_ring->name, "Left Ring Usage");
     left_ring->weight = -INFINITY;
     left_ring->length = 0;
@@ -103,7 +103,7 @@ void initialize_mono_stats()
     }
 
     mono_stat *left_middle = (mono_stat *)malloc(sizeof(mono_stat));
-    left_ring->next = left_middle;
+    add_mono_stat(left_middle);
     strcpy(left_middle->name, "Left Middle Usage");
     left_middle->weight = -INFINITY;
     left_middle->length = 0;
@@ -122,7 +122,7 @@ void initialize_mono_stats()
     }
 
     mono_stat *left_index = (mono_stat *)malloc(sizeof(mono_stat));
-    left_middle->next = left_index;
+    add_mono_stat(left_index);
     strcpy(left_index->name, "Left Index Usage");
     left_index->weight = -INFINITY;
     left_index->length = 0;
@@ -141,7 +141,7 @@ void initialize_mono_stats()
     }
 
     mono_stat *left_inner = (mono_stat *)malloc(sizeof(mono_stat));
-    left_index->next = left_inner;
+    add_mono_stat(left_inner);
     strcpy(left_inner->name, "Left Inner Usage");
     left_inner->weight = -INFINITY;
     left_inner->length = 0;
@@ -161,7 +161,7 @@ void initialize_mono_stats()
 
 
     mono_stat *right_inner = (mono_stat *)malloc(sizeof(mono_stat));
-    left_inner->next = right_inner;
+    add_mono_stat(right_inner);
     strcpy(right_inner->name, "Right Inner Usage");
     right_inner->weight = -INFINITY;
     right_inner->length = 0;
@@ -180,7 +180,7 @@ void initialize_mono_stats()
     }
 
     mono_stat *right_index = (mono_stat *)malloc(sizeof(mono_stat));
-    right_inner->next = right_index;
+    add_mono_stat(right_index);
     strcpy(right_index->name, "Right Index Usage");
     right_index->weight = -INFINITY;
     right_index->length = 0;
@@ -199,7 +199,7 @@ void initialize_mono_stats()
     }
 
     mono_stat *right_middle = (mono_stat *)malloc(sizeof(mono_stat));
-    right_index->next = right_middle;
+    add_mono_stat(right_middle);
     strcpy(right_middle->name, "Right Middle Usage");
     right_middle->weight = -INFINITY;
     right_middle->length = 0;
@@ -218,7 +218,7 @@ void initialize_mono_stats()
     }
 
     mono_stat *right_ring = (mono_stat *)malloc(sizeof(mono_stat));
-    right_middle->next = right_ring;
+    add_mono_stat(right_ring);
     strcpy(right_ring->name, "Right Ring Usage");
     right_ring->weight = -INFINITY;
     right_ring->length = 0;
@@ -237,7 +237,7 @@ void initialize_mono_stats()
     }
 
     mono_stat *right_pinky = (mono_stat *)malloc(sizeof(mono_stat));
-    right_ring->next = right_pinky;
+    add_mono_stat(right_pinky);
     strcpy(right_pinky->name, "Right Pinky Usage");
     right_pinky->weight = -INFINITY;
     right_pinky->length = 0;
@@ -256,7 +256,7 @@ void initialize_mono_stats()
     }
 
     mono_stat *right_outer = (mono_stat *)malloc(sizeof(mono_stat));
-    right_pinky->next = right_outer;
+    add_mono_stat(right_outer);
     strcpy(right_outer->name, "Right Outer Usage");
     right_outer->weight = -INFINITY;
     right_outer->length = 0;
@@ -276,7 +276,7 @@ void initialize_mono_stats()
 
     /* Allocate and initialize a new stats for hand usage. */
     mono_stat *left_hand = (mono_stat *)malloc(sizeof(mono_stat));
-    right_outer->next = left_hand;
+    add_mono_stat(left_hand);
     strcpy(left_hand->name, "Left Hand Usage");
     left_hand->weight = -INFINITY;
     left_hand->length = 0;
@@ -295,7 +295,7 @@ void initialize_mono_stats()
     }
 
     mono_stat *right_hand = (mono_stat *)malloc(sizeof(mono_stat));
-    left_hand->next = right_hand;
+    add_mono_stat(right_hand);
     strcpy(right_hand->name, "Right Hand Usage");
     right_hand->weight = -INFINITY;
     right_hand->length = 0;
@@ -315,7 +315,7 @@ void initialize_mono_stats()
 
     /* Allocate and initialize a new stats for row usage. */
     mono_stat *top_row = (mono_stat *)malloc(sizeof(mono_stat));
-    right_hand->next = top_row;
+    add_mono_stat(top_row);
     strcpy(top_row->name, "Top Row Usage");
     top_row->weight = -INFINITY;
     top_row->length = 0;
@@ -334,7 +334,7 @@ void initialize_mono_stats()
     }
 
     mono_stat *home_row = (mono_stat *)malloc(sizeof(mono_stat));
-    top_row->next = home_row;
+    add_mono_stat(home_row);
     strcpy(home_row->name, "Home Row Usage");
     home_row->weight = -INFINITY;
     home_row->length = 0;
@@ -353,7 +353,7 @@ void initialize_mono_stats()
     }
 
     mono_stat *bottom_row = (mono_stat *)malloc(sizeof(mono_stat));
-    home_row->next = bottom_row;
+    add_mono_stat(bottom_row);
     strcpy(bottom_row->name, "Bottom Row Usage");
     bottom_row->weight = -INFINITY;
     bottom_row->length = 0;
@@ -370,8 +370,6 @@ void initialize_mono_stats()
             bottom_row->ngrams[i] = -1;
         }
     }
-
-    bottom_row->next = NULL;
 }
 
 /*

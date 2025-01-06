@@ -45,8 +45,7 @@ void initialize_skip_stats()
     int row0, col0, row1, col1;
     /* Allocate and initialize SFS. */
     skip_stat *same_finger = (skip_stat *)malloc(sizeof(skip_stat));
-    /* Ensure you set the head on the first stat of each type. */
-    skip_head = same_finger;
+    add_skip_stat(same_finger);
     strcpy(same_finger->name, "Same Finger Skipgram");
     /* Set all skip weights to -INFINITY. */
     for (int i = 0; i < 10; i++) {
@@ -70,7 +69,7 @@ void initialize_skip_stats()
 
     /* per finger SFS */
     skip_stat *left_pinky = (skip_stat *)malloc(sizeof(skip_stat));
-    same_finger->next = left_pinky;
+    add_skip_stat(left_pinky);
     strcpy(left_pinky->name, "Left Pinky Skipgram");
     for (int i = 0; i < 10; i++) {
         left_pinky->weight[i] = -INFINITY;
@@ -91,7 +90,7 @@ void initialize_skip_stats()
     }
 
     skip_stat *left_ring = (skip_stat *)malloc(sizeof(skip_stat));
-    left_pinky->next = left_ring;
+    add_skip_stat(left_ring);
     strcpy(left_ring->name, "Left Ring Skipgram");
     for (int i = 0; i < 10; i++) {
         left_ring->weight[i] = -INFINITY;
@@ -112,7 +111,7 @@ void initialize_skip_stats()
     }
 
     skip_stat *left_middle = (skip_stat *)malloc(sizeof(skip_stat));
-    left_ring->next = left_middle;
+    add_skip_stat(left_middle);
     strcpy(left_middle->name, "Left Middle Skipgram");
     for (int i = 0; i < 10; i++) {
         left_middle->weight[i] = -INFINITY;
@@ -133,7 +132,7 @@ void initialize_skip_stats()
     }
 
     skip_stat *left_index = (skip_stat *)malloc(sizeof(skip_stat));
-    left_middle->next = left_index;
+    add_skip_stat(left_index);
     strcpy(left_index->name, "Left Index Skipgram");
     for (int i = 0; i < 10; i++) {
         left_index->weight[i] = -INFINITY;
@@ -154,7 +153,7 @@ void initialize_skip_stats()
     }
 
     skip_stat *right_index = (skip_stat *)malloc(sizeof(skip_stat));
-    left_index->next = right_index;
+    add_skip_stat(right_index);
     strcpy(right_index->name, "Right Index Skipgram");
     for (int i = 0; i < 10; i++) {
         right_index->weight[i] = -INFINITY;
@@ -175,7 +174,7 @@ void initialize_skip_stats()
     }
 
     skip_stat *right_middle = (skip_stat *)malloc(sizeof(skip_stat));
-    right_index->next = right_middle;
+    add_skip_stat(right_middle);
     strcpy(right_middle->name, "Right Middle Skipgram");
     for (int i = 0; i < 10; i++) {
         right_middle->weight[i] = -INFINITY;
@@ -196,7 +195,7 @@ void initialize_skip_stats()
     }
 
     skip_stat *right_ring = (skip_stat *)malloc(sizeof(skip_stat));
-    right_middle->next = right_ring;
+    add_skip_stat(right_ring);
     strcpy(right_ring->name, "Right Ring Skipgram");
     for (int i = 0; i < 10; i++) {
         right_ring->weight[i] = -INFINITY;
@@ -217,7 +216,7 @@ void initialize_skip_stats()
     }
 
     skip_stat *right_pinky = (skip_stat *)malloc(sizeof(skip_stat));
-    right_ring->next = right_pinky;
+    add_skip_stat(right_pinky);
     strcpy(right_pinky->name, "Right Pinky Skipgram");
     for (int i = 0; i < 10; i++) {
         right_pinky->weight[i] = -INFINITY;
@@ -239,7 +238,7 @@ void initialize_skip_stats()
 
     /* 2U SFS */
     skip_stat *bad_same_finger = (skip_stat *)malloc(sizeof(skip_stat));
-    right_pinky->next = bad_same_finger;
+    add_skip_stat(bad_same_finger);
     strcpy(bad_same_finger->name, "Bad Same Finger Skipgram");
     for (int i = 0; i < 10; i++) {
         bad_same_finger->weight[i] = -INFINITY;
@@ -261,7 +260,7 @@ void initialize_skip_stats()
 
     /* per finger 2U SFS */
     skip_stat *bad_left_pinky = (skip_stat *)malloc(sizeof(skip_stat));
-    bad_same_finger->next = bad_left_pinky;
+    add_skip_stat(bad_left_pinky);
     strcpy(bad_left_pinky->name, "Bad Left Pinky Skipgram");
     for (int i = 0; i < 10; i++) {
         bad_left_pinky->weight[i] = -INFINITY;
@@ -282,7 +281,7 @@ void initialize_skip_stats()
     }
 
     skip_stat *bad_left_ring = (skip_stat *)malloc(sizeof(skip_stat));
-    bad_left_pinky->next = bad_left_ring;
+    add_skip_stat(bad_left_ring);
     strcpy(bad_left_ring->name, "Bad Left Ring Skipgram");
     for (int i = 0; i < 10; i++) {
         bad_left_ring->weight[i] = -INFINITY;
@@ -303,7 +302,7 @@ void initialize_skip_stats()
     }
 
     skip_stat *bad_left_middle = (skip_stat *)malloc(sizeof(skip_stat));
-    bad_left_ring->next = bad_left_middle;
+    add_skip_stat(bad_left_middle);
     strcpy(bad_left_middle->name, "Bad Left Middle Skipgram");
     for (int i = 0; i < 10; i++) {
         bad_left_middle->weight[i] = -INFINITY;
@@ -324,7 +323,7 @@ void initialize_skip_stats()
     }
 
     skip_stat *bad_left_index = (skip_stat *)malloc(sizeof(skip_stat));
-    bad_left_middle->next = bad_left_index;
+    add_skip_stat(bad_left_index);
     strcpy(bad_left_index->name, "Bad Left Index Skipgram");
     for (int i = 0; i < 10; i++) {
         bad_left_index->weight[i] = -INFINITY;
@@ -345,7 +344,7 @@ void initialize_skip_stats()
     }
 
     skip_stat *bad_right_index = (skip_stat *)malloc(sizeof(skip_stat));
-    bad_left_index->next = bad_right_index;
+    add_skip_stat(bad_right_index);
     strcpy(bad_right_index->name, "Bad Right Index Skipgram");
     for (int i = 0; i < 10; i++) {
         bad_right_index->weight[i] = -INFINITY;
@@ -366,7 +365,7 @@ void initialize_skip_stats()
     }
 
     skip_stat *bad_right_middle = (skip_stat *)malloc(sizeof(skip_stat));
-    bad_right_index->next = bad_right_middle;
+    add_skip_stat(bad_right_middle);
     strcpy(bad_right_middle->name, "Bad Right Middle Skipgram");
     for (int i = 0; i < 10; i++) {
         bad_right_middle->weight[i] = -INFINITY;
@@ -387,7 +386,7 @@ void initialize_skip_stats()
     }
 
     skip_stat *bad_right_ring = (skip_stat *)malloc(sizeof(skip_stat));
-    bad_right_middle->next = bad_right_ring;
+    add_skip_stat(bad_right_ring);
     strcpy(bad_right_ring->name, "Bad Right Ring Skipgram");
     for (int i = 0; i < 10; i++) {
         bad_right_ring->weight[i] = -INFINITY;
@@ -408,7 +407,7 @@ void initialize_skip_stats()
     }
 
     skip_stat *bad_right_pinky = (skip_stat *)malloc(sizeof(skip_stat));
-    bad_right_ring->next = bad_right_pinky;
+    add_skip_stat(bad_right_pinky);
     strcpy(bad_right_pinky->name, "Bad Right Pinky Skipgram");
     for (int i = 0; i < 10; i++) {
         bad_right_pinky->weight[i] = -INFINITY;
@@ -427,8 +426,6 @@ void initialize_skip_stats()
             bad_right_pinky->ngrams[i] = -1;
         }
     }
-
-    bad_right_pinky->next = NULL;
 }
 
 /*

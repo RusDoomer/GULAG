@@ -43,8 +43,7 @@ void initialize_quad_stats()
     int row0, col0, row1, col1, row2, col2, row3, col3;
     /* Allocate and initialize SFQs. */
     quad_stat *same_finger = (quad_stat *)malloc(sizeof(quad_stat));
-    /* Ensure you set the head on the first stat of each type. */
-    quad_head = same_finger;
+    add_quad_stat(same_finger);
     strcpy(same_finger->name, "Same Finger Quadgram");
     same_finger->weight = -INFINITY;
     same_finger->length = 0;
@@ -64,7 +63,7 @@ void initialize_quad_stats()
     }
 
     quad_stat *redirect = (quad_stat *)malloc(sizeof(quad_stat));
-    same_finger->next = redirect;
+    add_quad_stat(redirect);
     strcpy(redirect->name, "Chained Redirect");
     redirect->weight = -INFINITY;
     redirect->length = 0;
@@ -83,7 +82,7 @@ void initialize_quad_stats()
     }
 
     quad_stat *bad_redirect = (quad_stat *)malloc(sizeof(quad_stat));
-    redirect->next = bad_redirect;
+    add_quad_stat(bad_redirect);
     strcpy(bad_redirect->name, "Bad Chained Redirect");
     bad_redirect->weight = -INFINITY;
     bad_redirect->length = 0;
@@ -102,7 +101,7 @@ void initialize_quad_stats()
     }
 
     quad_stat *alt = (quad_stat *)malloc(sizeof(quad_stat));
-    bad_redirect->next = alt;
+    add_quad_stat(alt);
     strcpy(alt->name, "Chained Alternation");
     alt->weight = -INFINITY;
     alt->length = 0;
@@ -121,7 +120,7 @@ void initialize_quad_stats()
     }
 
     quad_stat *alt_in = (quad_stat *)malloc(sizeof(quad_stat));
-    alt->next = alt_in;
+    add_quad_stat(alt_in);
     strcpy(alt_in->name, "Chained Alternation In");
     alt_in->weight = -INFINITY;
     alt_in->length = 0;
@@ -140,7 +139,7 @@ void initialize_quad_stats()
     }
 
     quad_stat *alt_out = (quad_stat *)malloc(sizeof(quad_stat));
-    alt_in->next = alt_out;
+    add_quad_stat(alt_out);
     strcpy(alt_out->name, "Chained Alternation Out");
     alt_out->weight = -INFINITY;
     alt_out->length = 0;
@@ -159,7 +158,7 @@ void initialize_quad_stats()
     }
 
     quad_stat *alt_mix = (quad_stat *)malloc(sizeof(quad_stat));
-    alt_out->next = alt_mix;
+    add_quad_stat(alt_mix);
     strcpy(alt_mix->name, "Chained Alternation Mix");
     alt_mix->weight = -INFINITY;
     alt_mix->length = 0;
@@ -178,7 +177,7 @@ void initialize_quad_stats()
     }
 
     quad_stat *same_row_alt = (quad_stat *)malloc(sizeof(quad_stat));
-    alt_mix->next = same_row_alt;
+    add_quad_stat(same_row_alt);
     strcpy(same_row_alt->name, "Same Row Chained Alternation");
     same_row_alt->weight = -INFINITY;
     same_row_alt->length = 0;
@@ -197,7 +196,7 @@ void initialize_quad_stats()
     }
 
     quad_stat *same_row_alt_in = (quad_stat *)malloc(sizeof(quad_stat));
-    same_row_alt->next = same_row_alt_in;
+    add_quad_stat(same_row_alt_in);
     strcpy(same_row_alt_in->name, "Same Row Chained Alternation In");
     same_row_alt_in->weight = -INFINITY;
     same_row_alt_in->length = 0;
@@ -216,7 +215,7 @@ void initialize_quad_stats()
     }
 
     quad_stat *same_row_alt_out = (quad_stat *)malloc(sizeof(quad_stat));
-    same_row_alt_in->next = same_row_alt_out;
+    add_quad_stat(same_row_alt_out);
     strcpy(same_row_alt_out->name, "Same Row Chained Alternation Out");
     same_row_alt_out->weight = -INFINITY;
     same_row_alt_out->length = 0;
@@ -235,7 +234,7 @@ void initialize_quad_stats()
     }
 
     quad_stat *same_row_alt_mix = (quad_stat *)malloc(sizeof(quad_stat));
-    same_row_alt_out->next = same_row_alt_mix;
+    add_quad_stat(same_row_alt_mix);
     strcpy(same_row_alt_mix->name, "Same Row Chained Alternation Mix");
     same_row_alt_mix->weight = -INFINITY;
     same_row_alt_mix->length = 0;
@@ -254,7 +253,7 @@ void initialize_quad_stats()
     }
 
     quad_stat *adjacent_finger_alt = (quad_stat *)malloc(sizeof(quad_stat));
-    same_row_alt_mix->next = adjacent_finger_alt;
+    add_quad_stat(adjacent_finger_alt);
     strcpy(adjacent_finger_alt->name, "Adjacent Finger Chained Alternation");
     adjacent_finger_alt->weight = -INFINITY;
     adjacent_finger_alt->length = 0;
@@ -273,7 +272,7 @@ void initialize_quad_stats()
     }
 
     quad_stat *adjacent_finger_alt_in = (quad_stat *)malloc(sizeof(quad_stat));
-    adjacent_finger_alt->next = adjacent_finger_alt_in;
+    add_quad_stat(adjacent_finger_alt_in);
     strcpy(adjacent_finger_alt_in->name, "Adjacent Finger Chained Alternation In");
     adjacent_finger_alt_in->weight = -INFINITY;
     adjacent_finger_alt_in->length = 0;
@@ -292,7 +291,7 @@ void initialize_quad_stats()
     }
 
     quad_stat *adjacent_finger_alt_out = (quad_stat *)malloc(sizeof(quad_stat));
-    adjacent_finger_alt_in->next = adjacent_finger_alt_out;
+    add_quad_stat(adjacent_finger_alt_out);
     strcpy(adjacent_finger_alt_out->name, "Adjacent Finger Chained Alternation Out");
     adjacent_finger_alt_out->weight = -INFINITY;
     adjacent_finger_alt_out->length = 0;
@@ -311,7 +310,7 @@ void initialize_quad_stats()
     }
 
     quad_stat *adjacent_finger_alt_mix = (quad_stat *)malloc(sizeof(quad_stat));
-    adjacent_finger_alt_out->next = adjacent_finger_alt_mix;
+    add_quad_stat(adjacent_finger_alt_mix);
     strcpy(adjacent_finger_alt_mix->name, "Adjacent Finger Chained Alternation Mix");
     adjacent_finger_alt_mix->weight = -INFINITY;
     adjacent_finger_alt_mix->length = 0;
@@ -330,7 +329,7 @@ void initialize_quad_stats()
     }
 
     quad_stat *same_row_adjacent_finger_alt = (quad_stat *)malloc(sizeof(quad_stat));
-    adjacent_finger_alt_mix->next = same_row_adjacent_finger_alt;
+    add_quad_stat(same_row_adjacent_finger_alt);
     strcpy(same_row_adjacent_finger_alt->name, "Same Row Adjacent Finger Chained Alternation");
     same_row_adjacent_finger_alt->weight = -INFINITY;
     same_row_adjacent_finger_alt->length = 0;
@@ -349,7 +348,7 @@ void initialize_quad_stats()
     }
 
     quad_stat *same_row_adjacent_finger_alt_in = (quad_stat *)malloc(sizeof(quad_stat));
-    same_row_adjacent_finger_alt->next = same_row_adjacent_finger_alt_in;
+    add_quad_stat(same_row_adjacent_finger_alt_in);
     strcpy(same_row_adjacent_finger_alt_in->name, "Same Row Adjacent Finger Chained Alternation In");
     same_row_adjacent_finger_alt_in->weight = -INFINITY;
     same_row_adjacent_finger_alt_in->length = 0;
@@ -368,7 +367,7 @@ void initialize_quad_stats()
     }
 
     quad_stat *same_row_adjacent_finger_alt_out = (quad_stat *)malloc(sizeof(quad_stat));
-    same_row_adjacent_finger_alt_in->next = same_row_adjacent_finger_alt_out;
+    add_quad_stat(same_row_adjacent_finger_alt_out);
     strcpy(same_row_adjacent_finger_alt_out->name, "Same Row Adjacent Finger Chained Alternation Out");
     same_row_adjacent_finger_alt_out->weight = -INFINITY;
     same_row_adjacent_finger_alt_out->length = 0;
@@ -387,7 +386,7 @@ void initialize_quad_stats()
     }
 
     quad_stat *same_row_adjacent_finger_alt_mix = (quad_stat *)malloc(sizeof(quad_stat));
-    same_row_adjacent_finger_alt_out->next = same_row_adjacent_finger_alt_mix;
+    add_quad_stat(same_row_adjacent_finger_alt_mix);
     strcpy(same_row_adjacent_finger_alt_mix->name, "Same Row Adjacent Finger Chained Alternation Mix");
     same_row_adjacent_finger_alt_mix->weight = -INFINITY;
     same_row_adjacent_finger_alt_mix->length = 0;
@@ -406,7 +405,7 @@ void initialize_quad_stats()
     }
 
     quad_stat *onehand = (quad_stat *)malloc(sizeof(quad_stat));
-    same_row_adjacent_finger_alt_mix->next = onehand;
+    add_quad_stat(onehand);
     strcpy(onehand->name, "Quad One Hand");
     onehand->weight = -INFINITY;
     onehand->length = 0;
@@ -425,7 +424,7 @@ void initialize_quad_stats()
     }
 
     quad_stat *onehand_in = (quad_stat *)malloc(sizeof(quad_stat));
-    onehand->next = onehand_in;
+    add_quad_stat(onehand_in);
     strcpy(onehand_in->name, "Quad One Hand In");
     onehand_in->weight = -INFINITY;
     onehand_in->length = 0;
@@ -444,7 +443,7 @@ void initialize_quad_stats()
     }
 
     quad_stat *onehand_out = (quad_stat *)malloc(sizeof(quad_stat));
-    onehand_in->next = onehand_out;
+    add_quad_stat(onehand_out);
     strcpy(onehand_out->name, "Quad One Hand Out");
     onehand_out->weight = -INFINITY;
     onehand_out->length = 0;
@@ -463,7 +462,7 @@ void initialize_quad_stats()
     }
 
     quad_stat *same_row_onehand = (quad_stat *)malloc(sizeof(quad_stat));
-    onehand_out->next = same_row_onehand;
+    add_quad_stat(same_row_onehand);
     strcpy(same_row_onehand->name, "Quad Same Row One Hand");
     same_row_onehand->weight = -INFINITY;
     same_row_onehand->length = 0;
@@ -482,7 +481,7 @@ void initialize_quad_stats()
     }
 
     quad_stat *same_row_onehand_in = (quad_stat *)malloc(sizeof(quad_stat));
-    same_row_onehand->next = same_row_onehand_in;
+    add_quad_stat(same_row_onehand_in);
     strcpy(same_row_onehand_in->name, "Quad Same Row One Hand In");
     same_row_onehand_in->weight = -INFINITY;
     same_row_onehand_in->length = 0;
@@ -501,7 +500,7 @@ void initialize_quad_stats()
     }
 
     quad_stat *same_row_onehand_out = (quad_stat *)malloc(sizeof(quad_stat));
-    same_row_onehand_in->next = same_row_onehand_out;
+    add_quad_stat(same_row_onehand_out);
     strcpy(same_row_onehand_out->name, "Quad Same Row One Hand Out");
     same_row_onehand_out->weight = -INFINITY;
     same_row_onehand_out->length = 0;
@@ -520,7 +519,7 @@ void initialize_quad_stats()
     }
 
     quad_stat *adjacent_finger_onehand = (quad_stat *)malloc(sizeof(quad_stat));
-    same_row_onehand_out->next = adjacent_finger_onehand;
+    add_quad_stat(adjacent_finger_onehand);
     strcpy(adjacent_finger_onehand->name, "Quad Adjacent Finger One Hand");
     adjacent_finger_onehand->weight = -INFINITY;
     adjacent_finger_onehand->length = 0;
@@ -539,7 +538,7 @@ void initialize_quad_stats()
     }
 
     quad_stat *adjacent_finger_onehand_in = (quad_stat *)malloc(sizeof(quad_stat));
-    adjacent_finger_onehand->next = adjacent_finger_onehand_in;
+    add_quad_stat(adjacent_finger_onehand_in);
     strcpy(adjacent_finger_onehand_in->name, "Quad Adjacent Finger One Hand In");
     adjacent_finger_onehand_in->weight = -INFINITY;
     adjacent_finger_onehand_in->length = 0;
@@ -558,7 +557,7 @@ void initialize_quad_stats()
     }
 
     quad_stat *adjacent_finger_onehand_out = (quad_stat *)malloc(sizeof(quad_stat));
-    adjacent_finger_onehand_in->next = adjacent_finger_onehand_out;
+    add_quad_stat(adjacent_finger_onehand_out);
     strcpy(adjacent_finger_onehand_out->name, "Quad Adjacent Finger One Hand Out");
     adjacent_finger_onehand_out->weight = -INFINITY;
     adjacent_finger_onehand_out->length = 0;
@@ -577,7 +576,7 @@ void initialize_quad_stats()
     }
 
     quad_stat *same_row_adjacent_finger_onehand = (quad_stat *)malloc(sizeof(quad_stat));
-    adjacent_finger_onehand_out->next = same_row_adjacent_finger_onehand;
+    add_quad_stat(same_row_adjacent_finger_onehand);
     strcpy(same_row_adjacent_finger_onehand->name, "Quad Same Row Adjacent Finger One Hand");
     same_row_adjacent_finger_onehand->weight = -INFINITY;
     same_row_adjacent_finger_onehand->length = 0;
@@ -596,7 +595,7 @@ void initialize_quad_stats()
     }
 
     quad_stat *same_row_adjacent_finger_onehand_in = (quad_stat *)malloc(sizeof(quad_stat));
-    same_row_adjacent_finger_onehand->next = same_row_adjacent_finger_onehand_in;
+    add_quad_stat(same_row_adjacent_finger_onehand_in);
     strcpy(same_row_adjacent_finger_onehand_in->name, "Quad Same Row Adjacent Finger One Hand In");
     same_row_adjacent_finger_onehand_in->weight = -INFINITY;
     same_row_adjacent_finger_onehand_in->length = 0;
@@ -615,7 +614,7 @@ void initialize_quad_stats()
     }
 
     quad_stat *same_row_adjacent_finger_onehand_out = (quad_stat *)malloc(sizeof(quad_stat));
-    same_row_adjacent_finger_onehand_in->next = same_row_adjacent_finger_onehand_out;
+    add_quad_stat(same_row_adjacent_finger_onehand_out);
     strcpy(same_row_adjacent_finger_onehand_out->name, "Quad Same Row Adjacent Finger One Hand Out");
     same_row_adjacent_finger_onehand_out->weight = -INFINITY;
     same_row_adjacent_finger_onehand_out->length = 0;
@@ -634,7 +633,7 @@ void initialize_quad_stats()
     }
 
     quad_stat *roll = (quad_stat *)malloc(sizeof(quad_stat));
-    same_row_adjacent_finger_onehand_out->next = roll;
+    add_quad_stat(roll);
     strcpy(roll->name, "Quad Roll");
     roll->weight = -INFINITY;
     roll->length = 0;
@@ -653,7 +652,7 @@ void initialize_quad_stats()
     }
 
     quad_stat *roll_in = (quad_stat *)malloc(sizeof(quad_stat));
-    roll->next = roll_in;
+    add_quad_stat(roll_in);
     strcpy(roll_in->name, "Quad Roll In");
     roll_in->weight = -INFINITY;
     roll_in->length = 0;
@@ -672,7 +671,7 @@ void initialize_quad_stats()
     }
 
     quad_stat *roll_out = (quad_stat *)malloc(sizeof(quad_stat));
-    roll_in->next = roll_out;
+    add_quad_stat(roll_out);
     strcpy(roll_out->name, "Quad Roll Out");
     roll_out->weight = -INFINITY;
     roll_out->length = 0;
@@ -691,7 +690,7 @@ void initialize_quad_stats()
     }
 
     quad_stat *same_row_roll = (quad_stat *)malloc(sizeof(quad_stat));
-    roll_out->next = same_row_roll;
+    add_quad_stat(same_row_roll);
     strcpy(same_row_roll->name, "Quad Same Row Roll");
     same_row_roll->weight = -INFINITY;
     same_row_roll->length = 0;
@@ -710,7 +709,7 @@ void initialize_quad_stats()
     }
 
     quad_stat *same_row_roll_in = (quad_stat *)malloc(sizeof(quad_stat));
-    same_row_roll->next = same_row_roll_in;
+    add_quad_stat(same_row_roll_in);
     strcpy(same_row_roll_in->name, "Quad Same Row Roll In");
     same_row_roll_in->weight = -INFINITY;
     same_row_roll_in->length = 0;
@@ -729,7 +728,7 @@ void initialize_quad_stats()
     }
 
     quad_stat *same_row_roll_out = (quad_stat *)malloc(sizeof(quad_stat));
-    same_row_roll_in->next = same_row_roll_out;
+    add_quad_stat(same_row_roll_out);
     strcpy(same_row_roll_out->name, "Quad Same Row Roll Out");
     same_row_roll_out->weight = -INFINITY;
     same_row_roll_out->length = 0;
@@ -748,7 +747,7 @@ void initialize_quad_stats()
     }
 
     quad_stat *adjacent_finger_roll = (quad_stat *)malloc(sizeof(quad_stat));
-    same_row_roll_out->next = adjacent_finger_roll;
+    add_quad_stat(adjacent_finger_roll);
     strcpy(adjacent_finger_roll->name, "Quad Adjacent Finger Roll");
     adjacent_finger_roll->weight = -INFINITY;
     adjacent_finger_roll->length = 0;
@@ -767,7 +766,7 @@ void initialize_quad_stats()
     }
 
     quad_stat *adjacent_finger_roll_in = (quad_stat *)malloc(sizeof(quad_stat));
-    adjacent_finger_roll->next = adjacent_finger_roll_in;
+    add_quad_stat(adjacent_finger_roll_in);
     strcpy(adjacent_finger_roll_in->name, "Quad Adjacent Finger Roll In");
     adjacent_finger_roll_in->weight = -INFINITY;
     adjacent_finger_roll_in->length = 0;
@@ -786,7 +785,7 @@ void initialize_quad_stats()
     }
 
     quad_stat *adjacent_finger_roll_out = (quad_stat *)malloc(sizeof(quad_stat));
-    adjacent_finger_roll_in->next = adjacent_finger_roll_out;
+    add_quad_stat(adjacent_finger_roll_out);
     strcpy(adjacent_finger_roll_out->name, "Quad Adjacent Finger Roll Out");
     adjacent_finger_roll_out->weight = -INFINITY;
     adjacent_finger_roll_out->length = 0;
@@ -805,7 +804,7 @@ void initialize_quad_stats()
     }
 
     quad_stat *same_row_adjacent_finger_roll = (quad_stat *)malloc(sizeof(quad_stat));
-    adjacent_finger_roll_out->next = same_row_adjacent_finger_roll;
+    add_quad_stat(same_row_adjacent_finger_roll);
     strcpy(same_row_adjacent_finger_roll->name, "Quad Same Row Adjacent Finger Roll");
     same_row_adjacent_finger_roll->weight = -INFINITY;
     same_row_adjacent_finger_roll->length = 0;
@@ -824,7 +823,7 @@ void initialize_quad_stats()
     }
 
     quad_stat *same_row_adjacent_finger_roll_in = (quad_stat *)malloc(sizeof(quad_stat));
-    same_row_adjacent_finger_roll->next = same_row_adjacent_finger_roll_in;
+    add_quad_stat(same_row_adjacent_finger_roll_in);
     strcpy(same_row_adjacent_finger_roll_in->name, "Quad Same Row Adjacent Finger Roll In");
     same_row_adjacent_finger_roll_in->weight = -INFINITY;
     same_row_adjacent_finger_roll_in->length = 0;
@@ -843,7 +842,7 @@ void initialize_quad_stats()
     }
 
     quad_stat *same_row_adjacent_finger_roll_out = (quad_stat *)malloc(sizeof(quad_stat));
-    same_row_adjacent_finger_roll_in->next = same_row_adjacent_finger_roll_out;
+    add_quad_stat(same_row_adjacent_finger_roll_out);
     strcpy(same_row_adjacent_finger_roll_out->name, "Quad Same Row Adjacent Finger Roll Out");
     same_row_adjacent_finger_roll_out->weight = -INFINITY;
     same_row_adjacent_finger_roll_out->length = 0;
@@ -862,7 +861,7 @@ void initialize_quad_stats()
     }
 
     quad_stat *true_roll = (quad_stat *)malloc(sizeof(quad_stat));
-    same_row_adjacent_finger_roll_out->next = true_roll;
+    add_quad_stat(true_roll);
     strcpy(true_roll->name, "True Roll");
     true_roll->weight = -INFINITY;
     true_roll->length = 0;
@@ -881,7 +880,7 @@ void initialize_quad_stats()
     }
 
     quad_stat *true_roll_in = (quad_stat *)malloc(sizeof(quad_stat));
-    true_roll->next = true_roll_in;
+    add_quad_stat(true_roll_in);
     strcpy(true_roll_in->name, "True Roll In");
     true_roll_in->weight = -INFINITY;
     true_roll_in->length = 0;
@@ -900,7 +899,7 @@ void initialize_quad_stats()
     }
 
     quad_stat *true_roll_out = (quad_stat *)malloc(sizeof(quad_stat));
-    true_roll_in->next = true_roll_out;
+    add_quad_stat(true_roll_out);
     strcpy(true_roll_out->name, "True Roll Out");
     true_roll_out->weight = -INFINITY;
     true_roll_out->length = 0;
@@ -919,7 +918,7 @@ void initialize_quad_stats()
     }
 
     quad_stat *same_row_true_roll = (quad_stat *)malloc(sizeof(quad_stat));
-    true_roll_out->next = same_row_true_roll;
+    add_quad_stat(same_row_true_roll);
     strcpy(same_row_true_roll->name, "Same Row True Roll");
     same_row_true_roll->weight = -INFINITY;
     same_row_true_roll->length = 0;
@@ -938,7 +937,7 @@ void initialize_quad_stats()
     }
 
     quad_stat *same_row_true_roll_in = (quad_stat *)malloc(sizeof(quad_stat));
-    same_row_true_roll->next = same_row_true_roll_in;
+    add_quad_stat(same_row_true_roll_in);
     strcpy(same_row_true_roll_in->name, "Same Row True Roll In");
     same_row_true_roll_in->weight = -INFINITY;
     same_row_true_roll_in->length = 0;
@@ -957,7 +956,7 @@ void initialize_quad_stats()
     }
 
     quad_stat *same_row_true_roll_out = (quad_stat *)malloc(sizeof(quad_stat));
-    same_row_true_roll_in->next = same_row_true_roll_out;
+    add_quad_stat(same_row_true_roll_out);
     strcpy(same_row_true_roll_out->name, "Same Row True Roll Out");
     same_row_true_roll_out->weight = -INFINITY;
     same_row_true_roll_out->length = 0;
@@ -976,7 +975,7 @@ void initialize_quad_stats()
     }
 
     quad_stat *adjacent_finger_true_roll = (quad_stat *)malloc(sizeof(quad_stat));
-    same_row_true_roll_out->next = adjacent_finger_true_roll;
+    add_quad_stat(adjacent_finger_true_roll);
     strcpy(adjacent_finger_true_roll->name, "Adjacent Finger True Roll");
     adjacent_finger_true_roll->weight = -INFINITY;
     adjacent_finger_true_roll->length = 0;
@@ -995,7 +994,7 @@ void initialize_quad_stats()
     }
 
     quad_stat *adjacent_finger_true_roll_in = (quad_stat *)malloc(sizeof(quad_stat));
-    adjacent_finger_true_roll->next = adjacent_finger_true_roll_in;
+    add_quad_stat(adjacent_finger_true_roll_in);
     strcpy(adjacent_finger_true_roll_in->name, "Adjacent Finger True Roll In");
     adjacent_finger_true_roll_in->weight = -INFINITY;
     adjacent_finger_true_roll_in->length = 0;
@@ -1014,7 +1013,7 @@ void initialize_quad_stats()
     }
 
     quad_stat *adjacent_finger_true_roll_out = (quad_stat *)malloc(sizeof(quad_stat));
-    adjacent_finger_true_roll_in->next = adjacent_finger_true_roll_out;
+    add_quad_stat(adjacent_finger_true_roll_out);
     strcpy(adjacent_finger_true_roll_out->name, "Adjacent Finger True Roll Out");
     adjacent_finger_true_roll_out->weight = -INFINITY;
     adjacent_finger_true_roll_out->length = 0;
@@ -1033,7 +1032,7 @@ void initialize_quad_stats()
     }
 
     quad_stat *same_row_adjacent_finger_true_roll = (quad_stat *)malloc(sizeof(quad_stat));
-    adjacent_finger_true_roll_out->next = same_row_adjacent_finger_true_roll;
+    add_quad_stat(same_row_adjacent_finger_true_roll);
     strcpy(same_row_adjacent_finger_true_roll->name, "Same Row Adjacent Finger True Roll");
     same_row_adjacent_finger_true_roll->weight = -INFINITY;
     same_row_adjacent_finger_true_roll->length = 0;
@@ -1052,7 +1051,7 @@ void initialize_quad_stats()
     }
 
     quad_stat *same_row_adjacent_finger_true_roll_in = (quad_stat *)malloc(sizeof(quad_stat));
-    same_row_adjacent_finger_true_roll->next = same_row_adjacent_finger_true_roll_in;
+    add_quad_stat(same_row_adjacent_finger_true_roll_in);
     strcpy(same_row_adjacent_finger_true_roll_in->name, "Same Row Adjacent Finger True Roll In");
     same_row_adjacent_finger_true_roll_in->weight = -INFINITY;
     same_row_adjacent_finger_true_roll_in->length = 0;
@@ -1071,7 +1070,7 @@ void initialize_quad_stats()
     }
 
     quad_stat *same_row_adjacent_finger_true_roll_out = (quad_stat *)malloc(sizeof(quad_stat));
-    same_row_adjacent_finger_true_roll_in->next = same_row_adjacent_finger_true_roll_out;
+    add_quad_stat(same_row_adjacent_finger_true_roll_out);
     strcpy(same_row_adjacent_finger_true_roll_out->name, "Same Row Adjacent Finger True Roll Out");
     same_row_adjacent_finger_true_roll_out->weight = -INFINITY;
     same_row_adjacent_finger_true_roll_out->length = 0;
@@ -1090,7 +1089,7 @@ void initialize_quad_stats()
     }
 
     quad_stat *chained_roll = (quad_stat *)malloc(sizeof(quad_stat));
-    same_row_adjacent_finger_true_roll_out->next = chained_roll;
+    add_quad_stat(chained_roll);
     strcpy(chained_roll->name, "Chained Roll");
     chained_roll->weight = -INFINITY;
     chained_roll->length = 0;
@@ -1109,7 +1108,7 @@ void initialize_quad_stats()
     }
 
     quad_stat *chained_roll_in = (quad_stat *)malloc(sizeof(quad_stat));
-    chained_roll->next = chained_roll_in;
+    add_quad_stat(chained_roll_in);
     strcpy(chained_roll_in->name, "Chained Roll In");
     chained_roll_in->weight = -INFINITY;
     chained_roll_in->length = 0;
@@ -1128,7 +1127,7 @@ void initialize_quad_stats()
     }
 
     quad_stat *chained_roll_out = (quad_stat *)malloc(sizeof(quad_stat));
-    chained_roll_in->next = chained_roll_out;
+    add_quad_stat(chained_roll_out);
     strcpy(chained_roll_out->name, "Chained Roll Out");
     chained_roll_out->weight = -INFINITY;
     chained_roll_out->length = 0;
@@ -1147,7 +1146,7 @@ void initialize_quad_stats()
     }
 
     quad_stat *chained_roll_mix = (quad_stat *)malloc(sizeof(quad_stat));
-    chained_roll_out->next = chained_roll_mix;
+    add_quad_stat(chained_roll_mix);
     strcpy(chained_roll_mix->name, "Chained Roll Mix");
     chained_roll_mix->weight = -INFINITY;
     chained_roll_mix->length = 0;
@@ -1166,7 +1165,7 @@ void initialize_quad_stats()
     }
 
     quad_stat *same_row_chained_roll = (quad_stat *)malloc(sizeof(quad_stat));
-    chained_roll_mix->next = same_row_chained_roll;
+    add_quad_stat(same_row_chained_roll);
     strcpy(same_row_chained_roll->name, "Same Row Chained Roll");
     same_row_chained_roll->weight = -INFINITY;
     same_row_chained_roll->length = 0;
@@ -1185,7 +1184,7 @@ void initialize_quad_stats()
     }
 
     quad_stat *same_row_chained_roll_in = (quad_stat *)malloc(sizeof(quad_stat));
-    same_row_chained_roll->next = same_row_chained_roll_in;
+    add_quad_stat(same_row_chained_roll_in);
     strcpy(same_row_chained_roll_in->name, "Same Row Chained Roll In");
     same_row_chained_roll_in->weight = -INFINITY;
     same_row_chained_roll_in->length = 0;
@@ -1204,7 +1203,7 @@ void initialize_quad_stats()
     }
 
     quad_stat *same_row_chained_roll_out = (quad_stat *)malloc(sizeof(quad_stat));
-    same_row_chained_roll_in->next = same_row_chained_roll_out;
+    add_quad_stat(same_row_chained_roll_out);
     strcpy(same_row_chained_roll_out->name, "Same Row Chained Roll Out");
     same_row_chained_roll_out->weight = -INFINITY;
     same_row_chained_roll_out->length = 0;
@@ -1223,7 +1222,7 @@ void initialize_quad_stats()
     }
 
     quad_stat *same_row_chained_roll_mix = (quad_stat *)malloc(sizeof(quad_stat));
-    same_row_chained_roll_out->next = same_row_chained_roll_mix;
+    add_quad_stat(same_row_chained_roll_mix);
     strcpy(same_row_chained_roll_mix->name, "Same Row Chained Roll Mix");
     same_row_chained_roll_mix->weight = -INFINITY;
     same_row_chained_roll_mix->length = 0;
@@ -1242,7 +1241,7 @@ void initialize_quad_stats()
     }
 
     quad_stat *adjacent_finger_chained_roll = (quad_stat *)malloc(sizeof(quad_stat));
-    same_row_chained_roll_mix->next = adjacent_finger_chained_roll;
+    add_quad_stat(adjacent_finger_chained_roll);
     strcpy(adjacent_finger_chained_roll->name, "Adjacent Finger Chained Roll");
     adjacent_finger_chained_roll->weight = -INFINITY;
     adjacent_finger_chained_roll->length = 0;
@@ -1261,7 +1260,7 @@ void initialize_quad_stats()
     }
 
     quad_stat *adjacent_finger_chained_roll_in = (quad_stat *)malloc(sizeof(quad_stat));
-    adjacent_finger_chained_roll->next = adjacent_finger_chained_roll_in;
+    add_quad_stat(adjacent_finger_chained_roll_in);
     strcpy(adjacent_finger_chained_roll_in->name, "Adjacent Finger Chained Roll In");
     adjacent_finger_chained_roll_in->weight = -INFINITY;
     adjacent_finger_chained_roll_in->length = 0;
@@ -1280,7 +1279,7 @@ void initialize_quad_stats()
     }
 
     quad_stat *adjacent_finger_chained_roll_out = (quad_stat *)malloc(sizeof(quad_stat));
-    adjacent_finger_chained_roll_in->next = adjacent_finger_chained_roll_out;
+    add_quad_stat(adjacent_finger_chained_roll_out);
     strcpy(adjacent_finger_chained_roll_out->name, "Adjacent Finger Chained Roll Out");
     adjacent_finger_chained_roll_out->weight = -INFINITY;
     adjacent_finger_chained_roll_out->length = 0;
@@ -1299,7 +1298,7 @@ void initialize_quad_stats()
     }
 
     quad_stat *adjacent_finger_chained_roll_mix = (quad_stat *)malloc(sizeof(quad_stat));
-    adjacent_finger_chained_roll_out->next = adjacent_finger_chained_roll_mix;
+    add_quad_stat(adjacent_finger_chained_roll_mix);
     strcpy(adjacent_finger_chained_roll_mix->name, "Adjacent Finger Chained Roll Mix");
     adjacent_finger_chained_roll_mix->weight = -INFINITY;
     adjacent_finger_chained_roll_mix->length = 0;
@@ -1318,7 +1317,7 @@ void initialize_quad_stats()
     }
 
     quad_stat *same_row_adjacent_finger_chained_roll = (quad_stat *)malloc(sizeof(quad_stat));
-    adjacent_finger_chained_roll_mix->next = same_row_adjacent_finger_chained_roll;
+    add_quad_stat(same_row_adjacent_finger_chained_roll);
     strcpy(same_row_adjacent_finger_chained_roll->name, "Same Row Adjacent Finger Chained Roll");
     same_row_adjacent_finger_chained_roll->weight = -INFINITY;
     same_row_adjacent_finger_chained_roll->length = 0;
@@ -1337,7 +1336,7 @@ void initialize_quad_stats()
     }
 
     quad_stat *same_row_adjacent_finger_chained_roll_in = (quad_stat *)malloc(sizeof(quad_stat));
-    same_row_adjacent_finger_chained_roll->next = same_row_adjacent_finger_chained_roll_in;
+    add_quad_stat(same_row_adjacent_finger_chained_roll_in);
     strcpy(same_row_adjacent_finger_chained_roll_in->name, "Same Row Adjacent Finger Chained Roll In");
     same_row_adjacent_finger_chained_roll_in->weight = -INFINITY;
     same_row_adjacent_finger_chained_roll_in->length = 0;
@@ -1356,7 +1355,7 @@ void initialize_quad_stats()
     }
 
     quad_stat *same_row_adjacent_finger_chained_roll_out = (quad_stat *)malloc(sizeof(quad_stat));
-    same_row_adjacent_finger_chained_roll_in->next = same_row_adjacent_finger_chained_roll_out;
+    add_quad_stat(same_row_adjacent_finger_chained_roll_out);
     strcpy(same_row_adjacent_finger_chained_roll_out->name, "Same Row Adjacent Finger Chained Roll Out");
     same_row_adjacent_finger_chained_roll_out->weight = -INFINITY;
     same_row_adjacent_finger_chained_roll_out->length = 0;
@@ -1375,7 +1374,7 @@ void initialize_quad_stats()
     }
 
     quad_stat *same_row_adjacent_finger_chained_roll_mix = (quad_stat *)malloc(sizeof(quad_stat));
-    same_row_adjacent_finger_chained_roll_out->next = same_row_adjacent_finger_chained_roll_mix;
+    add_quad_stat(same_row_adjacent_finger_chained_roll_mix);
     strcpy(same_row_adjacent_finger_chained_roll_mix->name, "Same Row Adjacent Finger Chained Roll Mix");
     same_row_adjacent_finger_chained_roll_mix->weight = -INFINITY;
     same_row_adjacent_finger_chained_roll_mix->length = 0;
@@ -1392,8 +1391,6 @@ void initialize_quad_stats()
             same_row_adjacent_finger_chained_roll_mix->ngrams[i] = -1;
         }
     }
-
-    same_row_adjacent_finger_chained_roll_mix->next = NULL;
 }
 
 /*

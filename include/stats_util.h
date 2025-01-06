@@ -5,6 +5,16 @@
 #include "structs.h"
 
 /*
+ * Insert s statistic into the appropriate linked list
+ */
+void add_mono_stat(mono_stat *stat);
+void add_bi_stat(bi_stat *stat);
+void add_tri_stat(tri_stat *stat);
+void add_quad_stat(quad_stat *stat);
+void add_skip_stat(skip_stat *stat);
+void add_meta_stat(meta_stat *stat);
+
+/*
  * Finds the score of a specific statistic in a given layout.
  * The function searches for the statistic by name and type within the layout's
  * statistical data.
