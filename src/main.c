@@ -28,16 +28,8 @@
  */
 void start_up()
 {
-    /* Set locale for wide character support. */
-    log_print('n',L"1/3: Setting Locale... ");
-    const char* locale = setlocale(LC_ALL, "en_US.UTF-8");
-    if (locale == NULL) {
-        error("Failed to set locale.");
-        return;
-    }
-
     /* Set stdout to wide-oriented. */
-    log_print('n',L"Setting error stream... ");
+    log_print('n',L"1/3: Setting error stream... ");
     if (fwide(stdout, 1) <= 0) {
         error("Failed to set wide-oriented stream.");
         return;
@@ -213,6 +205,11 @@ int main(int argc, char **argv) {
 
     clock_gettime(CLOCK_MONOTONIC, &full_start);
     clock_gettime(CLOCK_MONOTONIC, &start);
+
+    // THIS MUST COME BEFORE ANY PRINT STATEMENTS
+    const char* locale = setlocale(LC_ALL, "en_US.UTF-8");
+    if (locale == NULL) {error("Failed to set locale.");}
+
     log_print('q',L"\nWelcome to the GULAG\n\n");
     log_print('q',L"----- Starting Up -----\n\n");
     start_up();
