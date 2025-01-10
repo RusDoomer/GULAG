@@ -19,6 +19,14 @@ LDFLAGS := -lOpenCL -lm -lpthread -flto=auto
 OPT_FLAGS := -O3 -march=native -flto=auto -ffast-math
 DEBUG_FLAGS := -g -fsanitize=address
 
+# Detect the operating system
+UNAME_S := $(shell uname -s)
+
+# Conditional flags for macOS
+ifeq ($(UNAME_S), Darwin)
+    CFLAGS += -framework OpenCL
+endif
+
 # Default target to build the optimized version
 .PHONY: all
 all: directories $(EXECUTABLE)
