@@ -428,7 +428,11 @@ inline void calculate_skip_stats(__local cl_layout *working,
         for (int k = 1; k <= 9; k++) {
             working->skip_score[k][i] = 0;
             for (int j = 0; j < length; j++) {
-                unflat_bi(stats_skip[i].ngrams[j], &row0, &col0, &row1, &col1, bi_index_array);
+                int n = j * 4;
+                row0 = bi_index_array[n];
+                col0 = bi_index_array[n + 1];
+                row1 = bi_index_array[n + 2];
+                col1 = bi_index_array[n + 3];
                 if (working->matrix[row0][col0] != -1 && working->matrix[row1][col1] != -1) {
                     size_t index = index_skip(k, working->matrix[row0][col0], working->matrix[row1][col1]);
                     working->skip_score[k][i] += linear_skip[index];
