@@ -1177,7 +1177,7 @@ void gen_benchmark()
  */
 void cl_gen_benchmark()
 {
-    repetitions = 100000;
+    repetitions = 10000;
 
     /* OpenCL setup (same as in cl_improve) */
     cl_platform_id *platforms;
@@ -1265,12 +1265,12 @@ void cl_gen_benchmark()
     /* fill in thread counts based on powers of 2 and cores */
     thread_array[0] = starting_power;
     for (int i = 1; i < count; i++) {thread_array[i] = thread_array[i-1] * 2;}
-    thread_array[count] = num_compute_units / 2;
-    thread_array[count + 1] = num_compute_units;
-    thread_array[count + 2] = num_compute_units * 2;
-    thread_array[count + 3] = num_compute_units * 4;
-    thread_array[count + 4] = num_compute_units * 8;
-    thread_array[count + 5] = num_compute_units * 16;
+    thread_array[count] = num_compute_units;
+    thread_array[count + 1] = num_compute_units * 2;
+    thread_array[count + 2] = num_compute_units * 4;
+    thread_array[count + 3] = num_compute_units * 8;
+    thread_array[count + 4] = num_compute_units * 16;
+    thread_array[count + 5] = num_compute_units * 32;
 
     /* print the tests to be done */
     for (int i = 0; i < total; i++) {log_print('v',L"%d ", thread_array[i]);}
