@@ -1,11 +1,8 @@
 /*
  * stats_util.c - Utility functions for layout statistics.
  *
- * Author: Rus Doomer
- *
- * Description: This file contains utility functions for determining what
- *              stats each key sequences (n-grams) falls under, as well as
- *              other miscellaneous helpers.
+ * This file contains utility functions for determining what stats each key
+ * sequences (n-grams) falls under, as well as other miscellaneous helpers.
  */
 
 #include <string.h>
@@ -16,100 +13,8 @@
 #include "util.h"
 
 /*
- * Inserts a new monogram statistic into the monogram linked list
- */
-void add_mono_stat(mono_stat *stat)
-{
-    stat->next = NULL;
-    if (mono_head == NULL) {mono_head = stat;}
-    else
-    {
-        mono_stat *ptr = mono_head;
-        while (ptr->next != NULL) {ptr = ptr->next;}
-        ptr->next = stat;
-    }
-}
-
-/*
- * Inserts a new bigram statistic into the bigram linked list
- */
-void add_bi_stat(bi_stat *stat)
-{
-    stat->next = NULL;
-    if (bi_head == NULL) {bi_head = stat;}
-    else
-    {
-        bi_stat *ptr = bi_head;
-        while (ptr->next != NULL) {ptr = ptr->next;}
-        ptr->next = stat;
-    }
-}
-
-/*
- * Inserts a new trigram statistic into the trigram linked list
- */
-void add_tri_stat(tri_stat *stat)
-{
-    stat->next = NULL;
-    if (tri_head == NULL) {tri_head = stat;}
-    else
-    {
-        tri_stat *ptr = tri_head;
-        while (ptr->next != NULL) {ptr = ptr->next;}
-        ptr->next = stat;
-    }
-}
-
-/*
- * Inserts a new quadgram statistic into the quadgram linked list
- */
-void add_quad_stat(quad_stat *stat)
-{
-    stat->next = NULL;
-    if (quad_head == NULL) {quad_head = stat;}
-    else
-    {
-        quad_stat *ptr = quad_head;
-        while (ptr->next != NULL) {ptr = ptr->next;}
-        ptr->next = stat;
-    }
-}
-
-/*
- * Inserts a new skipgram statistic into the skipgram linked list
- */
-void add_skip_stat(skip_stat *stat)
-{
-    stat->next = NULL;
-    if (skip_head == NULL) {skip_head = stat;}
-    else
-    {
-        skip_stat *ptr = skip_head;
-        while (ptr->next != NULL) {ptr = ptr->next;}
-        ptr->next = stat;
-    }
-}
-
-/*
- * Inserts a new meta statistic into the meta linked list
- */
-void add_meta_stat(meta_stat *stat)
-{
-    stat->next = NULL;
-    if (meta_head == NULL) {meta_head = stat;}
-    else
-    {
-        meta_stat *ptr = meta_head;
-        while (ptr->next != NULL) {ptr = ptr->next;}
-        ptr->next = stat;
-    }
-}
-
-
-/*
- * Finds the index of a specific statistic in a given layout.
- * The function searches for the statistic by name and type within the layout's
- * statistical data.
+ * Finds the index of a specific statistic in a given layout. The function
+ * searches for the statistic by name and type within the statistic data.
  *
  * Parameters:
  *   stat_name: The name of the statistic to find.
@@ -119,33 +24,33 @@ void add_meta_stat(meta_stat *stat)
  * Returns:
  *   The index of the found statistic. Returns -1 if the statistic is not found.
  */
-int find_stat_index(char *stat_name, char type, layout *lt) {
+int find_stat_index(char *stat_name, char type) {
     int i;
 
     switch (type) {
         case 'm':
-            for (i = 0; i < MONO_END; i++) {
+            for (i = 0; i < MONO_LENGTH; i++) {
                 if (strcmp(stats_mono[i].name, stat_name) == 0) {
                     return i;
                 }
             }
             break;
         case 'b':
-            for (i = 0; i < BI_END; i++) {
+            for (i = 0; i < BI_LENGTH; i++) {
                 if (strcmp(stats_bi[i].name, stat_name) == 0) {
                     return i;
                 }
             }
             break;
         case 't':
-            for (i = 0; i < TRI_END; i++) {
+            for (i = 0; i < TRI_LENGTH; i++) {
                 if (strcmp(stats_tri[i].name, stat_name) == 0) {
                     return i;
                 }
             }
             break;
         case 'q':
-            for (i = 0; i < QUAD_END; i++) {
+            for (i = 0; i < QUAD_LENGTH; i++) {
                 if (strcmp(stats_quad[i].name, stat_name) == 0) {
                     return i;
                 }
@@ -160,7 +65,7 @@ int find_stat_index(char *stat_name, char type, layout *lt) {
         case '7':
         case '8':
         case '9':
-            for (i = 0; i < SKIP_END; i++) {
+            for (i = 0; i < SKIP_LENGTH; i++) {
                 if (strcmp(stats_skip[i].name, stat_name) == 0) {
                     return i;
                 }
@@ -168,7 +73,7 @@ int find_stat_index(char *stat_name, char type, layout *lt) {
             break;
         /* Meta stats */
         case 'e':
-            for (i = 0; i < META_END; i++) {
+            for (i = 0; i < META_LENGTH; i++) {
                 if (strcmp(stats_meta[i].name, stat_name) == 0) {
                     return i;
                 }

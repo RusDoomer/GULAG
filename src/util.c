@@ -1,11 +1,9 @@
 /*
  * util.c - Utility functions for the GULAG.
  *
- * Author: Rus Doomer
- *
- * Description: This file contains various utility functions used throughout
- *              the GULAG, including error handling, data structure
- *              manipulation, and other generic helper functions.
+ * This file contains various utility functions used throughout the GULAG,
+ * including error handling, data structure manipulation, and other
+ * generic helper functions.
  */
 
 #include <wchar.h>
@@ -21,11 +19,11 @@
 #include "io_util.h"
 
 /*
- * Error handling function.
- * Shows the cursor, prints an error message to standard error, and terminates the program.
+ * Error handling function: Shows the cursor, prints an error message to
+ * standard error, and terminates the program.
  * Parameters:
  *   msg: The error message to be displayed.
- * Returns: Does not return (terminates program).
+ * Does not return (terminates program).
  */
 void error(const char *msg)
 {
@@ -41,7 +39,6 @@ void error(const char *msg)
  * Parameters:
  *   row0, col0, row1, col1, row2, col2, row3, col3: Row and column indices.
  *   i: Pointer to store the flattened index.
- * Returns: void.
  */
 void flat_quad(int row0, int col0, int row1, int col1, int row2, int col2,
     int row3, int col3, int *i)
@@ -58,7 +55,6 @@ void flat_quad(int row0, int col0, int row1, int col1, int row2, int col2,
  *   i: The flattened index.
  *   row0, col0, row1, col1, row2, col2, row3, col3: Pointers to store the
  *                                                   row and column indices.
- * Returns: void.
  */
 void unflat_quad(int i, int *row0, int *col0, int *row1, int *col1,
     int *row2, int *col2, int *row3, int *col3)
@@ -84,7 +80,6 @@ void unflat_quad(int i, int *row0, int *col0, int *row1, int *col1,
  * Parameters:
  *   row0, col0, row1, col1, row2, col2: Row and column indices.
  *   i: Pointer to store the flattened index.
- * Returns: void.
  */
 void flat_tri(int row0, int col0, int row1, int col1, int row2, int col2,
     int *i)
@@ -100,7 +95,6 @@ void flat_tri(int row0, int col0, int row1, int col1, int row2, int col2,
  *   i: The flattened index.
  *   row0, col0, row1, col1, row2, col2: Pointers to store the row and
  *                                       column indices.
- * Returns: void.
  */
 void unflat_tri(int i, int *row0, int *col0, int *row1, int *col1,
     int *row2, int *col2)
@@ -122,7 +116,6 @@ void unflat_tri(int i, int *row0, int *col0, int *row1, int *col1,
  * Parameters:
  *   row0, col0, row1, col1: Row and column indices.
  *   i: Pointer to store the flattened index.
- * Returns: void.
  */
 void flat_bi(int row0, int col0, int row1, int col1, int *i)
 {
@@ -135,7 +128,6 @@ void flat_bi(int row0, int col0, int row1, int col1, int *i)
  * Parameters:
  *   i: The flattened index.
  *   row0, col0, row1, col1: Pointers to store the row and column indices.
- * Returns: void.
  */
 void unflat_bi(int i, int *row0, int *col0, int *row1, int *col1)
 {
@@ -152,7 +144,6 @@ void unflat_bi(int i, int *row0, int *col0, int *row1, int *col1)
  * Parameters:
  *   row0, col0: Row and column indices.
  *   i: Pointer to store the flattened index.
- * Returns: void.
  */
 void flat_mono(int row0, int col0, int *i)
 {
@@ -164,7 +155,6 @@ void flat_mono(int row0, int col0, int *i)
  * Parameters:
  *   i: The flattened index.
  *   row0, col0: Pointers to store the row and column indices.
- * Returns: void.
  */
 void unflat_mono(int i, int *row0, int *col0)
 {
@@ -223,10 +213,7 @@ size_t index_skip(int skip_index, int j, int k) {
     return skip_index * LANG_LENGTH * LANG_LENGTH + j * LANG_LENGTH + k;
 }
 
-/*
- * Normalizes the corpus data from raw frequencies to percentages.
- * Returns: void.
- */
+/* Normalizes the corpus data from raw frequencies to percentages. */
 void normalize_corpus()
 {
     long long total_mono = 0;
@@ -308,10 +295,9 @@ void normalize_corpus()
 }
 
 /*
- * Allocates memory for a new layout data structure.
+ * Allocates memory for a new layout.
  * Parameters:
  *   lt: Pointer to a layout pointer where the newly allocated layout will be stored.
- * Returns: void.
  */
 void alloc_layout(layout **lt)
 {
@@ -320,22 +306,21 @@ void alloc_layout(layout **lt)
 
     (*lt)->score = 0;
 
-    (*lt)->mono_score = (float *)calloc(MONO_END, sizeof(float));
-    (*lt)->bi_score = (float *)calloc(BI_END, sizeof(float));
-    (*lt)->tri_score = (float *)calloc(TRI_END, sizeof(float));
-    (*lt)->quad_score = (float *)calloc(QUAD_END, sizeof(float));
+    (*lt)->mono_score = (float *)calloc(MONO_LENGTH, sizeof(float));
+    (*lt)->bi_score = (float *)calloc(BI_LENGTH, sizeof(float));
+    (*lt)->tri_score = (float *)calloc(TRI_LENGTH, sizeof(float));
+    (*lt)->quad_score = (float *)calloc(QUAD_LENGTH, sizeof(float));
     (*lt)->skip_score = (float **)malloc(10 * sizeof(float *));
     for (int i = 1; i < 10; i++) {
-        (*lt)->skip_score[i] = (float *)calloc(SKIP_END, sizeof(float));
+        (*lt)->skip_score[i] = (float *)calloc(SKIP_LENGTH, sizeof(float));
     }
-    (*lt)->meta_score = (float *)calloc(META_END, sizeof(float));
+    (*lt)->meta_score = (float *)calloc(META_LENGTH, sizeof(float));
 }
 
 /*
- * Frees the memory occupied by a layout data structure.
+ * Frees the memory occupied by a layout.
  * Parameters:
  *   lt: Pointer to the layout to be freed.
- * Returns: void.
  */
 void free_layout(layout *lt)
 {
@@ -356,47 +341,46 @@ void free_layout(layout *lt)
  * Calculates and assigns the overall score to a layout based on its statistics.
  * Parameters:
  *   lt: Pointer to the layout.
- * Returns: void.
  */
 void get_score(layout *lt)
 {
     lt->score = 0;
-    for (int i = 0; i < MONO_END; i++)
+    for (int i = 0; i < MONO_LENGTH; i++)
     {
-        lt->score += lt->mono_score[i] * stats_mono[i].weight;
+        if(!stats_mono[i].skip) {lt->score += lt->mono_score[i] * stats_mono[i].weight;}
     }
-    for (int i = 0; i < BI_END; i++)
+    for (int i = 0; i < BI_LENGTH; i++)
     {
-        lt->score += lt->bi_score[i] * stats_bi[i].weight;
+        if(!stats_bi[i].skip) {lt->score += lt->bi_score[i] * stats_bi[i].weight;}
     }
-    for (int i = 0; i < TRI_END; i++)
+    for (int i = 0; i < TRI_LENGTH; i++)
     {
-        lt->score += lt->tri_score[i] * stats_tri[i].weight;
+        if(!stats_tri[i].skip) {lt->score += lt->tri_score[i] * stats_tri[i].weight;}
     }
-    for (int i = 0; i < QUAD_END; i++)
+    for (int i = 0; i < QUAD_LENGTH; i++)
     {
-        lt->score += lt->quad_score[i] * stats_quad[i].weight;
+        if(!stats_quad[i].skip) {lt->score += lt->quad_score[i] * stats_quad[i].weight;}
     }
     for (int i = 1; i <= 9; i++)
     {
-        for (int j = 0; j < SKIP_END; j++)
+        for (int j = 0; j < SKIP_LENGTH; j++)
         {
-            lt->score += lt->skip_score[i][j] * stats_skip[j].weight[i];
+            if(!stats_skip[j].skip) {lt->score += lt->skip_score[i][j] * stats_skip[j].weight[i];}
         }
     }
-    for (int i = 0; i < META_END; i++)
+    for (int i = 0; i < META_LENGTH; i++)
     {
-        lt->score += lt->meta_score[i] * stats_meta[i].weight;
+        if(!stats_meta[i].skip) {lt->score += lt->meta_score[i] * stats_meta[i].weight;}
     }
 }
 
 /*
- * Calculates the difference between two layouts and stores the result in a third layout.
+ * Calculates the difference between two layouts and stores the result in
+ * a dummy layout.
  * Parameters:
  *   lt: Pointer to the first layout.
  *   lt2: Pointer to the second layout.
  *   lt_diff: Pointer to the layout where the difference will be stored.
- * Returns: void.
  */
 void get_layout_diff(layout *lt, layout *lt2, layout *lt_diff)
 {
@@ -426,38 +410,38 @@ void get_layout_diff(layout *lt, layout *lt2, layout *lt_diff)
     /* calculate score differences */
     lt_diff->score = lt->score - lt2->score;
 
-    for (int i = 0; i < MONO_END; i++) {
-        lt_diff->mono_score[i] = lt->mono_score[i] - lt2->mono_score[i];
+    for (int i = 0; i < MONO_LENGTH; i++) {
+        if(!stats_mono[i].skip) {lt_diff->mono_score[i] = lt->mono_score[i] - lt2->mono_score[i];}
     }
 
-    for (int i = 0; i < BI_END; i++) {
-        lt_diff->bi_score[i] = lt->bi_score[i] - lt2->bi_score[i];
+    for (int i = 0; i < BI_LENGTH; i++) {
+        if(!stats_bi[i].skip) {lt_diff->bi_score[i] = lt->bi_score[i] - lt2->bi_score[i];}
     }
 
-    for (int i = 0; i < TRI_END; i++) {
-        lt_diff->tri_score[i] = lt->tri_score[i] - lt2->tri_score[i];
+    for (int i = 0; i < TRI_LENGTH; i++) {
+        if(!stats_tri[i].skip) {lt_diff->tri_score[i] = lt->tri_score[i] - lt2->tri_score[i];}
     }
 
-    for (int i = 0; i < QUAD_END; i++) {
-        lt_diff->quad_score[i] = lt->quad_score[i] - lt2->quad_score[i];
+    for (int i = 0; i < QUAD_LENGTH; i++) {
+        if(!stats_quad[i].skip) {lt_diff->quad_score[i] = lt->quad_score[i] - lt2->quad_score[i];}
     }
 
     for (int h = 1; h < 10; h++) {
-        for (int i = 0; i < SKIP_END; i++) {
-            lt_diff->skip_score[h][i] = lt->skip_score[h][i] - lt2->skip_score[h][i];
+        for (int i = 0; i < SKIP_LENGTH; i++) {
+            if(!stats_skip[i].skip) {lt_diff->skip_score[h][i] = lt->skip_score[h][i] - lt2->skip_score[h][i];}
         }
     }
 
-    for (int i = 0; i < META_END; i++) {
-        lt_diff->meta_score[i] = lt->meta_score[i] - lt2->meta_score[i];
+    for (int i = 0; i < META_LENGTH; i++) {
+        if(!stats_meta[i].skip) {lt_diff->meta_score[i] = lt->meta_score[i] - lt2->meta_score[i];}
     }
 }
 
 /*
- * Creates a new node for the layout ranking list and inserts it in the correct position.
+ * Creates a new node for the layout ranking list and inserts it in the correct
+ * position.
  * Parameters:
  *   lt: Pointer to the layout to be added to the ranking.
- * Returns: void.
  */
 void create_node(layout *lt)
 {
@@ -486,10 +470,7 @@ void create_node(layout *lt)
     }
 }
 
-/*
- * Frees all nodes in the layout ranking list.
- * Returns: void.
- */
+/* Frees all nodes in the layout ranking list. */
 void free_list() {
     layout_node* current = head_node;
     layout_node* next_node;
@@ -504,7 +485,6 @@ void free_list() {
  * Randomly shuffles the keys in a layout.
  * Parameters:
  *   lt: Pointer to the layout to be shuffled.
- * Returns: void.
  */
 void shuffle_layout(layout *lt)
 {
@@ -527,7 +507,6 @@ void shuffle_layout(layout *lt)
  * Parameters:
  *   lt_dest: Pointer to the destination layout.
  *   lt_src: Pointer to the source layout.
- * Returns: void.
  */
 void copy(layout *lt_dest, layout *lt_src)
 {
@@ -540,29 +519,29 @@ void copy(layout *lt_dest, layout *lt_src)
         }
     }
     lt_dest->score = lt_src->score;
-    for (int i = 0; i < MONO_END; i++)
+    for (int i = 0; i < MONO_LENGTH; i++)
     {
         lt_dest->mono_score[i] = lt_src->mono_score[i];
     }
-    for (int i = 0; i < BI_END; i++)
+    for (int i = 0; i < BI_LENGTH; i++)
     {
         lt_dest->bi_score[i] = lt_src->bi_score[i];
     }
-    for (int i = 0; i < TRI_END; i++)
+    for (int i = 0; i < TRI_LENGTH; i++)
     {
         lt_dest->tri_score[i] = lt_src->tri_score[i];
     }
-    for (int i = 0; i < QUAD_END; i++)
+    for (int i = 0; i < QUAD_LENGTH; i++)
     {
         lt_dest->quad_score[i] = lt_src->quad_score[i];
     }
-    for (int i = 0; i < META_END; i++)
+    for (int i = 0; i < META_LENGTH; i++)
     {
         lt_dest->meta_score[i] = lt_src->meta_score[i];
     }
     for (int j = 1; j <= 9; j++)
     {
-        for (int i = 0; i < SKIP_END; i++)
+        for (int i = 0; i < SKIP_LENGTH; i++)
         {
             lt_dest->skip_score[j][i] = lt_src->skip_score[j][i];
         }
@@ -574,7 +553,6 @@ void copy(layout *lt_dest, layout *lt_src)
  * Parameters:
  *   lt_dest: Pointer to the destination layout.
  *   lt_src: Pointer to the source layout.
- * Returns: void.
  */
 void skeleton_copy(layout *lt_dest, layout *lt_src)
 {
@@ -589,10 +567,7 @@ void skeleton_copy(layout *lt_dest, layout *lt_src)
     lt_dest->score = lt_src->score;
 }
 
-/*
- * Generates a random float between 0 and 1.
- * Returns: The generated random float.
- */
+/* Returns a random float between 0 and 1. */
 float random_float() {
     return (float)rand() / RAND_MAX;
 }

@@ -1,12 +1,9 @@
 /*
  * mode.c - Modes for the GULAG.
  *
- * Author: Rus Doomer
- *
- * Description: This file implements the various modes of operation for the GULAG:
- *              analysis, comparison, ranking, generation, and improvement.
- *              It utilizes multithreading to enhance performance, specifically
- *              in the layout improvement process.
+ * This file implements the various modes of operation for the GULAG: analysis,
+ * comparison, ranking, generation, and improvement. It utilizes multithreading
+ * to enhance performance, specifically in the layout improvement process.
  */
 
 #include <stdio.h>
@@ -31,11 +28,9 @@
 #include "structs.h"
 
 /*
- * Performs analysis on a single layout.
- * This involves allocating memory for the layout, reading layout data from a file,
- * analyzing the layout, calculating its score, printing the output, and freeing the allocated memory.
- *
- * Returns: void.
+ * Performs analysis on a single layout. This involves allocating memory for the
+ * layout, reading layout data from a file, analyzing the layout, calculating
+ * its score, printing the output, and freeing the allocated memory.
  */
 void analysis() {
     /* Work for timing total/real layouts/second */
@@ -45,34 +40,34 @@ void analysis() {
 
     layout *lt;
 
-    /* util.c - allocates memory for a layout structure */
+    /* allocates memory for a layout structure */
     log_print('n',L"1/6: Allocating layout... ");
-    alloc_layout(&lt);
+    alloc_layout(&lt); /* util.c */
     log_print('n',L"Done\n\n");
 
-    /* io.c - reads a keyboard layout from a file and initializes a layout structure */
+    /* reads a keyboard layout from a file and initializes a layout structure */
     log_print('n',L"2/6: Reading layout... ");
-    read_layout(lt, 1);
+    read_layout(lt, 1); /* io.c */
     log_print('n',L"Done\n\n");
 
-    /* analyze.c - performs a single layout analysis */
+    /* performs a single layout analysis */
     log_print('n',L"3/6: Analyzing layout... ");
-    single_analyze(lt);
+    single_analyze(lt); /* analyze.c */
     log_print('n',L"Done\n\n");
 
-    /* util.c - calculates and assigns the overall score to a layout based on its statistics */
+    /* calculates and assigns the overall score to a layout based on its statistics */
     log_print('n',L"4/6: Calculating Score... ");
-    get_score(lt);
+    get_score(lt); /* util.c */
     log_print('n',L"Done\n\n");
 
-    /* io.c - prints the contents of a layout structure to the standard output */
+    /* prints the contents of a layout structure to the standard output */
     log_print('n',L"5/6: Printing Output...\n\n");
-    print_layout(lt);
+    print_layout(lt); /* io.c */
     log_print('n',L"Done\n\n");
 
-    /* util.c - frees the memory occupied by a layout data structure */
+    /* frees the memory occupied by a layout data structure */
     log_print('n',L"6/6: Freeing layout... ");
-    free_layout(lt);
+    free_layout(lt); /* util.c */
     log_print('n',L"Done\n\n");
 
     clock_gettime(CLOCK_MONOTONIC, &compute_end);
@@ -81,12 +76,10 @@ void analysis() {
 }
 
 /*
- * Compares two layouts and outputs the difference.
- * This function allocates memory for three layouts, reads data for two layouts from files,
- * performs analysis on both, calculates their scores, computes the difference,
- * prints the difference layout, and frees the allocated memory.
- *
- * Returns: void.
+ * Compares two layouts and outputs the difference. This function allocates
+ * memory for three layouts, reads data for two layouts from files, performs
+ * analysis on both, calculates their scores, computes the difference, prints
+ * the difference layout, and frees the allocated memory.
  */
 void compare() {
     /* Work for timing total/real layouts/second */
@@ -95,73 +88,71 @@ void compare() {
 
     layout *lt1, *lt2, *lt_diff;
 
-    /* util.c - allocates memory for the layouts */
+    /* allocates memory for the layouts */
     log_print('n',L"1/7: Allocating layouts... ");
-    alloc_layout(&lt1);
+    alloc_layout(&lt1); /* util.c */
     log_print('n',L"%s... ", layout_name);
-    alloc_layout(&lt2);
+    alloc_layout(&lt2); /* util.c */
     log_print('n',L"%s... ", layout2_name);
-    alloc_layout(&lt_diff);
+    alloc_layout(&lt_diff); /* util.c */
     log_print('n',L"diff... ");
     log_print('n',L"Done\n\n");
 
-    /* io.c - reading keyboard layouts and initializing */
+    /* reading keyboard layouts and initializing */
     log_print('n',L"2/7: Reading layout... ");
-    read_layout(lt1, 1);
+    read_layout(lt1, 1); /* io.c */
     log_print('n',L"%s... ", layout_name);
-    read_layout(lt2, 2);
+    read_layout(lt2, 2); /* io.c */
     log_print('n',L"%s... ", layout2_name);
     log_print('n',L"Done\n\n");
 
     clock_gettime(CLOCK_MONOTONIC, &compute_start);
 
-    /* analyze.c - perform layout analyses */
+    /* perform layout analyses */
     log_print('n',L"3/7: Analyzing layout... ");
-    single_analyze(lt1);
+    single_analyze(lt1); /* analyze.c */
     log_print('n',L"%s... ", layout_name);
-    single_analyze(lt2);
+    single_analyze(lt2); /* analyze.c */
     log_print('n',L"%s... ", layout2_name);
     log_print('n',L"Done\n\n");
 
-    /* util.c - calculate the overall scores */
+    /* calculate the overall scores */
     log_print('n',L"4/7: Calculating Score... ");
-    get_score(lt1);
+    get_score(lt1); /* util.c */
     log_print('n',L"%s... ", layout_name);
-    get_score(lt2);
+    get_score(lt2); /* util.c */
     log_print('n',L"%s... ", layout2_name);
     log_print('n',L"Done\n\n");
 
     clock_gettime(CLOCK_MONOTONIC, &compute_end);
     elapsed_compute_time += (compute_end.tv_sec - compute_start.tv_sec) + (compute_end.tv_nsec - compute_start.tv_nsec) / 1e9;
 
-    /* util.c - calculate the difference between the two layouts */
+    /* calculate the difference between the two layouts */
     log_print('n',L"5/7: Calculating Difference... ");
-    get_layout_diff(lt1, lt2, lt_diff);
+    get_layout_diff(lt1, lt2, lt_diff); /* util.c */
     log_print('n',L"Done\n\n");
 
-    /* io.c - print the diff layout */
+    /* print the diff layout */
     log_print('n',L"6/7: Printing Output...\n\n");
     print_layout(lt_diff);
     log_print('n',L"Done\n\n");
 
-    /* util.c - free the memory */
+    /* free the memory */
     log_print('n',L"7/7: Freeing layout... ");
-    free_layout(lt1);
+    free_layout(lt1); /* util.c */
     log_print('n',L"%s... ", layout_name);
-    free_layout(lt2);
+    free_layout(lt2); /* util.c */
     log_print('n',L"%s... ", layout2_name);
-    free_layout(lt_diff);
+    free_layout(lt_diff); /* util.c */
     log_print('n',L"diff... ");
     log_print('n',L"Done\n\n");
     return;
 }
 
 /*
- * Ranks all layouts in the layouts directory based on their scores.
- * It reads each layout file, analyzes it, calculates its score,
- * and maintains a ranked list of layouts. Finally, it prints the ranking.
- *
- * Returns: void.
+ * Ranks all layouts in the layouts directory based on their scores. It reads
+ * each layout file, analyzes it, calculates its score, and maintains a ranked
+ * list of layouts. Finally, it prints the ranking.
  */
 void rank() {
     /* Work for timing total/real layouts/second */
@@ -197,40 +188,40 @@ void rank() {
 
             layout *lt;
 
-            /* util.c - allocate memory for a layout */
+            /* allocate memory for a layout */
             log_print('n',L"Allocating... ");
-            alloc_layout(&lt);
+            alloc_layout(&lt); /* util.c */
 
-            /* io.c - read the keyboard layout */
+            /* read the keyboard layout */
             log_print('n',L"Reading... ");
-            read_layout(lt, 1);
+            read_layout(lt, 1); /* io.c */
 
-            /* analyze.c - perform a single layout analysis */
+            /* perform a single layout analysis */
             log_print('n',L"Analyzing... ");
-            single_analyze(lt);
+            single_analyze(lt); /* analyze.c */
 
-            /* util.c - calculate the overall score */
+            /* calculate the overall score */
             log_print('n',L"Get Score... ");
-            get_score(lt);
+            get_score(lt); /* util.c */
 
             /*
-             * util.c - create a new node for the layout ranking list
-             *          and insert it in the correct position
+             * create a new node for the layout ranking list and insert it in
+             * the correct position
              */
             log_print('n',L"Ranking...");
-            create_node(lt);
+            create_node(lt); /* util.c */
 
-            /* util.c - frees the memory occupied by a layout data structure */
+            /* frees the memory occupied by a layout data structure */
             log_print('n',L"Freeing... ");
-            free_layout(lt);
+            free_layout(lt); /* util.c */
             log_print('n',L"Done\n");
             layouts_analyzed++;
         }
     }
     log_print('n',L"\n");
 
-    /* io.c - print the ranked list of layouts */
-    print_ranking();
+    /* print the ranked list of layouts */
+    print_ranking(); /* io.c */
     log_print('q',L"Done\n\n");
 
     /* Reset layout_name to a safe state */
@@ -238,16 +229,14 @@ void rank() {
     closedir(dir);
     free(path);
 
-    /* util.c - free all nodes in the layout ranking list */
-    free_list();
+    /* free all nodes in the layout ranking list */
+    free_list(); /* util.c */
 
     clock_gettime(CLOCK_MONOTONIC, &compute_end);
     elapsed_compute_time += (compute_end.tv_sec - compute_start.tv_sec) + (compute_end.tv_nsec - compute_start.tv_nsec) / 1e9;
 }
 
-/*
- * Structure to hold data for each thread in the layout improvement process.
- */
+/* Structure to hold data for each thread in the layout improvement process. */
 typedef struct thread_data {
     layout *lt;
     layout **best_lt;
@@ -256,9 +245,8 @@ typedef struct thread_data {
 } thread_data;
 
 /*
- * Function executed by each thread to improve a layout.
- * It performs simulated annealing with adaptive cooling and reheating
- * to find a layout with a better score.
+ * Function executed by each thread to improve a layout. It performs simulated
+ * annealing to find a layout with a better score.
  *
  * Parameters:
  *   arg: A pointer to a thread_data structure.
@@ -273,22 +261,22 @@ void *thread_function(void *arg) {
 
     /* Allocate max and working layouts */
     layout *max_lt, *working_lt;
-    /* util.c - allocate memory for layouts */
-    alloc_layout(&max_lt);
-    alloc_layout(&working_lt);
+    /* Allocate memory for layouts */
+    alloc_layout(&max_lt);     /* util.c */
+    alloc_layout(&working_lt); /* util.c */
 
-    /* util.c - copy initial layout to working and max */
-    copy(working_lt, lt);
+    /* copy initial layout to working and max */
+    copy(working_lt, lt); /* util.c */
 
     /* Set name so we can see if we improved */
     strcat(working_lt->name, " improved");
 
-    /* analyze.c - analyze and score the initial layout */
-    single_analyze(working_lt);
-    /* util.c - calculate the overall score */
-    get_score(working_lt);
-    /* util.c - copies the layout */
-    copy(max_lt, working_lt);
+    /* analyze and score the initial layout */
+    single_analyze(working_lt); /* analyze.c */
+    /* calculate the overall score */
+    get_score(working_lt); /* util.c */
+    /* copies the layout */
+    copy(max_lt, working_lt); /* util.c */
 
     /* Simulated annealing with enhancements */
     struct timespec start, current;
@@ -343,16 +331,16 @@ void *thread_function(void *arg) {
             working_lt->matrix[row2][col2] = temp;
         }
 
-        /* analyze.c - analyze the new layout */
-        single_analyze(working_lt);
-        /* util.c - calculates the new score */
-        get_score(working_lt);
+        /* analyze the new layout */
+        single_analyze(working_lt); /* analyze.c */
+        /* calculates the new score */
+        get_score(working_lt); /* util.c */
 
         /* Exponentiate the score difference for acceptance probability (using sigmoid) */
         float delta_score = working_lt->score - max_lt->score;
         if (delta_score > 0 || (1.0 / (1.0 + exp(-10 * delta_score / T))) > random_float()) {
-            /* util.c - copy the new layout if it passes */
-            copy(max_lt, working_lt);
+            /* copy the new layout if it passes */
+            copy(max_lt, working_lt); /* util.c */
             /* Increment improvement counter */
             improvement_counter++;
         } else {
@@ -441,26 +429,24 @@ void *thread_function(void *arg) {
     }
 
     layout *best_layout;
-    /* util.c - allocates memory for best layout */
-    alloc_layout(&best_layout);
-    /* util.c - copy max_lt to best layout */
-    copy(best_layout, max_lt);
+    /* allocates memory for best layout */
+    alloc_layout(&best_layout); /* util.c */
+    /* copy max_lt to best layout */
+    copy(best_layout, max_lt); /* util.c */
     *(data->best_lt) = best_layout;
 
 
-    /* util.c - free layouts */
-    free_layout(max_lt);
-    free_layout(working_lt);
+    /* free layouts */
+    free_layout(max_lt);     /* util.c */
+    free_layout(working_lt); /* util.c */
 
     pthread_exit(NULL);
 }
 
 /*
  * Initiates the layout generation process without a specific starting layout.
- * Calls improve with shuffle set to 1, effectively starting from a random layout,
- * with no pins. Will still use set of keys from selected layout.
- *
- * Returns: void.
+ * Calls improve with shuffle set to 1, effectively starting from a random
+ * layout, with no pins. Will still use set of keys from selected layout.
  */
 void generate() {
     /* No specific layout used, so unpin all positions for a fresh start */
@@ -477,9 +463,7 @@ void generate() {
  * Each thread runs a simulated annealing process to find a better layout.
  *
  * Parameters:
- *   shuffle: A flag indicating whether to shuffle the layout before starting (1) or not (0).
- *
- * Returns: void.
+ *   shuffle: A flag indicating whether to shuffle the layout before starting.
  */
 void improve(int shuffle) {
     /* Work for timing total/real layouts/second */
@@ -490,25 +474,25 @@ void improve(int shuffle) {
 
     layout *lt;
 
-    /* io.c - prints the current pins */
+    /* prints the current pins */
     log_print('v',L"Pins: \n");
-    print_pins();
+    print_pins(); /* io.c */
     log_print('v',L"\n");
 
-    /* util.c - allocate memory for layout */
+    /* allocate memory for layout */
     log_print('n',L"1/9: Allocating layout... ");
-    alloc_layout(&lt);
+    alloc_layout(&lt); /* util.c */
     log_print('n',L"Done\n\n");
 
-    /* io.c - read the starting keyboard layout */
+    /* read the starting keyboard layout */
     log_print('n',L"2/9: Reading layout... ");
-    read_layout(lt, 1);
+    read_layout(lt, 1); /* io.c */
     log_print('n',L"Done\n\n");
 
     if (shuffle) {
-        /* util.c - shuffles the matrix */
+        /* shuffles the matrix */
         log_print('n',L"3/9: Shuffling layout... ");
-        shuffle_layout(lt);
+        shuffle_layout(lt); /* util.c */
         strcpy(lt->name, "random shuffle");
         log_print('n',L"Done\n\n");
     } else {
@@ -516,15 +500,15 @@ void improve(int shuffle) {
         log_print('n',L"Done\n\n");
     }
 
-    /* analyze.c - perform a single layout analysis */
+    /* perform a single layout analysis */
     log_print('n',L"4/9: Analyzing starting point... ");
-    single_analyze(lt);
-    /* util.c - calculate the overall score */
-    get_score(lt);
+    single_analyze(lt); /* analyze.c */
+    /* calculate the overall score */
+    get_score(lt); /* util.c */
     log_print('n',L"Done\n\n");
 
-    /* io.c - prints the starting layout */
-    print_layout(lt);
+    /* prints the starting layout */
+    print_layout(lt); /* io.c */
     log_print('n',L"\n");
 
     int iterations = repetitions / threads;
@@ -561,28 +545,28 @@ void improve(int shuffle) {
     }
     log_print('n',L"Done\n\n");
 
-    /* analyze.c - perform a single layout analysis */
+    /* perform a single layout analysis */
     log_print('n',L"8/9: Analyzing best layout... ");
-    single_analyze(best_layout);
-    /* util.c - calculates the overall score */
-    get_score(best_layout);
+    single_analyze(best_layout); /* analyze.c */
+    /* calculates the overall score */
+    get_score(best_layout); /* util.c */
     log_print('n',L"Done\n\n");
 
     /* Compare with the original layout and print the better one */
     log_print('n',L"9/9: Printing layout...\n\n");
     if (best_layout->score > lt->score) {
-        /* io.c - prints the best layout */
-        print_layout(best_layout);
+        /* prints the best layout */
+        print_layout(best_layout); /* io.c */
     } else {
-        /* io.c - prints the starting layout */
-        print_layout(lt);
+        /* prints the starting layout */
+        print_layout(lt); /* io.c */
     }
     log_print('n',L"Done\n\n");
 
-    /* util.c - free all allocated layouts and thread data */
+    /* free all allocated layouts and thread data */
     for (int i = 0; i < threads; i++) {
         if (best_layouts[i] != NULL) {
-            free_layout(best_layouts[i]);
+            free_layout(best_layouts[i]); /* util.c */
         }
     }
 
@@ -594,11 +578,7 @@ void improve(int shuffle) {
     elapsed_compute_time += (compute_end.tv_sec - compute_start.tv_sec) + (compute_end.tv_nsec - compute_start.tv_nsec) / 1e9;
 }
 
-/*
- * Generates a new layout using OpenCL.
- *
- * Returns: void.
- */
+/* Generates a new layout using OpenCL. */
 void cl_generate() {
     /* No specific layout used, so unpin all positions for a fresh start */
     for (int i = 0; i < ROW; i++) {
@@ -652,8 +632,6 @@ char* read_source_file(const char* filename, size_t* length) {
  *
  * Parameters:
  *   shuffle: A flag indicating whether to shuffle the layout before starting (1) or not (0).
- *
- * Returns: void.
  */
 void cl_improve(int shuffle) {
     /* Work for timing total/real layouts/second */
@@ -661,6 +639,10 @@ void cl_improve(int shuffle) {
     layouts_analyzed += 2;
     struct timespec compute_start, compute_end;
 
+    /*
+     * precalculate all unflat indices because modulo/division are quite slow
+     * on GPU, so memory accesses are better.
+     */
     int   *mono_index_array = malloc(sizeof(int) * DIM1 * 2);
     for (int i = 0; i < DIM1; i++)
     {
@@ -737,14 +719,8 @@ void cl_improve(int shuffle) {
     print_layout(lt);
     log_print('n', L"\n");
 
-    /* Find the "ideal" amount of work items you can do based on the stats you're using */
-    WORKERS = -1;
-    if (MONO_END > WORKERS) {WORKERS = MONO_END;}
-    if (BI_END > WORKERS) {WORKERS = BI_END;}
-    if (TRI_END > WORKERS) {WORKERS = TRI_END;}
-    if (QUAD_END > WORKERS) {WORKERS = QUAD_END;}
-    if (SKIP_END > WORKERS) {WORKERS = SKIP_END;}
-    if (WORKERS == -1) {error("Something went wrong with finding correct amount of work-items");}
+    /* Set the "ideal" number of work items */
+    WORKERS = 32;
 
     /* OpenCL setup */
     cl_platform_id *platforms;
@@ -825,17 +801,11 @@ void cl_improve(int shuffle) {
     program = clCreateProgramWithSource(context, 1, (const char**)&kernel_source, &source_length, &err);
     if (err != CL_SUCCESS) {error("OpenCL Error: Failed to create program from source.");}
 
-    /* Find mono_stat indexes for Hand Balance Meta Stat */
-    int index_left_hand_usage = find_stat_index("Left Hand Usage", 'm', lt);
-    int index_right_hand_usage = find_stat_index("Right Hand Usage", 'm', lt);
-    if (index_left_hand_usage == -1 || index_right_hand_usage == -1) {error("hand usage stats must have non-zero weight even if you don't care, sorry :)");}
-    if (index_left_hand_usage >= MONO_END || index_right_hand_usage >= MONO_END) {error("the index of left hand usage or right hand usage is out of bounds, idk what you did");}
-
     /* Compiler options to pass constants to the kernel using compiler flags */
     /* Ensure this is large enough for all defines */
     char options[512];
-    sprintf(options, "-Iinclude -cl-fast-relaxed-math -D MONO_END=%d -D BI_END=%d -D TRI_END=%d -D QUAD_END=%d -D SKIP_END=%d -D META_END=%d -D THREADS=%d -D REPETITIONS=%d -D MAX_SWAPS=%d -D WORKERS=%d -D LEFT_HAND=%d -D RIGHT_HAND=%d",
-            MONO_END, BI_END, TRI_END, QUAD_END, SKIP_END, META_END, threads, repetitions, MAX_SWAPS, WORKERS, index_left_hand_usage, index_right_hand_usage);
+    sprintf(options, "-Iinclude -cl-fast-relaxed-math -D MONO_LENGTH=%d -D BI_LENGTH=%d -D TRI_LENGTH=%d -D QUAD_LENGTH=%d -D SKIP_LENGTH=%d -D META_LENGTH=%d -D THREADS=%d -D REPETITIONS=%d -D MAX_SWAPS=%d -D WORKERS=%d",
+            MONO_LENGTH, BI_LENGTH, TRI_LENGTH, QUAD_LENGTH, SKIP_LENGTH, META_LENGTH, threads, repetitions, MAX_SWAPS, WORKERS);
 
     err = clBuildProgram(program, 1, &device, options, NULL, NULL);
     if (err != CL_SUCCESS) {
@@ -880,8 +850,6 @@ void cl_improve(int shuffle) {
     if (err != CL_SUCCESS) {error("OpenCL Error: Failed to create buffer for tri_index_array.");}
     cl_mem buffer_quad_index_array = clCreateBuffer(context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, sizeof(int) * DIM4 * 8, quad_index_array, &err);
     if (err != CL_SUCCESS) {error("OpenCL Error: Failed to create buffer for quad_index_array.");}
-
-
     cl_mem buffer_linear_mono = clCreateBuffer(context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, sizeof(float) * LANG_LENGTH, linear_mono, &err);
     if (err != CL_SUCCESS) {error("OpenCL Error: Failed to create buffer for linear_mono.");}
     cl_mem buffer_linear_bi = clCreateBuffer(context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, sizeof(float) * LANG_LENGTH * LANG_LENGTH, linear_bi, &err);
@@ -892,17 +860,17 @@ void cl_improve(int shuffle) {
     if (err != CL_SUCCESS) {error("OpenCL Error: Failed to create buffer for linear_quad.");}
     cl_mem buffer_linear_skip = clCreateBuffer(context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, sizeof(float) * 10 * LANG_LENGTH * LANG_LENGTH, linear_skip, &err);
     if (err != CL_SUCCESS) {error("OpenCL Error: Failed to create buffer for linear_skip.");}
-    cl_mem buffer_stats_mono = clCreateBuffer(context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, sizeof(mono_stat) * MONO_END, stats_mono, &err);
+    cl_mem buffer_stats_mono = clCreateBuffer(context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, sizeof(mono_stat) * MONO_LENGTH, stats_mono, &err);
     if (err != CL_SUCCESS) {error("OpenCL Error: Failed to create buffer for stats_mono.");}
-    cl_mem buffer_stats_bi = clCreateBuffer(context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, sizeof(bi_stat) * BI_END, stats_bi, &err);
+    cl_mem buffer_stats_bi = clCreateBuffer(context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, sizeof(bi_stat) * BI_LENGTH, stats_bi, &err);
     if (err != CL_SUCCESS) {error("OpenCL Error: Failed to create buffer for stats_bi.");}
-    cl_mem buffer_stats_tri = clCreateBuffer(context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, sizeof(tri_stat) * TRI_END, stats_tri, &err);
+    cl_mem buffer_stats_tri = clCreateBuffer(context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, sizeof(tri_stat) * TRI_LENGTH, stats_tri, &err);
     if (err != CL_SUCCESS) {error("OpenCL Error: Failed to create buffer for stats_tri.");}
-    cl_mem buffer_stats_quad = clCreateBuffer(context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, sizeof(quad_stat) * QUAD_END, stats_quad, &err);
+    cl_mem buffer_stats_quad = clCreateBuffer(context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, sizeof(quad_stat) * QUAD_LENGTH, stats_quad, &err);
     if (err != CL_SUCCESS) {error("OpenCL Error: Failed to create buffer for stats_quad.");}
-    cl_mem buffer_stats_skip = clCreateBuffer(context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, sizeof(skip_stat) * SKIP_END, stats_skip, &err);
+    cl_mem buffer_stats_skip = clCreateBuffer(context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, sizeof(skip_stat) * SKIP_LENGTH, stats_skip, &err);
     if (err != CL_SUCCESS) {error("OpenCL Error: Failed to create buffer for stats_skip.");}
-    cl_mem buffer_stats_meta = clCreateBuffer(context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, sizeof(meta_stat) * META_END, stats_meta, &err);
+    cl_mem buffer_stats_meta = clCreateBuffer(context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, sizeof(meta_stat) * META_LENGTH, stats_meta, &err);
     if (err != CL_SUCCESS) {error("OpenCL Error: Failed to create buffer for stats_meta.");}
     cl_mem buffer_layouts = clCreateBuffer(context, CL_MEM_READ_WRITE, sizeof(layout) * threads, NULL, &err);
     if (err != CL_SUCCESS) {error("OpenCL Error: Failed to create buffer for layouts.");}
@@ -928,7 +896,6 @@ void cl_improve(int shuffle) {
     if (err != CL_SUCCESS) {error("OpenCL Error: Failed to set kernel argument 2.");}
     err = clSetKernelArg(kernel, 3, sizeof(cl_mem), &buffer_quad_index_array);
     if (err != CL_SUCCESS) {error("OpenCL Error: Failed to set kernel argument 3.");}
-
     err = clSetKernelArg(kernel, 4, sizeof(cl_mem), &buffer_linear_mono);
     if (err != CL_SUCCESS) {error("OpenCL Error: Failed to set kernel argument 4.");}
     err = clSetKernelArg(kernel, 5, sizeof(cl_mem), &buffer_linear_bi);
@@ -972,8 +939,10 @@ void cl_improve(int shuffle) {
 
     /* Enqueue kernel */
     log_print('v', L"6/9: Enqueueing kernel... ");
-    size_t global_size = threads * WORKERS; // Example: same number of threads as your C code
-    size_t local_size = WORKERS; // Example: one workgroup
+    /* threads layouts in parallel */
+    size_t global_size = threads * WORKERS;
+    /* WORKERS threads per layout */
+    size_t local_size = WORKERS;
     err = clEnqueueNDRangeKernel(queue, kernel, 1, NULL, &global_size, &local_size, 0, NULL, NULL);
     if (err != CL_SUCCESS) {error("OpenCL Error: Failed to enqueue kernel.");}
     log_print('v', L"Done\n");
@@ -1059,11 +1028,11 @@ void cl_improve(int shuffle) {
 
     /* print final layout */
     log_print('v', L"9/9: Printing layout...\n\n");
-    /* analyze.c - perform a single layout analysis */
+    /* perform a single layout analysis */
     log_print('n',L"8/9: Analyzing best layout... ");
-    single_analyze(best_layout);
-    /* util.c - calculates the overall score */
-    get_score(best_layout);
+    single_analyze(best_layout); /* analyze.c */
+    /* calculates the overall score */
+    get_score(best_layout); /* util.c */
     log_print('n',L"Done\n\n");
     print_layout(best_layout);
     log_print('v', L"Done\n\n");
@@ -1081,10 +1050,9 @@ void cl_improve(int shuffle) {
 }
 
 /*
- * Performs a benchmark to determine the optimal number of threads for layout generation on pure cpu.
- * It runs the generation process with different numbers of threads and measures performance.
- *
- * Returns: void.
+ * Performs a benchmark to determine the optimal number of threads for layout
+ * generation on pure cpu. It runs the generation process with different numbers
+ * of threads and measures performance.
  */
 void gen_benchmark()
 {
@@ -1170,10 +1138,9 @@ void gen_benchmark()
 }
 
 /*
- * Performs a benchmark to determine the optimal number of threads for layout generation on opencl.
- * It runs the generation process with different numbers of threads and measures performance.
- *
- * Returns: void.
+ * Performs a benchmark to determine the optimal number of threads for layout
+ * generation on opencl. It runs the generation process with different numbers
+ * of threads and measures performance.
  */
 void cl_gen_benchmark()
 {
@@ -1329,9 +1296,8 @@ void cl_gen_benchmark()
 }
 
 /*
- * Prints a help message providing usage instructions for the program's command line arguments.
- *
- * Returns: void.
+ * Prints a help message providing usage instructions for the program's command
+ * line arguments.
  */
 void print_help() {
     /* Work for timing total/real layouts/second */
@@ -1390,11 +1356,7 @@ void print_help() {
     elapsed_compute_time += (compute_end.tv_sec - compute_start.tv_sec) + (compute_end.tv_nsec - compute_start.tv_nsec) / 1e9;
 }
 
-/*
- * Prints an introductory message and information about the GULAG.
- *
- * Returns: void.
- */
+/* Prints an introductory message and information about the GULAG. */
 void print_info() {
     /* Work for timing total/real layouts/second */
     layouts_analyzed = 0;

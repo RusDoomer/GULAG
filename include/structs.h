@@ -1,7 +1,7 @@
 #ifndef STRUCTS_H
 #define STRUCTS_H
 
-// Dimensions of the layout grid.
+/* Dimensions of the layout grid. */
 #define row 3
 #define col 12
 #define dim1 row * col
@@ -35,7 +35,7 @@ typedef struct mono_stat {
     int ngrams[dim1];
     int length;
     float weight;
-    struct mono_stat *next;
+    int skip;
 } mono_stat;
 
 typedef struct bi_stat {
@@ -43,7 +43,7 @@ typedef struct bi_stat {
     int ngrams[dim2];
     int length;
     float weight;
-    struct bi_stat *next;
+    int skip;
 } bi_stat;
 
 typedef struct tri_stat {
@@ -51,7 +51,7 @@ typedef struct tri_stat {
     int ngrams[dim3];
     int length;
     float weight;
-    struct tri_stat *next;
+    int skip;
 } tri_stat;
 
 typedef struct quad_stat {
@@ -59,7 +59,7 @@ typedef struct quad_stat {
     int ngrams[dim4];
     int length;
     float weight;
-    struct quad_stat *next;
+    int skip;
 } quad_stat;
 
 typedef struct skip_stat {
@@ -68,7 +68,7 @@ typedef struct skip_stat {
     int length;
     /* multiple weights for skip-X-grams */
     float weight[10];
-    struct skip_stat *next;
+    int skip;
 } skip_stat;
 
 /*
@@ -77,8 +77,13 @@ typedef struct skip_stat {
  */
 typedef struct meta_stat {
     char name[100];
+    char stat_types[100];
+    int stat_indices[100];
+    float stat_weights[100];
+    int length;
     float weight;
-    struct meta_stat *next;
+    int absv; /* only for hand balanace for now, 1 if value is absolute */
+    int skip;
 } meta_stat;
 
 #endif

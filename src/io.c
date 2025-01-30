@@ -1,12 +1,9 @@
 /*
  * io.c - Input/output operations for the GULAG.
  *
- * Author: Rus Doomer
- *
- * Description: This file handles file operations, argument parsing,
- *              and user interaction for the GULAG. It includes functions
- *              for reading configuration files, processing command-line arguments,
- *              handling corpus data, and managing layout input/output.
+ * This file handles file operations, argument parsing, and user interaction for
+ * the GULAG. It includes functions for reading configuration files, processing
+ * command-line arguments, handling corpus data, and managing layout i/o.
  */
 
 #include <stdio.h>
@@ -36,23 +33,22 @@
  * Parameters:
  *   required_level: The minimum verbosity level required to print the message.
  *                   'q' for quiet, 'n' for normal, 'v' for verbose.
- *   format:         The format string for the message, compatible with vwprintf.
+ *   format:         The format string for the message.
  *   ...:            Variable arguments for the format string.
- *
- * Returns:
- *   void
  */
 void log_print(char required_level, const wchar_t *format, ...) {
     /* Check if the current output mode meets or exceeds the required level */
-    if ((required_level == 'q' && (output_mode == 'q' || output_mode == 'n' || output_mode == 'v')) ||
+    if (
+        (required_level == 'q' && (output_mode == 'q' || output_mode == 'n' || output_mode == 'v')) ||
         (required_level == 'n' && (output_mode == 'n' || output_mode == 'v')) ||
-        (required_level == 'v' && output_mode == 'v')) {
-
+        (required_level == 'v' &&  output_mode == 'v')
+       )
+    {
         va_list args;
         va_start(args, format);
         vwprintf(format, args);
         va_end(args);
-
+        /* force the message to be printed immediately */
         fflush(stdout);
     }
 }
@@ -63,8 +59,6 @@ void log_print(char required_level, const wchar_t *format, ...) {
  * such as pinned key positions, language, corpus, layout names,
  * weights file, run mode, number of repetitions, number of threads,
  * output mode, and backend mode.
- *
- * Returns: void.
  */
 void read_config()
 {
@@ -76,7 +70,6 @@ void read_config()
     /* config.conf assumed to be in the working directory. */
     config = fopen("config.conf", "r");
     if (config == NULL) {
-        /* util.c - error handling */
         error("Required file config.conf not found.");
     }
     log_print('q',L"config.conf found... ");
@@ -132,11 +125,11 @@ void read_config()
     weight_name = (char *)malloc((sizeof(char) * strlen(buff)) + 1);
     strcpy(weight_name, buff);
 
-    /* io_util.c - validates and converts run mode */
+    /* validate and convert run mode */
     if (fscanf(config, "%s %s", discard, buff) != 2) {
         error("Failed to read run mode from config file.");
     }
-    run_mode = check_run_mode(buff);
+    run_mode = check_run_mode(buff); /* io_util.c */
 
     if (fscanf(config, "%s %s", discard, buff) != 2) {
         error("Failed to read repetitions from config file.");
@@ -148,17 +141,17 @@ void read_config()
     }
     threads = atoi(buff);
 
-    /* io_util.c - validates and converts output mode */
+    /* validate and convert output mode */
     if (fscanf(config, "%s %s", discard, buff) != 2) {
         error("Failed to read output mode from config file.");
     }
-    output_mode = check_output_mode(buff);
+    output_mode = check_output_mode(buff); /* io_util.c */
 
-    /* io_util.c - validates and converts backend mode */
+    /* validate and convert backend mode */
     if (fscanf(config, "%s %s", discard, buff) != 2) {
         error("Failed to read backend mode from config file.");
     }
-    backend_mode = check_backend_mode(buff);
+    backend_mode = check_backend_mode(buff); /* io_util.c */
 
     fclose(config);
 }
@@ -169,11 +162,6 @@ void read_config()
  * corresponding global variables such as language name, corpus name,
  * layout names, weight file, repetitions, threads, run mode, output mode,
  * and backend mode.
- *
- * Parameters:
- *   argc: The number of command line arguments.
- *   argv: An array of C-style strings containing the command line arguments.
- * Returns: void.
  */
 void read_args(int argc, char **argv)
 {
@@ -208,19 +196,18 @@ void read_args(int argc, char **argv)
             threads = atoi(optarg);
             break;
         case 'm':
-            /* io_util.c - validates and converts run mode */
-            run_mode = check_run_mode(optarg);
+            /* validate and convert run mode */
+            run_mode = check_run_mode(optarg); /* io_util.c */
             break;
         case 'o':
-            /* io_util.c - validates and converts output mode */
-            output_mode = check_output_mode(optarg);
+            /* validate and convert output mode */
+            output_mode = check_output_mode(optarg); /* io_util.c */
             break;
         case 'b':
-            /* io_util.c - validates and converts backend mode */
-            backend_mode = check_backend_mode(optarg);
+            /* validate and convert backend mode */
+            backend_mode = check_backend_mode(optarg); /* io_util.c */
             break;
         case '?':
-            /* util.c - error handling */
             error("Improper Usage: %s -l lang_name -c corpus_name "
                 "-1 layout_name -2 layout2_name -w weight_name -r repetitions "
                 "-t threads -m run_mode -o output_mode -b backend_mode");
@@ -231,12 +218,8 @@ void read_args(int argc, char **argv)
 }
 
 /*
- * Validates the current program settings to ensure they are legal and consistent.
- * Checks if the language, corpus, layouts, weights, run mode, output mode,
- * number of threads, and repetitions are valid. Terminates the program with
- * an error message if an invalid setting is found.
- *
- * Returns: void.
+ * Validates the current program settings to ensure they are legal.
+ * Terminates the program if an invalid setting is found.
  */
 void check_setup()
 {
@@ -265,12 +248,9 @@ void check_setup()
 
 /*
  * Reads and sets the current language's character set from a language file.
- * The function constructs the path to the language file based on 'lang_name',
- * reads the character set into 'lang_arr', and sets up the 'char_table' for
- * character code lookups. It performs checks to ensure the language file
- * is correctly formatted and only contains legal characters.
- *
- * Returns: void.
+ * Sets up the 'char_table' for character code lookups. It performs checks to
+ * ensure the language file is correctly formatted and only contains legal
+ * characters.
  */
 void read_lang()
 {
@@ -313,11 +293,11 @@ void read_lang()
     }
 
     /*
-     * io_util.c - check for duplicate characters
-     * this allows duplicate characters that are side by side for
-     * of shifted pair (and to allow the double space at the start)
+     * Check for duplicate characters this allows duplicate characters that are
+     * side by side for of shifted pair
+     * (and to allow the double space at the start)
      */
-    if (check_duplicates(lang_arr) != -1) {
+    if (check_duplicates(lang_arr) != -1) { /* io_util.c */
         error("Lang file contains duplicate characters.");
     }
 
@@ -334,10 +314,8 @@ void read_lang()
 }
 
 /*
- * Attempts to read corpus data from a cache file.
- * This function constructs the path to the cache file based on 'lang_name'
- * and 'corpus_name'. If the cache file exists, it reads the pre-computed
- * ngram frequencies into the global corpus arrays.
+ * Attempts to read corpus data from a cache file. If the cache file exists,
+ * it reads the pre-computed ngram frequencies into the global corpus arrays.
  *
  * Returns:
  *   1 if the cache file was successfully read, 0 otherwise.
@@ -429,12 +407,10 @@ int read_corpus_cache()
 }
 
 /*
- * Reads and processes a corpus text file to collect ngram frequency data.
- * It constructs the path to the corpus file and reads it character by character,
- * updating the frequency counts in the global corpus arrays for monograms,
- * bigrams, trigrams, quadgrams, and skipgrams.
- *
- * Returns: void.
+ * Reads and processes a corpus text file to collect ngram frequency data. Reads
+ * the corpus character by character, updating the frequency counts in the
+ * global corpus arrays for monograms, bigrams, trigrams, quadgrams,
+ * and skipgrams.
  */
 void read_corpus()
 {
@@ -457,9 +433,9 @@ void read_corpus()
     int mem[] = {-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1};
 
     wchar_t curr;
-    /* io_util.c - convert characters based on the lang file */
     while ((curr = fgetwc(corpus)) != WEOF) {
-        mem[0] = convert_char(curr);
+        /* convert characters based on the lang file */
+        mem[0] = convert_char(curr); /* io_util.c */
         /* If character is valid in the language */
         if (mem[0] > 0 && mem[0] < 51) {
             corpus_mono[mem[0]]++;
@@ -467,10 +443,10 @@ void read_corpus()
             /* If there is a previous character, record the bigram */
             if (mem[1] > 0 && mem[1] < 51) {
                 corpus_bi[mem[1]][mem[0]]++;
-                /* If there are two previous characters, record the trigram */
+                /* If there are two, record the trigram */
                 if (mem[2] > 0 && mem[2] < 51) {
                     corpus_tri[mem[2]][mem[1]][mem[0]]++;
-                    /* If there are three previous characters, record the quadgram */
+                    /* If there are three, record the quadgram */
                     if (mem[3] > 0 && mem[3] < 51) {
                         corpus_quad[mem[3]][mem[2]][mem[1]][mem[0]]++;
                     }
@@ -486,8 +462,8 @@ void read_corpus()
                 }
             }
         }
-        /* io_util.c - shift over an array one index, dropping the last value */
-        iterate(mem, 11);
+        /* shift over an array one index, dropping the last value */
+        iterate(mem, 11); /* io_util.c */
     }
 
     fclose(corpus);
@@ -498,8 +474,6 @@ void read_corpus()
  * Creates or updates a cache file with the current corpus frequency data.
  * This function writes the current state of the global corpus arrays to a
  * cache file, allowing for quicker initialization in future runs.
- *
- * Returns: void.
  */
 void cache_corpus()
 {
@@ -559,8 +533,6 @@ void cache_corpus()
  * Reads and applies weights from a weight file to the corresponding statistics.
  * It opens the weight file specified by 'weight_name' and parses it line by
  * line, updating the 'weight' field of each statistic based on its name.
- *
- * Returns: void.
  */
 void read_weights()
 {
@@ -582,7 +554,7 @@ void read_weights()
     /* Read each line from the weights file. */
     while (fgetws(line, sizeof(line) / sizeof(line[0]), weight_file) != NULL)
     {
-         /* Parse the line: split on ':' to get name and weight(s) */
+        /* Parse the line: split on ':' to get name and weight(s) */
         wchar_t *delimiter = wcschr(line, L':');
         /* Skip lines that don't have the expected format */
         if (delimiter == NULL) {continue;}
@@ -591,7 +563,7 @@ void read_weights()
         wchar_t *name_part = line;
         wchar_t *weight_part = delimiter + 1;
 
-         /* Trim whitespace around name and weight */
+        /* Trim whitespace around name and weight */
         while (*name_part && iswspace(*name_part))
             name_part++;
         while (name_part[wcslen(name_part) - 1] && iswspace(name_part[wcslen(name_part) - 1]))
@@ -620,75 +592,57 @@ void read_weights()
             token = wcstok(NULL, L" ", &state);
         }
 
-        /* Find the matching stat in the linked lists and update its weight(s) */
-        mono_stat *current_mono = mono_head;
-        while (current_mono != NULL)
+        /* Find the matching stat in the arrays and update its weight(s) */
+        for (int i = 0; i < MONO_LENGTH; i++)
         {
-            if (strcmp(current_mono->name, name_buffer) == 0)
+            if (strcmp(stats_mono[i].name, name_buffer) == 0)
             {
-                current_mono->weight = weights[0];
-                break;
+                stats_mono[i].weight = weights[0];
             }
-            current_mono = current_mono->next;
         }
 
-        bi_stat *current_bi = bi_head;
-        while (current_bi != NULL)
+        for (int i = 0; i < BI_LENGTH; i++)
         {
-            if (strcmp(current_bi->name, name_buffer) == 0)
+            if (strcmp(stats_bi[i].name, name_buffer) == 0)
             {
-                current_bi->weight = weights[0];
-                break;
+                stats_bi[i].weight = weights[0];
             }
-            current_bi = current_bi->next;
         }
 
-        tri_stat *current_tri = tri_head;
-        while (current_tri != NULL)
+        for (int i = 0; i < TRI_LENGTH; i++)
         {
-            if (strcmp(current_tri->name, name_buffer) == 0)
+            if (strcmp(stats_tri[i].name, name_buffer) == 0)
             {
-                current_tri->weight = weights[0];
-                break;
+                stats_tri[i].weight = weights[0];
             }
-            current_tri = current_tri->next;
         }
 
-        quad_stat *current_quad = quad_head;
-        while (current_quad != NULL)
+        for (int i = 0; i < QUAD_LENGTH; i++)
         {
-            if (strcmp(current_quad->name, name_buffer) == 0)
+            if (strcmp(stats_quad[i].name, name_buffer) == 0)
             {
-                current_quad->weight = weights[0];
-                break;
+                stats_quad[i].weight = weights[0];
             }
-            current_quad = current_quad->next;
         }
 
-        skip_stat *current_skip = skip_head;
-        while (current_skip != NULL)
+        for (int i = 0; i < SKIP_LENGTH; i++)
         {
-            if (strcmp(current_skip->name, name_buffer) == 0)
+            if (strcmp(stats_skip[i].name, name_buffer) == 0)
             {
                 /* Update weights array for skip_stat */
-                for (int i = 1; i <= 9; i++)
+                for (int k = 1; k <= 9; k++)
                 {
-                    current_skip->weight[i] = weights[i - 1];
+                    stats_skip[i].weight[k] = weights[k - 1];
                 }
-                break;
             }
-            current_skip = current_skip->next;
         }
 
-        meta_stat *current_meta = meta_head;
-        while (current_meta != NULL)
+        for (int i = 0; i < META_LENGTH; i++)
         {
-            if (strcmp(current_meta->name, name_buffer) == 0)
+            if (strcmp(stats_meta[i].name, name_buffer) == 0)
             {
-                current_meta->weight = weights[0];
-                break;
+                stats_meta[i].weight = weights[0];
             }
-            current_meta = current_meta->next;
         }
     }
 
@@ -697,15 +651,13 @@ void read_weights()
 }
 
 /*
- * Reads a keyboard layout from a file and initializes a layout structure.
- * The layout file is specified by either 'layout_name' or 'layout2_name'
- * based on the 'which_layout' parameter. The function reads the layout matrix
- * and sets the layout name in the provided layout structure.
+ * Reads and initializes a layout from a file. The layout file is specified by
+ * either 'layout_name' or 'layout2_name' based on the 'which_layout' parameter.
+ * The function reads the layout matrix and sets the layout name in the pointer.
  *
  * Parameters:
  *   lt:           A pointer to the layout structure to be initialized.
  *   which_layout: An integer indicating which layout to read (1 or 2).
- * Returns: void.
  */
 void read_layout(layout *lt, int which_layout)
 {
@@ -753,7 +705,6 @@ void read_layout(layout *lt, int which_layout)
  * Prints the layout name and score.
  * Parameters:
  *   lt: A pointer to the layout structure to be printed.
- * Returns: void.
  */
 void quiet_print(layout *lt)
 {
@@ -773,39 +724,55 @@ void quiet_print(layout *lt)
  * Prints the layout along with ngram stats.
  * Parameters:
  *   lt: A pointer to the layout structure to be printed.
- * Returns: void.
  */
 void normal_print(layout *lt)
 {
     quiet_print(lt);
     log_print('n',L"\nMONOGRAM STATS\n");
-    for (int i = 0; i < MONO_END; i++) {log_print('n',L"%s : %f\%\n", stats_mono[i].name, lt->mono_score[i]);}
-    log_print('n',L"\nBIGRAM STATS\n");
-    for (int i = 0; i < BI_END; i++) {log_print('n',L"%s : %f\%\n", stats_bi[i].name, lt->bi_score[i]);}
-    log_print('n',L"\nTRIGRAM STATS\n");
-    for (int i = 0; i < TRI_END; i++) {log_print('n',L"%s : %f\%\n", stats_tri[i].name, lt->tri_score[i]);}
-    log_print('n',L"\nQUADGRAM STATS\n");
-    for (int i = 0; i < QUAD_END; i++) {log_print('n',L"%s : %f\%\n", stats_quad[i].name, lt->quad_score[i]);}
-    log_print('n',L"\nSKIPGRAM STATS\n");
-    for (int i = 0; i < SKIP_END; i++)
+    for (int i = 0; i < MONO_LENGTH; i++)
     {
-        log_print('n',L"%s : ", stats_skip[i].name);
-        for (int j = 1; j <= 9; j++)
+        if (!stats_mono[i].skip) {log_print('n',L"%s : %f\%\n", stats_mono[i].name, lt->mono_score[i]);}
+    }
+    log_print('n',L"\nBIGRAM STATS\n");
+    for (int i = 0; i < BI_LENGTH; i++)
+    {
+        if (!stats_bi[i].skip) {log_print('n',L"%s : %f\%\n", stats_bi[i].name, lt->bi_score[i]);}
+    }
+    log_print('n',L"\nTRIGRAM STATS\n");
+    for (int i = 0; i < TRI_LENGTH; i++)
+    {
+        if (!stats_tri[i].skip) {log_print('n',L"%s : %f\%\n", stats_tri[i].name, lt->tri_score[i]);}
+    }
+    log_print('n',L"\nQUADGRAM STATS\n");
+    for (int i = 0; i < QUAD_LENGTH; i++)
+    {
+        if (!stats_quad[i].skip) {log_print('n',L"%s : %f\%\n", stats_quad[i].name, lt->quad_score[i]);}
+    }
+    log_print('n',L"\nSKIPGRAM STATS\n");
+    for (int i = 0; i < SKIP_LENGTH; i++)
+    {
+        if (!stats_skip[i].skip)
         {
-            log_print('n',L"%f", lt->skip_score[j][i]);
-            log_print('n',L"%|");
+            log_print('n',L"%s : ", stats_skip[i].name);
+            for (int j = 1; j <= 9; j++)
+            {
+                log_print('n',L"%f", lt->skip_score[j][i]);
+                log_print('n',L"%|");
+            }
+            log_print('n',L"\n");
         }
-        log_print('n',L"\n");
     }
     log_print('n',L"\nMETA STATS\n");
-    for (int i = 0; i < META_END; i++) {log_print('n',L"%s : %f\%\n", stats_meta[i].name, lt->meta_score[i]);}
+    for (int i = 0; i < META_LENGTH; i++)
+    {
+        if (!stats_meta[i].skip) {log_print('n',L"%s : %f\%\n", stats_meta[i].name, lt->meta_score[i]);}
+    }
 }
 
 /*
  * Prints detailed information, currently the same as normal_print.
  * Parameters:
  *   lt: A pointer to the layout structure to be printed.
- * Returns: void.
  */
 void verbose_print(layout *lt)
 {
@@ -813,14 +780,12 @@ void verbose_print(layout *lt)
 }
 
 /*
- * Prints the contents of a layout structure to the standard output.
- * The function uses the current 'output_mode' to determine the level of detail
- * to print, ranging from just the layout matrix and score to detailed
+ * Prints a layout using the current 'output_mode' to determine the level of
+ * detail to print, ranging from just the layout matrix and score to detailed
  * statistics for each ngram type.
  *
  * Parameters:
  *   lt: A pointer to the layout structure to be printed.
- * Returns: void.
  */
 void print_layout(layout *lt)
 {
@@ -838,11 +803,9 @@ void print_layout(layout *lt)
 }
 
 /*
- * Prints the ranked list of layouts to the standard output.
- * Layouts are printed in descending order of their score, along with their names.
- * The function traverses the 'head_node' linked list to access each layout node.
- *
- * Returns: void.
+ * Prints the ranked list of layouts to the standard output. Layouts are printed
+ * in descending order of their score, along with their names. The function
+ * traverses the ranking linked list to access each layout node.
  */
 void print_ranking()
 {
@@ -855,12 +818,7 @@ void print_ranking()
     }
 }
 
-/*
- * Prints the current pin configuration for layout improvement to the standard output.
- * Each element in the 'pins' array is printed, showing which positions are pinned.
- *
- * Returns: void.
- */
+/*vPrints the current pin configuration for layout improvement. */
 void print_pins()
 {
     for (int i = 0; i < ROW; i++)
