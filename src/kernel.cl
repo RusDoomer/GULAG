@@ -370,7 +370,7 @@ inline void calculate_quad_stats(__local cl_layout *working,
                                  __constant int *quad_index_array) {
     int row0, col0, row1, col1, row2, col2, row3, col3;
     for (int i = local_id; i < QUAD_LENGTH; i += WORKERS) {
-        if(!stats_skip[i].skip)
+        if(!stats_quad[i].skip)
         {
             working->quad_score[i] = 0;
             int length = stats_quad[i].length;
@@ -491,7 +491,7 @@ inline void cl_meta_analysis(__local cl_layout *working,
                 }
                 j++;
             }
-            if (stats_meta[i].absv && working->meta_score[i] < 0) {lt->meta_score[i] *= -1;}
+            if (stats_meta[i].absv && working->meta_score[i] < 0) {working->meta_score[i] *= -1;}
         }
     }
 }
