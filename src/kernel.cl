@@ -187,9 +187,9 @@ inline void cl_get_score(__local cl_layout *lt,
     }
     for (int i = 1; i <= 9; i++)
     {
-        if(!stats_skip[i].skip)
+        for (int j = 0; j < SKIP_LENGTH; j++)
         {
-            for (int j = 0; j < SKIP_LENGTH; j++)
+            if(!stats_skip[j].skip)
             {
                 lt->score += lt->skip_score[i][j] * stats_skip[j].weight[i];
             }
@@ -273,7 +273,7 @@ inline void calculate_mono_stats(__local cl_layout *working,
             working->mono_score[i] = 0;
             int length = stats_mono[i].length;
             for (int j = 0; j < length; j++) {
-                int n = j * 2;
+                int n = stats_mono[i].ngrams[j] * 2;
                 row0 = mono_index_array[n];
                 col0 = mono_index_array[n + 1];
                 if (working->matrix[row0][col0] != -1) {
@@ -305,7 +305,7 @@ inline void calculate_bi_stats(__local cl_layout *working,
             working->bi_score[i] = 0;
             int length = stats_bi[i].length;
             for (int j = 0; j < length; j++) {
-                int n = j * 4;
+                int n = stats_bi[i].ngrams[j] * 4;
                 row0 = bi_index_array[n];
                 col0 = bi_index_array[n + 1];
                 row1 = bi_index_array[n + 2];
@@ -339,7 +339,7 @@ inline void calculate_tri_stats(__local cl_layout *working,
             working->tri_score[i] = 0;
             int length = stats_tri[i].length;
             for (int j = 0; j < length; j++) {
-                int n = j * 6;
+                int n = stats_tri[i].ngrams[j] * 6;
                 row0 = tri_index_array[n];
                 col0 = tri_index_array[n + 1];
                 row1 = tri_index_array[n + 2];
@@ -375,7 +375,7 @@ inline void calculate_quad_stats(__local cl_layout *working,
             working->quad_score[i] = 0;
             int length = stats_quad[i].length;
             for (int j = 0; j < length; j++) {
-                int n = j * 8;
+                int n = stats_quad[i].ngrams[j] * 8;
                 row0 = quad_index_array[n];
                 col0 = quad_index_array[n + 1];
                 row1 = quad_index_array[n + 2];
@@ -414,7 +414,7 @@ inline void calculate_skip_stats(__local cl_layout *working,
             for (int k = 1; k <= 9; k++) {
                 working->skip_score[k][i] = 0;
                 for (int j = 0; j < length; j++) {
-                    int n = j * 4;
+                    int n = stats_skip[i].ngrams[j] * 4;
                     row0 = bi_index_array[n];
                     col0 = bi_index_array[n + 1];
                     row1 = bi_index_array[n + 2];
@@ -431,7 +431,6 @@ inline void calculate_skip_stats(__local cl_layout *working,
 
 /*
  * Performs meta-analysis on a layout.
- * Currently, only calculates hand balance.
  * Parameters:
  *   lt: Pointer to the cl_layout to analyze.
  *   local_id: The local ID of the work item.

@@ -1020,7 +1020,7 @@ void cl_improve(int shuffle) {
     /* calculates the overall score */
     get_score(best_layout); /* util.c */
     log_print('n',L"Done\n\n");
-    print_layout(best_layout);
+    print_layout(best_layout); /* io.c */
     log_print('v', L"Done\n\n");
 
     free(layouts);
