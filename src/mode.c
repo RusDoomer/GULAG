@@ -671,7 +671,42 @@ void cl_improve(int shuffle) {
     log_print('n', L"\n");
 
     /* Set the "ideal" number of work items */
-    WORKERS = QUAD_LENGTH / 8;
+    WORKERS = -1;
+    int temp_total = 0;
+    for (int i = 0; i < MONO_LENGTH; i++) {
+        if (!stats_mono[i].skip) {temp_total++;}
+    }
+    if (temp_total > WORKERS) {WORKERS = temp_total;}
+
+    temp_total = 0;
+    for (int i = 0; i < BI_LENGTH; i++) {
+        if (!stats_bi[i].skip) {temp_total++;}
+    }
+    if (temp_total > WORKERS) {WORKERS = temp_total;}
+
+    temp_total = 0;
+    for (int i = 0; i < TRI_LENGTH; i++) {
+        if (!stats_tri[i].skip) {temp_total++;}
+    }
+    if (temp_total > WORKERS) {WORKERS = temp_total;}
+
+    temp_total = 0;
+    for (int i = 0; i < QUAD_LENGTH; i++) {
+        if (!stats_quad[i].skip) {temp_total++;}
+    }
+    if (temp_total > WORKERS) {WORKERS = temp_total;}
+
+    temp_total = 0;
+    for (int i = 0; i < SKIP_LENGTH; i++) {
+        if (!stats_skip[i].skip) {temp_total++;}
+    }
+    if (temp_total > WORKERS) {WORKERS = temp_total;}
+
+    temp_total = 0;
+    for (int i = 0; i < META_LENGTH; i++) {
+        if (!stats_meta[i].skip) {temp_total++;}
+    }
+    if (temp_total > WORKERS) {WORKERS = temp_total;}
 
     /* OpenCL setup */
     cl_platform_id *platforms;
