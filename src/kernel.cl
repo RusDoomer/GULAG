@@ -579,7 +579,7 @@ __kernel void improve_kernel(__constant float *linear_mono,
         barrier(CLK_LOCAL_MEM_FENCE);
 
         /* Calculate statistics */
-        calculate_mono_stats(&working, local_id, stats_mono, linear_monoy);
+        calculate_mono_stats(&working, local_id, stats_mono, linear_mono);
         calculate_bi_stats(&working, local_id, stats_bi, linear_bi);
         calculate_tri_stats(&working, local_id, stats_tri, linear_tri);
         calculate_quad_stats(&working, local_id, stats_quad, linear_quad);
