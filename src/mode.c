@@ -639,55 +639,6 @@ void cl_improve(int shuffle) {
     layouts_analyzed += 2;
     struct timespec compute_start, compute_end;
 
-    /*
-     * precalculate all unflat indices because modulo/division are quite slow
-     * on GPU, so memory accesses are better.
-     */
-    int   *mono_index_array = malloc(sizeof(int) * DIM1 * 2);
-    for (int i = 0; i < DIM1; i++)
-    {
-        int row0, col0;
-        unflat_mono(i, &row0, &col0);
-        mono_index_array[(i * 2) + 0] = row0;
-        mono_index_array[(i * 2) + 1] = col0;
-    }
-    int   *bi_index_array   = malloc(sizeof(int) * DIM2 * 4);
-    for (int i = 0; i < DIM2; i++)
-    {
-        int row0, col0, row1, col1;
-        unflat_bi(i, &row0, &col0, &row1, &col1);
-        bi_index_array[(i * 4) + 0] = row0;
-        bi_index_array[(i * 4) + 1] = col0;
-        bi_index_array[(i * 4) + 2] = row1;
-        bi_index_array[(i * 4) + 3] = col1;
-    }
-    int   *tri_index_array  = malloc(sizeof(int) * DIM3 * 6);
-    for (int i = 0; i < DIM3; i++)
-    {
-        int row0, col0, row1, col1, row2, col2;
-        unflat_tri(i, &row0, &col0, &row1, &col1, &row2, &col2);
-        tri_index_array[(i * 6) + 0] = row0;
-        tri_index_array[(i * 6) + 1] = col0;
-        tri_index_array[(i * 6) + 2] = row1;
-        tri_index_array[(i * 6) + 3] = col1;
-        tri_index_array[(i * 6) + 4] = row2;
-        tri_index_array[(i * 6) + 5] = col2;
-    }
-    int   *quad_index_array = malloc(sizeof(int) * DIM4 * 8);
-    for (int i = 0; i < DIM4; i++)
-    {
-        int row0, col0, row1, col1, row2, col2, row3, col3;
-        unflat_quad(i, &row0, &col0, &row1, &col1, &row2, &col2, &row3, &col3);
-        quad_index_array[(i * 8) + 0] = row0;
-        quad_index_array[(i * 8) + 1] = col0;
-        quad_index_array[(i * 8) + 2] = row1;
-        quad_index_array[(i * 8) + 3] = col1;
-        quad_index_array[(i * 8) + 4] = row2;
-        quad_index_array[(i * 8) + 5] = col2;
-        quad_index_array[(i * 8) + 6] = row3;
-        quad_index_array[(i * 8) + 7] = col3;
-    }
-
     log_print('v', L"Pins: \n");
     print_pins();
     log_print('v', L"\n");
@@ -720,7 +671,7 @@ void cl_improve(int shuffle) {
     log_print('n', L"\n");
 
     /* Set the "ideal" number of work items */
-    WORKERS = 32;
+    WORKERS = QUAD_LENGTH / 8;
 
     /* OpenCL setup */
     cl_platform_id *platforms;
@@ -1036,11 +987,6 @@ void cl_improve(int shuffle) {
     log_print('n',L"Done\n\n");
     print_layout(best_layout);
     log_print('v', L"Done\n\n");
-
-    free(mono_index_array);
-    free(bi_index_array);
-    free(tri_index_array);
-    free(quad_index_array);
 
     free(layouts);
     free_layout(lt);

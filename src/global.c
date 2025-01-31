@@ -66,6 +66,12 @@ int pins[row][col];
 /* Head of the linked list for layout ranking. */
 layout_node *head_node;
 
+/* Arrays to store precomputed unflattened indices */
+int *mono_index_array;
+int *bi_index_array;
+int *tri_index_array;
+int *quad_index_array;
+
 /* Arrays to store raw frequency counts from the corpus. */
 int *corpus_mono;
 int **corpus_bi;

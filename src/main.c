@@ -18,7 +18,7 @@
 void start_up()
 {
     /* Hide cursor. */
-    log_print('n',L"1/3: Hiding cursor... ");
+    log_print('n',L"1/4: Hiding cursor... ");
     wprintf(L"\e[?25l");
 
     /* Seed random number generator. */
@@ -27,7 +27,7 @@ void start_up()
     log_print('n',L"Done\n\n");
 
     /* Allocate language array. */
-    log_print('n',L"2/3: Allocating language array... ");
+    log_print('n',L"2/4: Allocating language array... ");
     lang_arr = (wchar_t *)calloc(101, sizeof(wchar_t));
 
     /* Allocate character hash table array. */
@@ -36,7 +36,7 @@ void start_up()
     log_print('n',L"Done\n\n");
 
     /* Allocate arrays for ngrams directly from corpus. */
-    log_print('n',L"3/3: Allocating corpus arrays...\n");
+    log_print('n',L"3/4: Allocating corpus arrays...\n");
     log_print('v',L"     Monograms... Integer... ");
     corpus_mono = (int *)calloc(LANG_LENGTH, sizeof(int));
     log_print('v',L"Floating Point... ");
@@ -91,6 +91,64 @@ void start_up()
     }
     log_print('v',L"       Floating Point... ");
     linear_skip = (float *)calloc(10 * LANG_LENGTH * LANG_LENGTH, sizeof(float));
+    log_print('v',L"Done\n\n");
+
+    /*
+     * precalculate all unflat indices because modulo/division are quite slow
+     * on GPU, so memory accesses are better.
+     */
+    log_print('n',L"4/4: Precomputing indexes...\n");
+    log_print('v',L"     Monograms...");
+    mono_index_array = malloc(sizeof(int) * DIM1 * 2);
+    for (int i = 0; i < DIM1; i++)
+    {
+        int row0, col0;
+        unflat_mono(i, &row0, &col0);
+        mono_index_array[(i * 2) + 0] = row0;
+        mono_index_array[(i * 2) + 1] = col0;
+    }
+    log_print('v',L"Done\n");
+    log_print('v',L"     Bigrams...");
+    bi_index_array   = malloc(sizeof(int) * DIM2 * 4);
+    for (int i = 0; i < DIM2; i++)
+    {
+        int row0, col0, row1, col1;
+        unflat_bi(i, &row0, &col0, &row1, &col1);
+        bi_index_array[(i * 4) + 0] = row0;
+        bi_index_array[(i * 4) + 1] = col0;
+        bi_index_array[(i * 4) + 2] = row1;
+        bi_index_array[(i * 4) + 3] = col1;
+    }
+    log_print('v',L"Done\n");
+    log_print('v',L"     Trigrams...");
+    tri_index_array  = malloc(sizeof(int) * DIM3 * 6);
+    for (int i = 0; i < DIM3; i++)
+    {
+        int row0, col0, row1, col1, row2, col2;
+        unflat_tri(i, &row0, &col0, &row1, &col1, &row2, &col2);
+        tri_index_array[(i * 6) + 0] = row0;
+        tri_index_array[(i * 6) + 1] = col0;
+        tri_index_array[(i * 6) + 2] = row1;
+        tri_index_array[(i * 6) + 3] = col1;
+        tri_index_array[(i * 6) + 4] = row2;
+        tri_index_array[(i * 6) + 5] = col2;
+    }
+    log_print('v',L"Done\n");
+    log_print('v',L"     Quadgrams...");
+    quad_index_array = malloc(sizeof(int) * DIM4 * 8);
+    for (int i = 0; i < DIM4; i++)
+    {
+        int row0, col0, row1, col1, row2, col2, row3, col3;
+        unflat_quad(i, &row0, &col0, &row1, &col1, &row2, &col2, &row3, &col3);
+        quad_index_array[(i * 8) + 0] = row0;
+        quad_index_array[(i * 8) + 1] = col0;
+        quad_index_array[(i * 8) + 2] = row1;
+        quad_index_array[(i * 8) + 3] = col1;
+        quad_index_array[(i * 8) + 4] = row2;
+        quad_index_array[(i * 8) + 5] = col2;
+        quad_index_array[(i * 8) + 6] = row3;
+        quad_index_array[(i * 8) + 7] = col3;
+    }
     log_print('v',L"Done\n");
 
     log_print('n',L"     Done\n\n");
@@ -100,7 +158,7 @@ void start_up()
 void shut_down()
 {
     /* Show cursor. */
-    log_print('n',L"1/3: Showing cursor... ");
+    log_print('n',L"1/4: Showing cursor... ");
     wprintf(L"\e[?25h");
 
     /* Free language array. */
@@ -113,7 +171,7 @@ void shut_down()
     log_print('n',L"Done\n\n");
 
     /* Free arrays for ngrams directly from corpus. */
-    log_print('n',L"2/3: Freeing corpus arrays... ");
+    log_print('n',L"2/4: Freeing corpus arrays... ");
     log_print('v',L"\n     Monograms... ");
     free(corpus_mono);
     free(linear_mono);
@@ -166,8 +224,15 @@ void shut_down()
     log_print('v',L"       Done\n");
     log_print('n',L"     Done\n\n");
 
+    log_print('n',L"3/4: Freeing index arrays... ");
+    free(mono_index_array);
+    free(bi_index_array);
+    free(tri_index_array);
+    free(quad_index_array);
+    log_print('v',L"Done\n\n");
+
     /* frees all stats */
-    log_print('n',L"3/3: Freeing stats... ");
+    log_print('n',L"4/4: Freeing stats... ");
     free_stats(); /* stats.c */
     log_print('n',L"     Done\n\n");
 }
