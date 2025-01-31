@@ -264,8 +264,7 @@ inline void swap_keys(__local cl_layout *lt, int row1, int col1, int row2, int c
 inline void calculate_mono_stats(__local cl_layout *working,
                                  size_t local_id,
                                  __constant mono_stat *stats_mono,
-                                 __constant float *linear_mono,
-                                 __constant int *mono_index_array) {
+                                 __constant float *linear_mono) {
     int row0, col0;
     for (int i = local_id; i < MONO_LENGTH; i += WORKERS) {
         if(!stats_mono[i].skip)
@@ -273,9 +272,9 @@ inline void calculate_mono_stats(__local cl_layout *working,
             working->mono_score[i] = 0;
             int length = stats_mono[i].length;
             for (int j = 0; j < length; j++) {
-                int n = stats_mono[i].ngrams[j] * 2;
-                row0 = mono_index_array[n];
-                col0 = mono_index_array[n + 1];
+                int n = stats_mono[i].ngrams[j];
+                row0 = n / COL;
+                col0 = n % COL;
                 if (working->matrix[row0][col0] != -1) {
                     size_t index = index_mono(working->matrix[row0][col0]);
                     working->mono_score[i] += linear_mono[index];
@@ -296,8 +295,7 @@ inline void calculate_mono_stats(__local cl_layout *working,
 inline void calculate_bi_stats(__local cl_layout *working,
                                size_t local_id,
                                __constant bi_stat *stats_bi,
-                               __constant float *linear_bi,
-                               __constant int *bi_index_array) {
+                               __constant float *linear_bi) {
     int row0, col0, row1, col1;
     for (int i = local_id; i < BI_LENGTH; i += WORKERS) {
         if(!stats_bi[i].skip)
@@ -305,11 +303,12 @@ inline void calculate_bi_stats(__local cl_layout *working,
             working->bi_score[i] = 0;
             int length = stats_bi[i].length;
             for (int j = 0; j < length; j++) {
-                int n = stats_bi[i].ngrams[j] * 4;
-                row0 = bi_index_array[n];
-                col0 = bi_index_array[n + 1];
-                row1 = bi_index_array[n + 2];
-                col1 = bi_index_array[n + 3];
+                int n = stats_bi[i].ngrams[j];
+                row1 = (n % (DIM1)) / COL;
+                col1 = n % COL;
+                n /= (DIM1);
+                row0 = n / COL;
+                col0 = n % COL;
                 if (working->matrix[row0][col0] != -1 && working->matrix[row1][col1] != -1) {
                     size_t index = index_bi(working->matrix[row0][col0], working->matrix[row1][col1]);
                     working->bi_score[i] += linear_bi[index];
@@ -330,8 +329,7 @@ inline void calculate_bi_stats(__local cl_layout *working,
 inline void calculate_tri_stats(__local cl_layout *working,
                                 size_t local_id,
                                 __constant tri_stat *stats_tri,
-                                __constant float *linear_tri,
-                                 __constant int *tri_index_array) {
+                                __constant float *linear_tri) {
     int row0, col0, row1, col1, row2, col2;
     for (int i = local_id; i < TRI_LENGTH; i += WORKERS) {
         if(!stats_tri[i].skip)
@@ -339,13 +337,15 @@ inline void calculate_tri_stats(__local cl_layout *working,
             working->tri_score[i] = 0;
             int length = stats_tri[i].length;
             for (int j = 0; j < length; j++) {
-                int n = stats_tri[i].ngrams[j] * 6;
-                row0 = tri_index_array[n];
-                col0 = tri_index_array[n + 1];
-                row1 = tri_index_array[n + 2];
-                col1 = tri_index_array[n + 3];
-                row2 = tri_index_array[n + 4];
-                col2 = tri_index_array[n + 5];
+                int n = stats_tri[i].ngrams[j];
+                row2 = (n % (DIM1)) / COL;
+                col2 = n % COL;
+                n /= (DIM1);
+                row1 = (n % (DIM1)) / COL;
+                col1 = n % COL;
+                n /= (DIM1);
+                row0 = n / COL;
+                col0 = n % COL;
                 if (working->matrix[row0][col0] != -1 && working->matrix[row1][col1] != -1 && working->matrix[row2][col2] != -1) {
                     size_t index = index_tri(working->matrix[row0][col0], working->matrix[row1][col1], working->matrix[row2][col2]);
                     working->tri_score[i] += linear_tri[index];
@@ -366,8 +366,7 @@ inline void calculate_tri_stats(__local cl_layout *working,
 inline void calculate_quad_stats(__local cl_layout *working,
                                  size_t local_id,
                                  __constant quad_stat *stats_quad,
-                                 __constant float *linear_quad,
-                                 __constant int *quad_index_array) {
+                                 __constant float *linear_quad) {
     int row0, col0, row1, col1, row2, col2, row3, col3;
     for (int i = local_id; i < QUAD_LENGTH; i += WORKERS) {
         if(!stats_quad[i].skip)
@@ -375,15 +374,18 @@ inline void calculate_quad_stats(__local cl_layout *working,
             working->quad_score[i] = 0;
             int length = stats_quad[i].length;
             for (int j = 0; j < length; j++) {
-                int n = stats_quad[i].ngrams[j] * 8;
-                row0 = quad_index_array[n];
-                col0 = quad_index_array[n + 1];
-                row1 = quad_index_array[n + 2];
-                col1 = quad_index_array[n + 3];
-                row2 = quad_index_array[n + 4];
-                col2 = quad_index_array[n + 5];
-                row3 = quad_index_array[n + 6];
-                col3 = quad_index_array[n + 7];
+                int n = stats_quad[i].ngrams[j];
+                row3 = (n % (DIM1)) / COL;
+                col3 = n % COL;
+                n /= (DIM1);
+                row2 = (n % (DIM1)) / COL;
+                col2 = n % COL;
+                n /= (DIM1);
+                row1 = (n % (DIM1)) / COL;
+                col1 = n % COL;
+                n /= (DIM1);
+                row0 = n / COL;
+                col0 = n % COL;
                 if (working->matrix[row0][col0] != -1 && working->matrix[row1][col1] != -1 && working->matrix[row2][col2] != -1 && working->matrix[row3][col3] != -1) {
                     size_t index = index_quad(working->matrix[row0][col0], working->matrix[row1][col1], working->matrix[row2][col2], working->matrix[row3][col3]);
                     working->quad_score[i] += linear_quad[index];
@@ -404,8 +406,7 @@ inline void calculate_quad_stats(__local cl_layout *working,
 inline void calculate_skip_stats(__local cl_layout *working,
                                  size_t local_id,
                                  __constant skip_stat *stats_skip,
-                                 __constant float *linear_skip,
-                                 __constant int *bi_index_array) {
+                                 __constant float *linear_skip) {
     int row0, col0, row1, col1;
     for (int i = local_id; i < SKIP_LENGTH; i += WORKERS) {
         if(!stats_skip[i].skip)
@@ -414,11 +415,12 @@ inline void calculate_skip_stats(__local cl_layout *working,
             for (int k = 1; k <= 9; k++) {
                 working->skip_score[k][i] = 0;
                 for (int j = 0; j < length; j++) {
-                    int n = stats_skip[i].ngrams[j] * 4;
-                    row0 = bi_index_array[n];
-                    col0 = bi_index_array[n + 1];
-                    row1 = bi_index_array[n + 2];
-                    col1 = bi_index_array[n + 3];
+                    int n = stats_skip[i].ngrams[j];
+                    row1 = (n % (DIM1)) / COL;
+                    col1 = n % COL;
+                    n /= (DIM1);
+                    row0 = n / COL;
+                    col0 = n % COL;
                     if (working->matrix[row0][col0] != -1 && working->matrix[row1][col1] != -1) {
                         size_t index = index_skip(k, working->matrix[row0][col0], working->matrix[row1][col1]);
                         working->skip_score[k][i] += linear_skip[index];
@@ -496,11 +498,7 @@ inline void cl_meta_analysis(__local cl_layout *working,
 }
 
 /* Main kernel for layout improvement using simulated annealing. */
-__kernel void improve_kernel(__constant int   *mono_index_array,
-                             __constant int   *bi_index_array,
-                             __constant int   *tri_index_array,
-                             __constant int   *quad_index_array,
-                             __constant float *linear_mono,
+__kernel void improve_kernel(__constant float *linear_mono,
                              __constant float *linear_bi,
                              __constant float *linear_tri,
                              __constant float *linear_quad,
@@ -581,11 +579,11 @@ __kernel void improve_kernel(__constant int   *mono_index_array,
         barrier(CLK_LOCAL_MEM_FENCE);
 
         /* Calculate statistics */
-        calculate_mono_stats(&working, local_id, stats_mono, linear_mono, mono_index_array);
-        calculate_bi_stats(&working, local_id, stats_bi, linear_bi, bi_index_array);
-        calculate_tri_stats(&working, local_id, stats_tri, linear_tri, tri_index_array);
-        calculate_quad_stats(&working, local_id, stats_quad, linear_quad, quad_index_array);
-        calculate_skip_stats(&working, local_id, stats_skip, linear_skip, bi_index_array);
+        calculate_mono_stats(&working, local_id, stats_mono, linear_monoy);
+        calculate_bi_stats(&working, local_id, stats_bi, linear_bi);
+        calculate_tri_stats(&working, local_id, stats_tri, linear_tri);
+        calculate_quad_stats(&working, local_id, stats_quad, linear_quad);
+        calculate_skip_stats(&working, local_id, stats_skip, linear_skip);
 
         barrier(CLK_LOCAL_MEM_FENCE);
         cl_meta_analysis(&working, local_id, stats_meta);

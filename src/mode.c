@@ -828,14 +828,6 @@ void cl_improve(int shuffle) {
     /* Allocate and copy data to device buffers */
     log_print('v', L"     Allocating and copying data to device buffers...");
 
-    cl_mem buffer_mono_index_array = clCreateBuffer(context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, sizeof(int) * DIM1 * 2, mono_index_array, &err);
-    if (err != CL_SUCCESS) {error("OpenCL Error: Failed to create buffer for mono_index_array.");}
-    cl_mem buffer_bi_index_array = clCreateBuffer(context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, sizeof(int) * DIM2 * 4, bi_index_array, &err);
-    if (err != CL_SUCCESS) {error("OpenCL Error: Failed to create buffer for bi_index_array.");}
-    cl_mem buffer_tri_index_array = clCreateBuffer(context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, sizeof(int) * DIM3 * 6, tri_index_array, &err);
-    if (err != CL_SUCCESS) {error("OpenCL Error: Failed to create buffer for tri_index_array.");}
-    cl_mem buffer_quad_index_array = clCreateBuffer(context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, sizeof(int) * DIM4 * 8, quad_index_array, &err);
-    if (err != CL_SUCCESS) {error("OpenCL Error: Failed to create buffer for quad_index_array.");}
     cl_mem buffer_linear_mono = clCreateBuffer(context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, sizeof(float) * LANG_LENGTH, linear_mono, &err);
     if (err != CL_SUCCESS) {error("OpenCL Error: Failed to create buffer for linear_mono.");}
     cl_mem buffer_linear_bi = clCreateBuffer(context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, sizeof(float) * LANG_LENGTH * LANG_LENGTH, linear_bi, &err);
@@ -874,44 +866,36 @@ void cl_improve(int shuffle) {
     /* Set kernel arguments */
     log_print('v', L"     Setting kernel arguments... ");
 
-    err = clSetKernelArg(kernel, 0, sizeof(cl_mem), &buffer_mono_index_array);
+    err = clSetKernelArg(kernel, 0, sizeof(cl_mem), &buffer_linear_mono);
     if (err != CL_SUCCESS) {error("OpenCL Error: Failed to set kernel argument 0.");}
-    err = clSetKernelArg(kernel, 1, sizeof(cl_mem), &buffer_bi_index_array);
+    err = clSetKernelArg(kernel, 1, sizeof(cl_mem), &buffer_linear_bi);
     if (err != CL_SUCCESS) {error("OpenCL Error: Failed to set kernel argument 1.");}
-    err = clSetKernelArg(kernel, 2, sizeof(cl_mem), &buffer_tri_index_array);
+    err = clSetKernelArg(kernel, 2, sizeof(cl_mem), &buffer_linear_tri);
     if (err != CL_SUCCESS) {error("OpenCL Error: Failed to set kernel argument 2.");}
-    err = clSetKernelArg(kernel, 3, sizeof(cl_mem), &buffer_quad_index_array);
+    err = clSetKernelArg(kernel, 3, sizeof(cl_mem), &buffer_linear_quad);
     if (err != CL_SUCCESS) {error("OpenCL Error: Failed to set kernel argument 3.");}
-    err = clSetKernelArg(kernel, 4, sizeof(cl_mem), &buffer_linear_mono);
+    err = clSetKernelArg(kernel, 4, sizeof(cl_mem), &buffer_linear_skip);
     if (err != CL_SUCCESS) {error("OpenCL Error: Failed to set kernel argument 4.");}
-    err = clSetKernelArg(kernel, 5, sizeof(cl_mem), &buffer_linear_bi);
+    err = clSetKernelArg(kernel, 5, sizeof(cl_mem), &buffer_stats_mono);
     if (err != CL_SUCCESS) {error("OpenCL Error: Failed to set kernel argument 5.");}
-    err = clSetKernelArg(kernel, 6, sizeof(cl_mem), &buffer_linear_tri);
+    err = clSetKernelArg(kernel, 6, sizeof(cl_mem), &buffer_stats_bi);
     if (err != CL_SUCCESS) {error("OpenCL Error: Failed to set kernel argument 6.");}
-    err = clSetKernelArg(kernel, 7, sizeof(cl_mem), &buffer_linear_quad);
+    err = clSetKernelArg(kernel, 7, sizeof(cl_mem), &buffer_stats_tri);
     if (err != CL_SUCCESS) {error("OpenCL Error: Failed to set kernel argument 7.");}
-    err = clSetKernelArg(kernel, 8, sizeof(cl_mem), &buffer_linear_skip);
+    err = clSetKernelArg(kernel, 8, sizeof(cl_mem), &buffer_stats_quad);
     if (err != CL_SUCCESS) {error("OpenCL Error: Failed to set kernel argument 8.");}
-    err = clSetKernelArg(kernel, 9, sizeof(cl_mem), &buffer_stats_mono);
+    err = clSetKernelArg(kernel, 9, sizeof(cl_mem), &buffer_stats_skip);
     if (err != CL_SUCCESS) {error("OpenCL Error: Failed to set kernel argument 9.");}
-    err = clSetKernelArg(kernel, 10, sizeof(cl_mem), &buffer_stats_bi);
+    err = clSetKernelArg(kernel, 10, sizeof(cl_mem), &buffer_stats_meta);
     if (err != CL_SUCCESS) {error("OpenCL Error: Failed to set kernel argument 10.");}
-    err = clSetKernelArg(kernel, 11, sizeof(cl_mem), &buffer_stats_tri);
+    err = clSetKernelArg(kernel, 11, sizeof(cl_mem), &buffer_layouts);
     if (err != CL_SUCCESS) {error("OpenCL Error: Failed to set kernel argument 11.");}
-    err = clSetKernelArg(kernel, 12, sizeof(cl_mem), &buffer_stats_quad);
+    err = clSetKernelArg(kernel, 12, sizeof(cl_mem), &buffer_pins);
     if (err != CL_SUCCESS) {error("OpenCL Error: Failed to set kernel argument 12.");}
-    err = clSetKernelArg(kernel, 13, sizeof(cl_mem), &buffer_stats_skip);
+    err = clSetKernelArg(kernel, 13, sizeof(int), &seed);
     if (err != CL_SUCCESS) {error("OpenCL Error: Failed to set kernel argument 13.");}
-    err = clSetKernelArg(kernel, 14, sizeof(cl_mem), &buffer_stats_meta);
-    if (err != CL_SUCCESS) {error("OpenCL Error: Failed to set kernel argument 14.");}
-    err = clSetKernelArg(kernel, 15, sizeof(cl_mem), &buffer_layouts);
-    if (err != CL_SUCCESS) {error("OpenCL Error: Failed to set kernel argument 15.");}
-    err = clSetKernelArg(kernel, 16, sizeof(cl_mem), &buffer_pins);
-    if (err != CL_SUCCESS) {error("OpenCL Error: Failed to set kernel argument 16.");}
-    err = clSetKernelArg(kernel, 17, sizeof(int), &seed);
-    if (err != CL_SUCCESS) {error("OpenCL Error: Failed to set kernel argument 17.");}
-    err = clSetKernelArg(kernel, 18, sizeof(cl_mem), &buffer_reps);
-    if (err != CL_SUCCESS) { error("OpenCL Error: Failed to set kernel argument 18."); }
+    err = clSetKernelArg(kernel, 14, sizeof(cl_mem), &buffer_reps);
+    if (err != CL_SUCCESS) { error("OpenCL Error: Failed to set kernel argument 14."); }
     log_print('v', L"Done\n");
 
     log_print('v', L"     Done\n\n");
@@ -984,10 +968,6 @@ void cl_improve(int shuffle) {
 
     /* Cleanup */
     log_print('v', L"8/9: Cleaning up OpenCL...");
-    clReleaseMemObject(buffer_mono_index_array);
-    clReleaseMemObject(buffer_bi_index_array);
-    clReleaseMemObject(buffer_tri_index_array);
-    clReleaseMemObject(buffer_quad_index_array);
     clReleaseMemObject(buffer_linear_mono);
     clReleaseMemObject(buffer_linear_bi);
     clReleaseMemObject(buffer_linear_tri);

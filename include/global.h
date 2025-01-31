@@ -58,12 +58,6 @@ extern int pins[row][col];
 /* Head of the linked list for layout ranking. */
 extern layout_node *head_node;
 
-/* Arrays to store precomputed unflattened indices */
-extern int *mono_index_array;
-extern int *bi_index_array;
-extern int *tri_index_array;
-extern int *quad_index_array;
-
 /* Arrays to store raw frequency counts from the corpus. */
 extern int *corpus_mono;
 extern int **corpus_bi;
