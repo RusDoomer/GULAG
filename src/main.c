@@ -382,7 +382,7 @@ int main(int argc, char **argv) {
     log_print('v',L"\nTRIGRAM:\n\n");
     for (int i = 0; i < TRI_LENGTH; i++)
     {
-        log_print('v',L"%s : % 5.4f\n", stats_tri[i].name, stats_tri[i].weight);
+        log_print('v',L"%s : % 5.3f\n", stats_tri[i].name, stats_tri[i].weight);
     }
 
     log_print('v',L"\nQUADGRAM:\n\n");
@@ -535,6 +535,7 @@ int main(int argc, char **argv) {
     clock_gettime(CLOCK_MONOTONIC, &full_end);
     double elapsed_total = (full_end.tv_sec - full_start.tv_sec) + (full_end.tv_nsec - full_start.tv_nsec) / 1e9;
     log_print('n',L"Layouts per second w/ startup and shutdown: %lf\n\n", layouts_analyzed / elapsed_total);
-    log_print('q',L"You are free to go.\n\n");
+    log_print_centered('q',L"You are free to go.");
+    log_print('q',L"\n");
     return 0;
 }

@@ -803,7 +803,7 @@ void normal_print(layout *lt)
             log_print('n',L"%s :\n    |", stats_skip[i].name);
             for (int j = 1; j <= 9; j++)
             {
-                log_print('n',L"%5.4f", lt->skip_score[j][i]);
+                log_print('n',L"%06.3f", lt->skip_score[j][i]);
                 log_print('n',L"%|");
             }
             log_print('n',L"\n");
