@@ -19,6 +19,24 @@
 void log_print(char required_level, const wchar_t *format, ...);
 
 /*
+ * Prints a message to the standard output stream, with verbosity control.
+ * The message will only be printed if the current output mode meets or
+ * exceeds the required verbosity level specified by 'required_level'. The
+ * contents of this message will be centered on an 80 character line, and
+ * will not be cut off if it is too long.
+ *
+ * Parameters:
+ *   required_level: The minimum verbosity level required to print the message.
+ *                   'q' for quiet, 'n' for normal, 'v' for verbose.
+ *   format:         The format string for the message.
+ *   ...:            Variable arguments for the format string.
+ */
+void log_print_centered(char required_level, const wchar_t *format, ...);
+
+/* Prints a bar of 80 ='s */
+void print_bar(char required_level);
+
+/*
  * Reads the configuration file to set up initial program parameters.
  * This function parses 'config.conf' to initialize various settings
  * such as pinned key positions, language, corpus, layout names,
@@ -138,5 +156,9 @@ void print_ranking();
  * Prints the current pin configuration for layout improvement.
  */
 void print_pins();
+
+
+/* Print ASCII logo of Gulag */
+void print_ascii();
 
 #endif

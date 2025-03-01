@@ -54,6 +54,53 @@ void log_print(char required_level, const wchar_t *format, ...) {
 }
 
 /*
+ * Prints a message to the standard output stream, with verbosity control.
+ * The message will only be printed if the current output mode meets or
+ * exceeds the required verbosity level specified by 'required_level'. The
+ * contents of this message will be centered on an 80 character line, and
+ * will not be cut off if it is too long.
+ *
+ * Parameters:
+ *   required_level: The minimum verbosity level required to print the message.
+ *                   'q' for quiet, 'n' for normal, 'v' for verbose.
+ *   format:         The format string for the message.
+ *   ...:            Variable arguments for the format string.
+ */
+void log_print_centered(char required_level, const wchar_t *format, ...) {
+    /* Check if the current output mode meets or exceeds the required level */
+    if (
+        (required_level == 'q' && (output_mode == 'q' || output_mode == 'n' || output_mode == 'v')) ||
+        (required_level == 'n' && (output_mode == 'n' || output_mode == 'v')) ||
+        (required_level == 'v' &&  output_mode == 'v')
+       )
+    {
+        va_list args;
+        /* magic number 81 for terminal window 80 + 1 for EOS */
+        wchar_t buffer [81];
+        va_start(args, format);
+        int len = vswprintf(buffer, sizeof(buffer) / sizeof(wchar_t), format, args);
+        va_end(args);
+
+        if (len < 0) {error("Error formatting centered log message.");}
+        int padding = (80 - len) / 2;
+        if(padding < 0) {error("Error finding padding for centered message.");}
+
+        wprintf(L"%*s%ls\n", padding, "", buffer);
+
+        /* force the message to be printed immediately */
+        fflush(stdout);
+    }
+}
+
+/* Prints a bar of 80 ='s */
+void print_bar(char required_level) {
+    for (int i = 0; i < 80; i++) {
+        log_print(required_level, L"=");
+    }
+    log_print(required_level,L"\n");
+}
+
+/*
  * Reads the configuration file to set up initial program parameters.
  * This function parses 'config.conf' to initialize various settings
  * such as pinned key positions, language, corpus, layout names,
@@ -267,7 +314,7 @@ void read_lang()
     if (lang == NULL) {
         error("Lang file not found.");
     }
-    log_print('v',L"Lang file found... ");
+    log_print('v',L"Lang found... ");
 
     log_print('v',L"Reading... ");
     wchar_t a;
@@ -338,7 +385,7 @@ int read_corpus_cache()
         return 0;
     }
     log_print('v',L"Cache found... ");
-    log_print('v',L"Reading from cache... ");
+    log_print('v',L"Reading cache... ");
     wchar_t curr;
     int i,j,k,l, value;
     /* Read cached frequencies for ngrams */
@@ -753,10 +800,10 @@ void normal_print(layout *lt)
     {
         if (!stats_skip[i].skip)
         {
-            log_print('n',L"%s : ", stats_skip[i].name);
+            log_print('n',L"%s :\n    |", stats_skip[i].name);
             for (int j = 1; j <= 9; j++)
             {
-                log_print('n',L"%f", lt->skip_score[j][i]);
+                log_print('n',L"%5.4f", lt->skip_score[j][i]);
                 log_print('n',L"%|");
             }
             log_print('n',L"\n");
@@ -767,6 +814,7 @@ void normal_print(layout *lt)
     {
         if (!stats_meta[i].skip) {log_print('n',L"%s : %f\%\n", stats_meta[i].name, lt->meta_score[i]);}
     }
+    log_print('n',L"\n");
 }
 
 /*
@@ -818,7 +866,7 @@ void print_ranking()
     }
 }
 
-/*vPrints the current pin configuration for layout improvement. */
+/* Prints the current pin configuration for layout improvement. */
 void print_pins()
 {
     for (int i = 0; i < ROW; i++)
@@ -829,4 +877,17 @@ void print_pins()
         }
         log_print('v',L"\n");
     }
+}
+
+/* Print ASCII logo of Gulag */
+void print_ascii()
+{
+    log_print_centered('q', L" ######\\  ##\\   ##\\ ##\\        ######\\   ######\\  ");
+    log_print_centered('q', L"##  __##\\ ## |  ## |## |      ##  __##\\ ##  __##\\ ");
+    log_print_centered('q', L"## /  \\__|## |  ## |## |      ## /  ## |## /  \\__|");
+    log_print_centered('q', L"## |####\\ ## |  ## |## |      ######## |## |####\\ ");
+    log_print_centered('q', L"## |\\_## |## |  ## |## |      ##  __## |## |\\_## |");
+    log_print_centered('q', L"## |  ## |## |  ## |## |      ## |  ## |## |  ## |");
+    log_print_centered('q', L"\\######  |\\######  |########\\ ## |  ## |\\######  |");
+    log_print_centered('q', L" \\______/  \\______/ \\________|\\__|  \\__| \\______/ ");
 }

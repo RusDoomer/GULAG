@@ -105,11 +105,11 @@ void shut_down()
     wprintf(L"\e[?25h");
 
     /* Free language array. */
-    log_print('n',L"Freeing language array... ");
+    log_print('n',L"Freeing lang array... ");
     free(lang_arr);
 
     /* Free character hash table array. */
-    log_print('n',L"Freeing character hashmap... ");
+    log_print('n',L"Freeing character map... ");
     free(char_table);
     log_print('n',L"Done\n\n");
 
@@ -188,18 +188,36 @@ int main(int argc, char **argv) {
     const char* locale = setlocale(LC_ALL, "en_US.UTF-8");
     if (locale == NULL) {error("Failed to set locale.");}
 
-    log_print('q',L"\nWelcome to the GULAG\n\n");
-    log_print('q',L"----- Starting Up -----\n\n");
+    log_print('q',L"\n");
+    log_print_centered('q',L"Welcome to the");
+    log_print('q',L"\n");
+    print_ascii();
+    log_print('q',L"\n");
+
+    print_bar('q');
+    log_print_centered('q',L"Starting Up");
+    log_print('q',L"\n");
+
+//log_print('q',L"----- Starting Up -----\n\n");
     start_up(); /* main.c */
 
     clock_gettime(CLOCK_MONOTONIC, &end);
     elapsed = (end.tv_sec - start.tv_sec) + (end.tv_nsec - start.tv_nsec) / 1e9;
-    log_print('q',L"----- Start Up Complete : %.9lf seconds -----\n\n", elapsed);
+//log_print('q',L"----- Start Up Complete : %.9lf seconds -----\n\n", elapsed);
+
+    log_print_centered('q',L"Start Up Complete : %.9lf seconds", elapsed);
+    print_bar('q');
+    log_print('q',L"\n");
 
 
 
     clock_gettime(CLOCK_MONOTONIC, &start);
-    log_print('q',L"----- Setting Up -----\n\n");
+
+    print_bar('q');
+    log_print_centered('q',L"Setting Up");
+    log_print('q',L"\n");
+
+//log_print('q',L"----- Setting Up -----\n\n");
     /* holds defaults to be overwritten by args */
     log_print('q',L"1/3: Reading config... ");
     read_config(); /* io.c */
@@ -217,27 +235,43 @@ int main(int argc, char **argv) {
 
     clock_gettime(CLOCK_MONOTONIC, &end);
     elapsed = (end.tv_sec - start.tv_sec) + (end.tv_nsec - start.tv_nsec) / 1e9;
-    log_print('q',L"----- Set Up Complete : %.9lf seconds -----\n\n", elapsed);
+//log_print('q',L"----- Set Up Complete : %.9lf seconds -----\n\n", elapsed);
+
+    log_print_centered('q',L"Set Up Complete : %.9lf seconds", elapsed);
+    print_bar('q');
+    log_print('q',L"\n");
 
 
+    print_bar('n');
+    log_print_centered('n',L"Configuration");
+    log_print('n',L"\n");
 
     /* Maybe move reading arguments/config to before start up?
      * Could allow for some purging/skipping? and proper verboseness */
-    log_print('n',L"| lang: %s | ", lang_name);
-    log_print('n',L"corpus: %s | ", corpus_name);
-    log_print('n',L"primary: %s | ", layout_name);
-    log_print('n',L"secondary: %s | ", layout2_name);
-    log_print('n',L"weights: %s | ", weight_name);
-    log_print('n',L"run mode: %c | ", run_mode);
-    log_print('n',L"reps: %d | ", repetitions);
-    log_print('n',L"threads: %d | ", threads);
-    log_print('n',L"out mode: %c |\n\n", output_mode);
+    log_print('n',L"Language         :    %s\n", lang_name);
+    log_print('n',L"Corpus File      :    %s\n", corpus_name);
+    log_print('n',L"Primary Layout   :    %s\n", layout_name);
+    log_print('n',L"Secondary Layout :    %s\n", layout2_name);
+    log_print('n',L"Weights File     :    %s\n", weight_name);
+    log_print('n',L"Run Mode         :    %c\n", run_mode);
+    log_print('n',L"Repetitions      :    %d\n", repetitions);
+    log_print('n',L"Threads          :    %d\n", threads);
+    log_print('n',L"Output Mode      :    %c\n", output_mode);
+
+    log_print('n',L"\n");
+    print_bar('n');
+    log_print('n',L"\n");
 
 
 
     clock_gettime(CLOCK_MONOTONIC, &start);
+
+    print_bar('q');
+    log_print_centered('q',L"Initializing Stats");
+    log_print('q',L"\n");
+
     /* initializes and trims statistics */
-    log_print('q',L"----- Initializing Stats -----\n\n");
+//log_print('q',L"----- Initializing Stats -----\n\n");
 
     log_print('n',L"1/1: Building stats... ");
     initialize_stats(); /* stats.c */
@@ -245,12 +279,20 @@ int main(int argc, char **argv) {
 
     clock_gettime(CLOCK_MONOTONIC, &end);
     elapsed = (end.tv_sec - start.tv_sec) + (end.tv_nsec - start.tv_nsec) / 1e9;
-    log_print('q',L"----- Initialization : %.9lf seconds -----\n\n", elapsed);
+//log_print('q',L"----- Initialization : %.9lf seconds -----\n\n", elapsed);
 
+    log_print_centered('q',L"Initialization Complete : %.9lf seconds", elapsed);
+    print_bar('q');
+    log_print('q',L"\n");
 
 
     clock_gettime(CLOCK_MONOTONIC, &start);
-    log_print('q',L"----- Reading Data -----\n\n");
+
+    print_bar('q');
+    log_print_centered('q',L"Reading Data");
+    log_print('q',L"\n");
+
+//log_print('q',L"----- Reading Data -----\n\n");
 
     /* read language file and fill array */
     log_print('n',L"1/4: Reading language... ");
@@ -259,7 +301,7 @@ int main(int argc, char **argv) {
 
     /* read from cache if it exists */
     log_print('n',L"2/4: Reading corpus... ");
-    log_print('v',L"Looking for cache... ");
+    log_print('v',L"Finding cache... ");
     int corpus_cache = 0;
     corpus_cache = read_corpus_cache(); /* io.c */
     log_print('n',L"Done\n\n");
@@ -267,12 +309,12 @@ int main(int argc, char **argv) {
         /* The next operation is slow so we want to let the user see
            what step they are stuck on. */
         /* read entire corpus file and fill arrays */
-        log_print('v',L"Reading raw corpus... ");
+        log_print('n',L"     2.3/4: Reading raw corpus... ");
         read_corpus(); /* io.c */
         log_print('n',L"Done\n\n");
 
         /* create new corpus cache */
-        log_print('n',L"2.5\4: Creating corpus cache... ");
+        log_print('n',L"     2.6/4: Creating corpus cache... ");
         cache_corpus(); /* io.c */
         log_print('n',L"Done\n\n");
     }
@@ -289,12 +331,21 @@ int main(int argc, char **argv) {
 
     clock_gettime(CLOCK_MONOTONIC, &end);
     elapsed = (end.tv_sec - start.tv_sec) + (end.tv_nsec - start.tv_nsec) / 1e9;
-    log_print('q',L"----- Reading Complete : %.9lf seconds -----\n\n", elapsed);
+//log_print('q',L"----- Reading Complete : %.9lf seconds -----\n\n", elapsed);
+
+    log_print_centered('q',L"Reading Complete : %.9lf seconds", elapsed);
+    print_bar('q');
+    log_print('q',L"\n");
 
 
 
     clock_gettime(CLOCK_MONOTONIC, &start);
-    log_print('q',L"----- Cleaning Up -----\n\n");
+
+    print_bar('q');
+    log_print_centered('q',L"Cleaning Up");
+    log_print('q',L"\n");
+
+//log_print('q',L"----- Cleaning Up -----\n\n");
 
     /* remove stats with 0 length or weight */
     log_print('n',L"1/1: Removing irrelevant stats... ");
@@ -303,34 +354,41 @@ int main(int argc, char **argv) {
 
     clock_gettime(CLOCK_MONOTONIC, &end);
     elapsed = (end.tv_sec - start.tv_sec) + (end.tv_nsec - start.tv_nsec) / 1e9;
-    log_print('q',L"----- Clean Up Complete : %.9lf seconds -----\n\n", elapsed);
+//log_print('q',L"----- Clean Up Complete : %.9lf seconds -----\n\n", elapsed);
+
+    log_print_centered('q',L"Clean Up Complete : %.9lf seconds", elapsed);
+    print_bar('q');
+    log_print('q',L"\n");
 
 
     /* print weights for sanity check */
-    log_print('v',L"----- Weights -----\n\n");
+    print_bar('v');
+    log_print_centered('v',L"Weights");
+    log_print('v',L"\n");
+//log_print('v',L"----- Weights -----\n\n");
 
     log_print('v',L"MONOGRAM:\n\n");
     for (int i = 0; i < MONO_LENGTH; i++)
     {
-        log_print('v',L"%s : %f\n", stats_mono[i].name, stats_mono[i].weight);
+        log_print('v',L"%s : % 5.4f\n", stats_mono[i].name, stats_mono[i].weight);
     }
 
     log_print('v',L"\nBIGRAM:\n\n");
     for (int i = 0; i < BI_LENGTH; i++)
     {
-        log_print('v',L"%s : %f\n", stats_bi[i].name, stats_bi[i].weight);
+        log_print('v',L"%s : % 5.4f\n", stats_bi[i].name, stats_bi[i].weight);
     }
 
     log_print('v',L"\nTRIGRAM:\n\n");
     for (int i = 0; i < TRI_LENGTH; i++)
     {
-        log_print('v',L"%s : %f\n", stats_tri[i].name, stats_tri[i].weight);
+        log_print('v',L"%s : % 5.4f\n", stats_tri[i].name, stats_tri[i].weight);
     }
 
     log_print('v',L"\nQUADGRAM:\n\n");
     for (int i = 0; i < QUAD_LENGTH; i++)
     {
-        log_print('v',L"%s : %f\n", stats_quad[i].name, stats_quad[i].weight);
+        log_print('v',L"%s : % 5.4f\n", stats_quad[i].name, stats_quad[i].weight);
     }
 
     log_print('v',L"\nSKIPGRAM:\n\n");
@@ -339,7 +397,7 @@ int main(int argc, char **argv) {
         log_print('v',L"%s : \n    ", stats_skip[i].name);
         for (int j = 1; j <= 9; j++)
         {
-            log_print('v',L"%f ", stats_skip[i].weight[j]);
+            log_print('v',L"% 5.4f|", stats_skip[i].weight[j]);
         }
         log_print('v',L"\n");
     }
@@ -347,16 +405,23 @@ int main(int argc, char **argv) {
     log_print('v',L"\nMETA:\n\n");
     for (int i = 0; i < META_LENGTH; i++)
     {
-        log_print('v',L"%s : %f\n", stats_meta[i].name, stats_meta[i].weight);
+        log_print('v',L"%s : % 5.4f\n", stats_meta[i].name, stats_meta[i].weight);
     }
     log_print('v',L"\n");
 
-    log_print('v',L"----- Weights Complete -----\n\n");
+//log_print('v',L"----- Weights Complete -----\n\n");
+
+    print_bar('v');
+    log_print('v',L"\n");
 
 
 
     clock_gettime(CLOCK_MONOTONIC, &start);
-    log_print('q',L"----- Running -----\n\n");
+//log_print('q',L"----- Running -----\n\n");
+
+    print_bar('q');
+    log_print_centered('q',L"Running");
+    log_print('q',L"\n");
 
     /* all in mode.c */
     switch(run_mode) {
@@ -430,12 +495,20 @@ int main(int argc, char **argv) {
 
     clock_gettime(CLOCK_MONOTONIC, &end);
     elapsed = (end.tv_sec - start.tv_sec) + (end.tv_nsec - start.tv_nsec) / 1e9;
-    log_print('q',L"----- Run Complete : %.9lf seconds -----\n\n", elapsed);
+//log_print('q',L"----- Run Complete : %.9lf seconds -----\n\n", elapsed);
+
+    log_print_centered('q',L"Run Complete : %.9lf seconds", elapsed);
+    print_bar('q');
+    log_print('q',L"\n");
 
 
 
     clock_gettime(CLOCK_MONOTONIC, &start);
-    log_print('q',L"----- Shutting Down -----\n\n");
+    //log_print('q',L"----- Shutting Down -----\n\n");
+
+    print_bar('q');
+    log_print_centered('q',L"Shutting Down");
+    log_print('q',L"\n");
 
     free(lang_name);
     free(corpus_name);
@@ -448,7 +521,11 @@ int main(int argc, char **argv) {
 
     clock_gettime(CLOCK_MONOTONIC, &end);
     elapsed = (end.tv_sec - start.tv_sec) + (end.tv_nsec - start.tv_nsec) / 1e9;
-    log_print('q',L"----- Shut Down Complete : %.9lf seconds -----\n\n", elapsed);
+//log_print('q',L"----- Shut Down Complete : %.9lf seconds -----\n\n", elapsed);
+
+    log_print_centered('q',L"Shut Down Complete : %.9lf seconds", elapsed);
+    print_bar('q');
+    log_print('q',L"\n");
 
 
 
