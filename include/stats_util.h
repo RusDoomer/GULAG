@@ -63,6 +63,9 @@ int is_same_finger_quad(int row0, int col0, int row1, int col1, int row2, int co
 /* 2u sfb */
 int is_bad_same_finger_bi(int row0, int col0, int row1, int col1);
 
+/* sfb with horizontal movement */
+int is_lateral_same_finger_bi(int row0, int col0, int row1, int col1);
+
 /* separate fingers but not index + pinky combo */
 int is_russor_fingers(int row0, int col0, int row1, int col1);
 

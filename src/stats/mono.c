@@ -35,10 +35,695 @@
  */
 void initialize_mono_stats()
 {
-    MONO_LENGTH = 17;
+    MONO_LENGTH = 53;
     stats_mono = (mono_stat *)malloc(sizeof(mono_stat) * MONO_LENGTH);
     int row0, col0;
     int index = 0;
+
+    strcpy(stats_mono[index].name, "Heatmap 0 00");
+    stats_mono[index].weight = -INFINITY;
+    stats_mono[index].length = 0;
+    stats_mono[index].skip = 0;
+    for (int i = 0; i < DIM1; i++)
+    {
+        /* convert a 1D index into a 2D matrix coordinate */
+        unflat_mono(i, &row0, &col0); /* util.c */
+        if (row0 == 0 && col0 == 0)
+        {
+            stats_mono[index].ngrams[i] = i;
+            stats_mono[index].length++;
+        }
+        else
+        {
+            stats_mono[index].ngrams[i] = -1;
+        }
+    }
+    index++;
+
+    strcpy(stats_mono[index].name, "Heatmap 0 01");
+    stats_mono[index].weight = -INFINITY;
+    stats_mono[index].length = 0;
+    stats_mono[index].skip = 0;
+    for (int i = 0; i < DIM1; i++)
+    {
+        unflat_mono(i, &row0, &col0);
+        if (row0 == 0 && col0 == 1)
+        {
+            stats_mono[index].ngrams[i] = i;
+            stats_mono[index].length++;
+        }
+        else
+        {
+            stats_mono[index].ngrams[i] = -1;
+        }
+    }
+    index++;
+
+    strcpy(stats_mono[index].name, "Heatmap 0 02");
+    stats_mono[index].weight = -INFINITY;
+    stats_mono[index].length = 0;
+    stats_mono[index].skip = 0;
+    for (int i = 0; i < DIM1; i++)
+    {
+        unflat_mono(i, &row0, &col0);
+        if (row0 == 0 && col0 == 2)
+        {
+            stats_mono[index].ngrams[i] = i;
+            stats_mono[index].length++;
+        }
+        else
+        {
+            stats_mono[index].ngrams[i] = -1;
+        }
+    }
+    index++;
+
+    strcpy(stats_mono[index].name, "Heatmap 0 03");
+    stats_mono[index].weight = -INFINITY;
+    stats_mono[index].length = 0;
+    stats_mono[index].skip = 0;
+    for (int i = 0; i < DIM1; i++)
+    {
+        unflat_mono(i, &row0, &col0);
+        if (row0 == 0 && col0 == 3)
+        {
+            stats_mono[index].ngrams[i] = i;
+            stats_mono[index].length++;
+        }
+        else
+        {
+            stats_mono[index].ngrams[i] = -1;
+        }
+    }
+    index++;
+
+    strcpy(stats_mono[index].name, "Heatmap 0 04");
+    stats_mono[index].weight = -INFINITY;
+    stats_mono[index].length = 0;
+    stats_mono[index].skip = 0;
+    for (int i = 0; i < DIM1; i++)
+    {
+        unflat_mono(i, &row0, &col0);
+        if (row0 == 0 && col0 == 4)
+        {
+            stats_mono[index].ngrams[i] = i;
+            stats_mono[index].length++;
+        }
+        else
+        {
+            stats_mono[index].ngrams[i] = -1;
+        }
+    }
+    index++;
+
+    strcpy(stats_mono[index].name, "Heatmap 0 05");
+    stats_mono[index].weight = -INFINITY;
+    stats_mono[index].length = 0;
+    stats_mono[index].skip = 0;
+    for (int i = 0; i < DIM1; i++)
+    {
+        unflat_mono(i, &row0, &col0);
+        if (row0 == 0 && col0 == 5)
+        {
+            stats_mono[index].ngrams[i] = i;
+            stats_mono[index].length++;
+        }
+        else
+        {
+            stats_mono[index].ngrams[i] = -1;
+        }
+    }
+    index++;
+
+    strcpy(stats_mono[index].name, "Heatmap 0 06");
+    stats_mono[index].weight = -INFINITY;
+    stats_mono[index].length = 0;
+    stats_mono[index].skip = 0;
+    for (int i = 0; i < DIM1; i++)
+    {
+        unflat_mono(i, &row0, &col0);
+        if (row0 == 0 && col0 == 6)
+        {
+            stats_mono[index].ngrams[i] = i;
+            stats_mono[index].length++;
+        }
+        else
+        {
+            stats_mono[index].ngrams[i] = -1;
+        }
+    }
+    index++;
+
+    strcpy(stats_mono[index].name, "Heatmap 0 07");
+    stats_mono[index].weight = -INFINITY;
+    stats_mono[index].length = 0;
+    stats_mono[index].skip = 0;
+    for (int i = 0; i < DIM1; i++)
+    {
+        unflat_mono(i, &row0, &col0);
+        if (row0 == 0 && col0 == 7)
+        {
+            stats_mono[index].ngrams[i] = i;
+            stats_mono[index].length++;
+        }
+        else
+        {
+            stats_mono[index].ngrams[i] = -1;
+        }
+    }
+    index++;
+
+    strcpy(stats_mono[index].name, "Heatmap 0 08");
+    stats_mono[index].weight = -INFINITY;
+    stats_mono[index].length = 0;
+    stats_mono[index].skip = 0;
+    for (int i = 0; i < DIM1; i++)
+    {
+        unflat_mono(i, &row0, &col0);
+        if (row0 == 0 && col0 == 8)
+        {
+            stats_mono[index].ngrams[i] = i;
+            stats_mono[index].length++;
+        }
+        else
+        {
+            stats_mono[index].ngrams[i] = -1;
+        }
+    }
+    index++;
+
+    strcpy(stats_mono[index].name, "Heatmap 0 09");
+    stats_mono[index].weight = -INFINITY;
+    stats_mono[index].length = 0;
+    stats_mono[index].skip = 0;
+    for (int i = 0; i < DIM1; i++)
+    {
+        unflat_mono(i, &row0, &col0);
+        if (row0 == 0 && col0 == 9)
+        {
+            stats_mono[index].ngrams[i] = i;
+            stats_mono[index].length++;
+        }
+        else
+        {
+            stats_mono[index].ngrams[i] = -1;
+        }
+    }
+    index++;
+
+    strcpy(stats_mono[index].name, "Heatmap 0 10");
+    stats_mono[index].weight = -INFINITY;
+    stats_mono[index].length = 0;
+    stats_mono[index].skip = 0;
+    for (int i = 0; i < DIM1; i++)
+    {
+        unflat_mono(i, &row0, &col0);
+        if (row0 == 0 && col0 == 10)
+        {
+            stats_mono[index].ngrams[i] = i;
+            stats_mono[index].length++;
+        }
+        else
+        {
+            stats_mono[index].ngrams[i] = -1;
+        }
+    }
+    index++;
+
+    strcpy(stats_mono[index].name, "Heatmap 0 11");
+    stats_mono[index].weight = -INFINITY;
+    stats_mono[index].length = 0;
+    stats_mono[index].skip = 0;
+    for (int i = 0; i < DIM1; i++)
+    {
+        unflat_mono(i, &row0, &col0);
+        if (row0 == 0 && col0 == 11)
+        {
+            stats_mono[index].ngrams[i] = i;
+            stats_mono[index].length++;
+        }
+        else
+        {
+            stats_mono[index].ngrams[i] = -1;
+        }
+    }
+    index++;
+
+    strcpy(stats_mono[index].name, "Heatmap 1 00");
+    stats_mono[index].weight = -INFINITY;
+    stats_mono[index].length = 0;
+    stats_mono[index].skip = 0;
+    for (int i = 0; i < DIM1; i++)
+    {
+        unflat_mono(i, &row0, &col0);
+        if (row0 == 1 && col0 == 0)
+        {
+            stats_mono[index].ngrams[i] = i;
+            stats_mono[index].length++;
+        }
+        else
+        {
+            stats_mono[index].ngrams[i] = -1;
+        }
+    }
+    index++;
+
+    strcpy(stats_mono[index].name, "Heatmap 1 01");
+    stats_mono[index].weight = -INFINITY;
+    stats_mono[index].length = 0;
+    stats_mono[index].skip = 0;
+    for (int i = 0; i < DIM1; i++)
+    {
+        unflat_mono(i, &row0, &col0);
+        if (row0 == 1 && col0 == 1)
+        {
+            stats_mono[index].ngrams[i] = i;
+            stats_mono[index].length++;
+        }
+        else
+        {
+            stats_mono[index].ngrams[i] = -1;
+        }
+    }
+    index++;
+
+    strcpy(stats_mono[index].name, "Heatmap 1 02");
+    stats_mono[index].weight = -INFINITY;
+    stats_mono[index].length = 0;
+    stats_mono[index].skip = 0;
+    for (int i = 0; i < DIM1; i++)
+    {
+        unflat_mono(i, &row0, &col0);
+        if (row0 == 1 && col0 == 2)
+        {
+            stats_mono[index].ngrams[i] = i;
+            stats_mono[index].length++;
+        }
+        else
+        {
+            stats_mono[index].ngrams[i] = -1;
+        }
+    }
+    index++;
+
+    strcpy(stats_mono[index].name, "Heatmap 1 03");
+    stats_mono[index].weight = -INFINITY;
+    stats_mono[index].length = 0;
+    stats_mono[index].skip = 0;
+    for (int i = 0; i < DIM1; i++)
+    {
+        unflat_mono(i, &row0, &col0);
+        if (row0 == 1 && col0 == 3)
+        {
+            stats_mono[index].ngrams[i] = i;
+            stats_mono[index].length++;
+        }
+        else
+        {
+            stats_mono[index].ngrams[i] = -1;
+        }
+    }
+    index++;
+
+    strcpy(stats_mono[index].name, "Heatmap 1 04");
+    stats_mono[index].weight = -INFINITY;
+    stats_mono[index].length = 0;
+    stats_mono[index].skip = 0;
+    for (int i = 0; i < DIM1; i++)
+    {
+        unflat_mono(i, &row0, &col0);
+        if (row0 == 1 && col0 == 4)
+        {
+            stats_mono[index].ngrams[i] = i;
+            stats_mono[index].length++;
+        }
+        else
+        {
+            stats_mono[index].ngrams[i] = -1;
+        }
+    }
+    index++;
+
+    strcpy(stats_mono[index].name, "Heatmap 1 05");
+    stats_mono[index].weight = -INFINITY;
+    stats_mono[index].length = 0;
+    stats_mono[index].skip = 0;
+    for (int i = 0; i < DIM1; i++)
+    {
+        unflat_mono(i, &row0, &col0);
+        if (row0 == 1 && col0 == 5)
+        {
+            stats_mono[index].ngrams[i] = i;
+            stats_mono[index].length++;
+        }
+        else
+        {
+            stats_mono[index].ngrams[i] = -1;
+        }
+    }
+    index++;
+
+    strcpy(stats_mono[index].name, "Heatmap 1 06");
+    stats_mono[index].weight = -INFINITY;
+    stats_mono[index].length = 0;
+    stats_mono[index].skip = 0;
+    for (int i = 0; i < DIM1; i++)
+    {
+        unflat_mono(i, &row0, &col0);
+        if (row0 == 1 && col0 == 6)
+        {
+            stats_mono[index].ngrams[i] = i;
+            stats_mono[index].length++;
+        }
+        else
+        {
+            stats_mono[index].ngrams[i] = -1;
+        }
+    }
+    index++;
+
+    strcpy(stats_mono[index].name, "Heatmap 1 07");
+    stats_mono[index].weight = -INFINITY;
+    stats_mono[index].length = 0;
+    stats_mono[index].skip = 0;
+    for (int i = 0; i < DIM1; i++)
+    {
+        unflat_mono(i, &row0, &col0);
+        if (row0 == 1 && col0 == 7)
+        {
+            stats_mono[index].ngrams[i] = i;
+            stats_mono[index].length++;
+        }
+        else
+        {
+            stats_mono[index].ngrams[i] = -1;
+        }
+    }
+    index++;
+
+    strcpy(stats_mono[index].name, "Heatmap 1 08");
+    stats_mono[index].weight = -INFINITY;
+    stats_mono[index].length = 0;
+    stats_mono[index].skip = 0;
+    for (int i = 0; i < DIM1; i++)
+    {
+        unflat_mono(i, &row0, &col0);
+        if (row0 == 1 && col0 == 8)
+        {
+            stats_mono[index].ngrams[i] = i;
+            stats_mono[index].length++;
+        }
+        else
+        {
+            stats_mono[index].ngrams[i] = -1;
+        }
+    }
+    index++;
+
+    strcpy(stats_mono[index].name, "Heatmap 1 09");
+    stats_mono[index].weight = -INFINITY;
+    stats_mono[index].length = 0;
+    stats_mono[index].skip = 0;
+    for (int i = 0; i < DIM1; i++)
+    {
+        unflat_mono(i, &row0, &col0);
+        if (row0 == 1 && col0 == 9)
+        {
+            stats_mono[index].ngrams[i] = i;
+            stats_mono[index].length++;
+        }
+        else
+        {
+            stats_mono[index].ngrams[i] = -1;
+        }
+    }
+    index++;
+
+    strcpy(stats_mono[index].name, "Heatmap 1 10");
+    stats_mono[index].weight = -INFINITY;
+    stats_mono[index].length = 0;
+    stats_mono[index].skip = 0;
+    for (int i = 0; i < DIM1; i++)
+    {
+        unflat_mono(i, &row0, &col0);
+        if (row0 == 1 && col0 == 10)
+        {
+            stats_mono[index].ngrams[i] = i;
+            stats_mono[index].length++;
+        }
+        else
+        {
+            stats_mono[index].ngrams[i] = -1;
+        }
+    }
+    index++;
+
+    strcpy(stats_mono[index].name, "Heatmap 1 11");
+    stats_mono[index].weight = -INFINITY;
+    stats_mono[index].length = 0;
+    stats_mono[index].skip = 0;
+    for (int i = 0; i < DIM1; i++)
+    {
+        unflat_mono(i, &row0, &col0);
+        if (row0 == 1 && col0 == 11)
+        {
+            stats_mono[index].ngrams[i] = i;
+            stats_mono[index].length++;
+        }
+        else
+        {
+            stats_mono[index].ngrams[i] = -1;
+        }
+    }
+    index++;
+
+    strcpy(stats_mono[index].name, "Heatmap 2 00");
+    stats_mono[index].weight = -INFINITY;
+    stats_mono[index].length = 0;
+    stats_mono[index].skip = 0;
+    for (int i = 0; i < DIM1; i++)
+    {
+        unflat_mono(i, &row0, &col0);
+        if (row0 == 2 && col0 == 0)
+        {
+            stats_mono[index].ngrams[i] = i;
+            stats_mono[index].length++;
+        }
+        else
+        {
+            stats_mono[index].ngrams[i] = -1;
+        }
+    }
+    index++;
+
+    strcpy(stats_mono[index].name, "Heatmap 2 01");
+    stats_mono[index].weight = -INFINITY;
+    stats_mono[index].length = 0;
+    stats_mono[index].skip = 0;
+    for (int i = 0; i < DIM1; i++)
+    {
+        unflat_mono(i, &row0, &col0);
+        if (row0 == 2 && col0 == 1)
+        {
+            stats_mono[index].ngrams[i] = i;
+            stats_mono[index].length++;
+        }
+        else
+        {
+            stats_mono[index].ngrams[i] = -1;
+        }
+    }
+    index++;
+
+    strcpy(stats_mono[index].name, "Heatmap 2 02");
+    stats_mono[index].weight = -INFINITY;
+    stats_mono[index].length = 0;
+    stats_mono[index].skip = 0;
+    for (int i = 0; i < DIM1; i++)
+    {
+        unflat_mono(i, &row0, &col0);
+        if (row0 == 2 && col0 == 2)
+        {
+            stats_mono[index].ngrams[i] = i;
+            stats_mono[index].length++;
+        }
+        else
+        {
+            stats_mono[index].ngrams[i] = -1;
+        }
+    }
+    index++;
+
+    strcpy(stats_mono[index].name, "Heatmap 2 03");
+    stats_mono[index].weight = -INFINITY;
+    stats_mono[index].length = 0;
+    stats_mono[index].skip = 0;
+    for (int i = 0; i < DIM1; i++)
+    {
+        unflat_mono(i, &row0, &col0);
+        if (row0 == 2 && col0 == 3)
+        {
+            stats_mono[index].ngrams[i] = i;
+            stats_mono[index].length++;
+        }
+        else
+        {
+            stats_mono[index].ngrams[i] = -1;
+        }
+    }
+    index++;
+
+    strcpy(stats_mono[index].name, "Heatmap 2 04");
+    stats_mono[index].weight = -INFINITY;
+    stats_mono[index].length = 0;
+    stats_mono[index].skip = 0;
+    for (int i = 0; i < DIM1; i++)
+    {
+        unflat_mono(i, &row0, &col0);
+        if (row0 == 2 && col0 == 4)
+        {
+            stats_mono[index].ngrams[i] = i;
+            stats_mono[index].length++;
+        }
+        else
+        {
+            stats_mono[index].ngrams[i] = -1;
+        }
+    }
+    index++;
+
+    strcpy(stats_mono[index].name, "Heatmap 2 05");
+    stats_mono[index].weight = -INFINITY;
+    stats_mono[index].length = 0;
+    stats_mono[index].skip = 0;
+    for (int i = 0; i < DIM1; i++)
+    {
+        unflat_mono(i, &row0, &col0);
+        if (row0 == 2 && col0 == 5)
+        {
+            stats_mono[index].ngrams[i] = i;
+            stats_mono[index].length++;
+        }
+        else
+        {
+            stats_mono[index].ngrams[i] = -1;
+        }
+    }
+    index++;
+
+    strcpy(stats_mono[index].name, "Heatmap 2 06");
+    stats_mono[index].weight = -INFINITY;
+    stats_mono[index].length = 0;
+    stats_mono[index].skip = 0;
+    for (int i = 0; i < DIM1; i++)
+    {
+        unflat_mono(i, &row0, &col0);
+        if (row0 == 2 && col0 == 6)
+        {
+            stats_mono[index].ngrams[i] = i;
+            stats_mono[index].length++;
+        }
+        else
+        {
+            stats_mono[index].ngrams[i] = -1;
+        }
+    }
+    index++;
+
+    strcpy(stats_mono[index].name, "Heatmap 2 07");
+    stats_mono[index].weight = -INFINITY;
+    stats_mono[index].length = 0;
+    stats_mono[index].skip = 0;
+    for (int i = 0; i < DIM1; i++)
+    {
+        unflat_mono(i, &row0, &col0);
+        if (row0 == 2 && col0 == 7)
+        {
+            stats_mono[index].ngrams[i] = i;
+            stats_mono[index].length++;
+        }
+        else
+        {
+            stats_mono[index].ngrams[i] = -1;
+        }
+    }
+    index++;
+
+    strcpy(stats_mono[index].name, "Heatmap 2 08");
+    stats_mono[index].weight = -INFINITY;
+    stats_mono[index].length = 0;
+    stats_mono[index].skip = 0;
+    for (int i = 0; i < DIM1; i++)
+    {
+        unflat_mono(i, &row0, &col0);
+        if (row0 == 2 && col0 == 8)
+        {
+            stats_mono[index].ngrams[i] = i;
+            stats_mono[index].length++;
+        }
+        else
+        {
+            stats_mono[index].ngrams[i] = -1;
+        }
+    }
+    index++;
+
+    strcpy(stats_mono[index].name, "Heatmap 2 09");
+    stats_mono[index].weight = -INFINITY;
+    stats_mono[index].length = 0;
+    stats_mono[index].skip = 0;
+    for (int i = 0; i < DIM1; i++)
+    {
+        unflat_mono(i, &row0, &col0);
+        if (row0 == 2 && col0 == 9)
+        {
+            stats_mono[index].ngrams[i] = i;
+            stats_mono[index].length++;
+        }
+        else
+        {
+            stats_mono[index].ngrams[i] = -1;
+        }
+    }
+    index++;
+
+    strcpy(stats_mono[index].name, "Heatmap 2 10");
+    stats_mono[index].weight = -INFINITY;
+    stats_mono[index].length = 0;
+    stats_mono[index].skip = 0;
+    for (int i = 0; i < DIM1; i++)
+    {
+        unflat_mono(i, &row0, &col0);
+        if (row0 == 2 && col0 == 10)
+        {
+            stats_mono[index].ngrams[i] = i;
+            stats_mono[index].length++;
+        }
+        else
+        {
+            stats_mono[index].ngrams[i] = -1;
+        }
+    }
+    index++;
+
+    strcpy(stats_mono[index].name, "Heatmap 2 11");
+    stats_mono[index].weight = -INFINITY;
+    stats_mono[index].length = 0;
+    stats_mono[index].skip = 0;
+    for (int i = 0; i < DIM1; i++)
+    {
+        unflat_mono(i, &row0, &col0);
+        if (row0 == 2 && col0 == 11)
+        {
+            stats_mono[index].ngrams[i] = i;
+            stats_mono[index].length++;
+        }
+        else
+        {
+            stats_mono[index].ngrams[i] = -1;
+        }
+    }
+    index++;
 
     /* Initialize a new stats for column/finger usage. */
     strcpy(stats_mono[index].name, "Left Outer Usage");
@@ -47,8 +732,7 @@ void initialize_mono_stats()
     stats_mono[index].skip = 0;
     for (int i = 0; i < DIM1; i++)
     {
-        /* convert a 1D index into a 2D matrix coordinate */
-        unflat_mono(i, &row0, &col0); /* util.c */
+        unflat_mono(i, &row0, &col0);
         if (col0 == 0)
         {
             stats_mono[index].ngrams[i] = i;

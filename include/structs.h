@@ -9,9 +9,11 @@
 #define dim3 dim2 * dim1
 #define dim4 dim3 * dim1
 
+// ALL NAMES 60 CHARACTERS LONG FOR PRINTING IN 80 CHARACTER LINES
+
 /* Structure for a keyboard layout and its stats. */
 typedef struct layout {
-    char name[100];
+    char name[61];
     int matrix[row][col];
     float *mono_score;
     float *bi_score;
@@ -24,14 +26,14 @@ typedef struct layout {
 
 /* Node for a linked list of layouts, used for ranking. */
 typedef struct layout_node {
-    char name[100];
+    char name[61];
     float score;
     struct layout_node *next;
 } layout_node;
 
 /* Structures to represent statistics based on ngrams. */
 typedef struct mono_stat {
-    char name[100];
+    char name[61];
     int ngrams[dim1];
     int length;
     float weight;
@@ -39,7 +41,7 @@ typedef struct mono_stat {
 } mono_stat;
 
 typedef struct bi_stat {
-    char name[100];
+    char name[61];
     int ngrams[dim2];
     int length;
     float weight;
@@ -47,7 +49,7 @@ typedef struct bi_stat {
 } bi_stat;
 
 typedef struct tri_stat {
-    char name[100];
+    char name[61];
     int ngrams[dim3];
     int length;
     float weight;
@@ -55,7 +57,7 @@ typedef struct tri_stat {
 } tri_stat;
 
 typedef struct quad_stat {
-    char name[100];
+    char name[61];
     int ngrams[dim4];
     int length;
     float weight;
@@ -63,7 +65,7 @@ typedef struct quad_stat {
 } quad_stat;
 
 typedef struct skip_stat {
-    char name[100];
+    char name[61];
     int ngrams[dim2];
     int length;
     /* multiple weights for skip-X-grams */
@@ -76,7 +78,7 @@ typedef struct skip_stat {
  * more than one kind of ngram, calculated through other stats
  */
 typedef struct meta_stat {
-    char name[100];
+    char name[61];
     char stat_types[100];
     int stat_indices[100];
     float stat_weights[100];

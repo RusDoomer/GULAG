@@ -35,7 +35,7 @@
  */
 void initialize_bi_stats()
 {
-    BI_LENGTH = 22;
+    BI_LENGTH = 27;
     stats_bi = (bi_stat *)malloc(sizeof(bi_stat) * BI_LENGTH);
     int row0, col0, row1, col1;
     int index = 0;
@@ -375,6 +375,104 @@ void initialize_bi_stats()
     {
         unflat_bi(i, &row0, &col0, &row1, &col1);
         if (is_bad_same_finger_bi(row0, col0, row1, col1) && finger(row0, col0) == 7)
+        {
+            stats_bi[index].ngrams[i] = i;
+            stats_bi[index].length++;
+        }
+        else
+        {
+            stats_bi[index].ngrams[i] = -1;
+        }
+    }
+    index++;
+
+    /* initialize lateral SFBs */
+    strcpy(stats_bi[index].name, "Lateral Same Finger Bigram");
+    stats_bi[index].weight = -INFINITY;
+    stats_bi[index].length = 0;
+    stats_bi[index].skip = 0;
+    for (int i = 0; i < DIM2; i++)
+    {
+        unflat_bi(i, &row0, &col0, &row1, &col1);
+        if (is_lateral_same_finger_bi(row0, col0, row1, col1))
+        {
+            stats_bi[index].ngrams[i] = i;
+            stats_bi[index].length++;
+        }
+        else
+        {
+            stats_bi[index].ngrams[i] = -1;
+        }
+    }
+    index++;
+
+    /* initialize per finger lateral bigram stats */
+    strcpy(stats_bi[index].name, "Lateral Left Pinky Bigram");
+    stats_bi[index].weight = -INFINITY;
+    stats_bi[index].length = 0;
+    stats_bi[index].skip = 0;
+    for (int i = 0; i < DIM2; i++)
+    {
+        unflat_bi(i, &row0, &col0, &row1, &col1);
+        if (is_lateral_same_finger_bi(row0, col0, row1, col1) && finger(row0, col0) == 0)
+        {
+            stats_bi[index].ngrams[i] = i;
+            stats_bi[index].length++;
+        }
+        else
+        {
+            stats_bi[index].ngrams[i] = -1;
+        }
+    }
+    index++;
+
+    strcpy(stats_bi[index].name, "Lateral Left Index Bigram");
+    stats_bi[index].weight = -INFINITY;
+    stats_bi[index].length = 0;
+    stats_bi[index].skip = 0;
+    for (int i = 0; i < DIM2; i++)
+    {
+        unflat_bi(i, &row0, &col0, &row1, &col1);
+        if (is_lateral_same_finger_bi(row0, col0, row1, col1) && finger(row0, col0) == 3)
+        {
+            stats_bi[index].ngrams[i] = i;
+            stats_bi[index].length++;
+        }
+        else
+        {
+            stats_bi[index].ngrams[i] = -1;
+        }
+    }
+    index++;
+
+    strcpy(stats_bi[index].name, "Lateral Right Index Bigram");
+    stats_bi[index].weight = -INFINITY;
+    stats_bi[index].length = 0;
+    stats_bi[index].skip = 0;
+    for (int i = 0; i < DIM2; i++)
+    {
+        unflat_bi(i, &row0, &col0, &row1, &col1);
+        if (is_lateral_same_finger_bi(row0, col0, row1, col1) && finger(row0, col0) == 4)
+        {
+            stats_bi[index].ngrams[i] = i;
+            stats_bi[index].length++;
+        }
+        else
+        {
+            stats_bi[index].ngrams[i] = -1;
+        }
+    }
+    index++;
+
+
+    strcpy(stats_bi[index].name, "Lateral Right Pinky Bigram");
+    stats_bi[index].weight = -INFINITY;
+    stats_bi[index].length = 0;
+    stats_bi[index].skip = 0;
+    for (int i = 0; i < DIM2; i++)
+    {
+        unflat_bi(i, &row0, &col0, &row1, &col1);
+        if (is_lateral_same_finger_bi(row0, col0, row1, col1) && finger(row0, col0) == 7)
         {
             stats_bi[index].ngrams[i] = i;
             stats_bi[index].length++;

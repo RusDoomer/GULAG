@@ -729,8 +729,8 @@ void read_layout(layout *lt, int which_layout)
     }
 
     /* Set the layout name in the layout structure. */
-    if (which_layout == 1) {strncpy(lt->name, layout_name, 99);}
-    else if (which_layout == 2) {strncpy(lt->name, layout2_name, 99);}
+    if (which_layout == 1) {strncpy(lt->name, layout_name, 60);}
+    else if (which_layout == 2) {strncpy(lt->name, layout2_name, 60);}
 
     wchar_t curr;
     /* Read the layout matrix from the file. */
@@ -778,22 +778,22 @@ void normal_print(layout *lt)
     log_print('n',L"\nMONOGRAM STATS\n");
     for (int i = 0; i < MONO_LENGTH; i++)
     {
-        if (!stats_mono[i].skip) {log_print('n',L"%s : %f\%\n", stats_mono[i].name, lt->mono_score[i]);}
+        if (!stats_mono[i].skip) {log_print('n',L"%s : %08.5f\%\n", stats_mono[i].name, lt->mono_score[i]);}
     }
     log_print('n',L"\nBIGRAM STATS\n");
     for (int i = 0; i < BI_LENGTH; i++)
     {
-        if (!stats_bi[i].skip) {log_print('n',L"%s : %f\%\n", stats_bi[i].name, lt->bi_score[i]);}
+        if (!stats_bi[i].skip) {log_print('n',L"%s : %08.5f\%\n", stats_bi[i].name, lt->bi_score[i]);}
     }
     log_print('n',L"\nTRIGRAM STATS\n");
     for (int i = 0; i < TRI_LENGTH; i++)
     {
-        if (!stats_tri[i].skip) {log_print('n',L"%s : %f\%\n", stats_tri[i].name, lt->tri_score[i]);}
+        if (!stats_tri[i].skip) {log_print('n',L"%s : %08.5f\%\n", stats_tri[i].name, lt->tri_score[i]);}
     }
     log_print('n',L"\nQUADGRAM STATS\n");
     for (int i = 0; i < QUAD_LENGTH; i++)
     {
-        if (!stats_quad[i].skip) {log_print('n',L"%s : %f\%\n", stats_quad[i].name, lt->quad_score[i]);}
+        if (!stats_quad[i].skip) {log_print('n',L"%s : %08.5f\%\n", stats_quad[i].name, lt->quad_score[i]);}
     }
     log_print('n',L"\nSKIPGRAM STATS\n");
     for (int i = 0; i < SKIP_LENGTH; i++)
@@ -812,7 +812,7 @@ void normal_print(layout *lt)
     log_print('n',L"\nMETA STATS\n");
     for (int i = 0; i < META_LENGTH; i++)
     {
-        if (!stats_meta[i].skip) {log_print('n',L"%s : %f\%\n", stats_meta[i].name, lt->meta_score[i]);}
+        if (!stats_meta[i].skip) {log_print('n',L"%s : %08.5f\%\n", stats_meta[i].name, lt->meta_score[i]);}
     }
     log_print('n',L"\n");
 }

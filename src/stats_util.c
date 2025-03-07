@@ -290,6 +290,12 @@ int is_bad_same_finger_bi(int row0, int col0, int row1, int col1)
     return is_same_finger_bi(row0, col0, row1, col1) && (row0 - row1 == 2 || row1 - row0 == 2);
 }
 
+/* sfb with horizontal movement */
+int is_lateral_same_finger_bi(int row0, int col0, int row1, int col1)
+{
+    return is_same_finger_bi(row0, col0, row1, col1) && (col0 - col1 > 0 || col0 - col1 < 0);
+}
+
 /* separate fingers but not index + pinky combo */
 int is_russor_fingers(int row0, int col0, int row1, int col1)
 {

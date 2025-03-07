@@ -1,3 +1,39 @@
+Heatmap 0 00 : 1
+Heatmap 0 01 : 1
+Heatmap 0 02 : 1
+Heatmap 0 03 : 1
+Heatmap 0 04 : 1
+Heatmap 0 05 : 1
+Heatmap 0 06 : 1
+Heatmap 0 07 : 1
+Heatmap 0 08 : 1
+Heatmap 0 09 : 1
+Heatmap 0 10 : 1
+Heatmap 0 11 : 1
+Heatmap 1 00 : 1
+Heatmap 1 01 : 1
+Heatmap 1 02 : 1
+Heatmap 1 03 : 1
+Heatmap 1 04 : 1
+Heatmap 1 05 : 1
+Heatmap 1 06 : 1
+Heatmap 1 07 : 1
+Heatmap 1 08 : 1
+Heatmap 1 09 : 1
+Heatmap 1 10 : 1
+Heatmap 1 11 : 1
+Heatmap 2 00 : 1
+Heatmap 2 01 : 1
+Heatmap 2 02 : 1
+Heatmap 2 03 : 1
+Heatmap 2 04 : 1
+Heatmap 2 05 : 1
+Heatmap 2 06 : 1
+Heatmap 2 07 : 1
+Heatmap 2 08 : 1
+Heatmap 2 09 : 1
+Heatmap 2 10 : 1
+Heatmap 2 11 : 1
 Left Outer Usage : 1
 Left Pinky Usage : 1
 Left Ring Usage : 1
@@ -33,6 +69,11 @@ Bad Right Index Bigram : 1
 Bad Right Middle Bigram : 1
 Bad Right Ring Bigram : 1
 Bad Right Pinky Bigram : 1
+Lateral Same Finger Bigram : 1
+Lateral Left Pinky Bigram : 1
+Lateral Left Index Bigram : 1
+Lateral Right Index Bigram : 1
+Lateral Right Pinky Bigram : 1
 Full Russor Bigram : 1
 Half Russor Bigram : 1
 Index Stretch Bigram : 1
