@@ -16,6 +16,7 @@
 #include <unistd.h>
 #include <time.h>
 
+#include <sys/time.h>
 #include <CL/cl.h>
 
 #include "mode.h"
@@ -242,6 +243,8 @@ typedef struct thread_data {
     layout **best_lt;
     int iterations;
     int thread_id;
+    FILE *logfile;
+    pthread_mutex_t *mutex;
 } thread_data;
 
 /*
@@ -336,9 +339,34 @@ void *thread_function(void *arg) {
         /* calculates the new score */
         get_score(working_lt); /* util.c */
 
-        /* Exponentiate the score difference for acceptance probability (using sigmoid) */
-        float delta_score = working_lt->score - max_lt->score;
-        if (delta_score > 0 || (1.0 / (1.0 + exp(-10 * delta_score / T))) > random_float()) {
+
+        float new_score = working_lt->score;
+        float delta_score = new_score - max_lt->score;
+        float probability = 1.0 / (1.0 + exp(-10.0 * delta_score / T));
+        float random_val = random_float();
+        int accepted = (delta_score > 0) || (probability > random_val);
+
+        // Get Unix timestamp with nanosecond precision
+        struct timespec ts;
+        clock_gettime(CLOCK_REALTIME, &ts);
+        double timestamp = ts.tv_sec + ts.tv_nsec / 1e9;
+
+        // Log data with timestamp (thread-safe)
+        pthread_mutex_lock(data->mutex);
+        fwprintf(data->logfile,
+            L"%d,%d,%.2f,%.2f,%.2f,%d,%lf\n",
+            data->thread_id,                  // Thread
+            i,                                // Iteration
+            T,                                // Temperature
+            new_score,                        // Score of new layout
+            max_lt->score,                    // Score of the current max layout
+            accepted ? 1 : 0,                 // Whether the layout was accepted
+            timestamp                         // Timestamp of this iteration
+        );
+        pthread_mutex_unlock(data->mutex);
+
+
+        if (accepted) {
             /* copy the new layout if it passes */
             copy(max_lt, working_lt); /* util.c */
             /* Increment improvement counter */
@@ -466,6 +494,30 @@ void generate() {
  *   shuffle: A flag indicating whether to shuffle the layout before starting.
  */
 void improve(int shuffle) {
+
+    // Create timestamped log filename
+    time_t rawtime;
+    struct tm *tm_info;
+    time(&rawtime);
+    tm_info = localtime(&rawtime);
+    char filename[64];
+    strftime(filename, 64, "annealing_log_%Y%m%d_%H%M%S.log", tm_info);
+
+    // Open log file in append mode with UTF-8 encoding
+    FILE *logfile = fopen(filename, "a"); // Text mode for UTF-8 compatibility
+    if (!logfile) {
+        perror("Failed to open log file");
+        exit(EXIT_FAILURE);
+    }
+
+    // Set file to wide mode (if needed for Unicode)
+    fwide(logfile, 1); // Enables wide-character writes
+
+    // Initialize mutex for thread-safe logging
+    pthread_mutex_t mutex;
+    pthread_mutex_init(&mutex, NULL);
+
+
     /* Work for timing total/real layouts/second */
     layouts_analyzed += ((int)repetitions/threads + 1) * threads;
     layouts_analyzed += 2;
@@ -521,6 +573,9 @@ void improve(int shuffle) {
     /* Create and start the threads */
     log_print('n',L"5/9: Initializing threads... ");
     for (int i = 0; i < threads; i++) {
+        thread_data_array[i].logfile = logfile;
+        thread_data_array[i].mutex = &mutex;
+
         best_layouts[i] = NULL;
         thread_data_array[i].lt = lt;
         thread_data_array[i].best_lt = &best_layouts[i];
@@ -569,6 +624,10 @@ void improve(int shuffle) {
             free_layout(best_layouts[i]); /* util.c */
         }
     }
+
+    // Cleanup
+    pthread_mutex_destroy(&mutex);
+    fclose(logfile);
 
     free_layout(lt);
     free(thread_data_array);
