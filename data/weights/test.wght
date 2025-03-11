@@ -46,8 +46,8 @@ Right Middle Usage : 0
 Right Ring Usage : 0
 Right Pinky Usage : 0
 Right Outer Usage : 0
-Left Hand Usage : 1
-Right Hand Usage : 1
+Left Hand Usage : 0
+Right Hand Usage : 0
 Top Row Usage : 0
 Home Row Usage : 0
 Bottom Row Usage : 0
@@ -211,7 +211,7 @@ Lateral Left Pinky Skipgram : 0 0 0 0 0 0 0 0 0
 Lateral Left Index Skipgram : 0 0 0 0 0 0 0 0 0
 Lateral Right Index Skipgram : 0 0 0 0 0 0 0 0 0
 Lateral Right Pinky Skipgram : 0 0 0 0 0 0 0 0 0
-Hand Balance : -0.1
+Hand Balance : 1
 RuSpeed : 0
 Left Pinky RuSpeed : 0
 Left Ring RuSpeed : 0

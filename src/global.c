@@ -1,12 +1,10 @@
 /*
  * global.c - Global variable definitions and constants for the GULAG.
  *
- * Author: Rus Doomer
- *
- * Description: This file contains the definitions of global variables and constants used
- *              throughout the GULAG. These variables manage configuration settings,
- *              language data, corpus statistics, and layout information. Management
- *              of these resources is crucial for the efficient operation of the GULAG.
+ * This file contains the definitions of global variables and constants used
+ * throughout the GULAG. These variables manage configuration settings, language
+ * data, corpus statistics, and layout information. Management of these
+ * resources is crucial for the efficient operation of the GULAG.
  */
 
 #include <wchar.h>
@@ -38,18 +36,6 @@ int DIM4 = dim4;
 
 int MAX_SWAPS = dim1 / 2;
 int WORKERS = 16;
-
-/*
- * Number of tracked statistics for each ngram type.
- * the name NGRAM_END is a relic of when these were enums
- * I'm not changing it though.
- */
-int MONO_END = 0;
-int BI_END = 0;
-int TRI_END = 0;
-int QUAD_END = 0;
-int SKIP_END = 0;
-int META_END = 0;
 
 /* Paths to data files. */
 char *lang_name = NULL;
@@ -94,13 +80,13 @@ float *linear_tri;
 float *linear_quad;
 float *linear_skip;
 
-/* Heads of linked lists for each statistic type. */
-mono_stat *mono_head;
-bi_stat *bi_head;
-tri_stat *tri_head;
-quad_stat *quad_head;
-skip_stat *skip_head;
-meta_stat *meta_head;
+/* total umber of statistics for each ngram type. */
+int MONO_LENGTH = 0;
+int BI_LENGTH = 0;
+int TRI_LENGTH = 0;
+int QUAD_LENGTH = 0;
+int SKIP_LENGTH = 0;
+int META_LENGTH = 0;
 
 /* Arrays to hold all statistics after processing. */
 mono_stat *stats_mono;

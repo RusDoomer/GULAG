@@ -26,3 +26,11 @@ To install and run this project, you will need the following:
 *   OpenCL
 *   An OpenCL-compatible GPU
 *   Make
+
+---
+
+## 3. Troubleshooting
+
+### Why can't GULAG find the shai corpus?
+
+This program is BYOC, so you must download the corpus yourself, the simplest way to do that is to download [this file](https://colemak.com/pub/corpus/iweb-corpus-samples-cleaned.txt.xz) unpack it and move the file to `./data/english/corpora/shai.txt`.

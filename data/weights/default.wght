@@ -1,3 +1,39 @@
+Heatmap 0 00 : 0
+Heatmap 0 01 : 0
+Heatmap 0 02 : 0
+Heatmap 0 03 : 0
+Heatmap 0 04 : 0
+Heatmap 0 05 : 0
+Heatmap 0 06 : 0
+Heatmap 0 07 : 0
+Heatmap 0 08 : 0
+Heatmap 0 09 : 0
+Heatmap 0 10 : 0
+Heatmap 0 11 : 0
+Heatmap 1 00 : 0
+Heatmap 1 01 : 0
+Heatmap 1 02 : 0
+Heatmap 1 03 : 0
+Heatmap 1 04 : 0
+Heatmap 1 05 : 0
+Heatmap 1 06 : 0
+Heatmap 1 07 : 0
+Heatmap 1 08 : 0
+Heatmap 1 09 : 0
+Heatmap 1 10 : 0
+Heatmap 1 11 : 0
+Heatmap 2 00 : 0
+Heatmap 2 01 : 0
+Heatmap 2 02 : 0
+Heatmap 2 03 : 0
+Heatmap 2 04 : 0
+Heatmap 2 05 : 0
+Heatmap 2 06 : 0
+Heatmap 2 07 : 0
+Heatmap 2 08 : 0
+Heatmap 2 09 : 0
+Heatmap 2 10 : 0
+Heatmap 2 11 : 0
 Left Outer Usage : -1
 Left Pinky Usage : -1
 Left Ring Usage : -0.5
@@ -33,6 +69,11 @@ Bad Right Index Bigram : 0
 Bad Right Middle Bigram : 0
 Bad Right Ring Bigram : -5
 Bad Right Pinky Bigram : -10
+Lateral Same Finger Bigram : 0
+Lateral Left Pinky Bigram : 0
+Lateral Left Index Bigram : 0
+Lateral Right Index Bigram : 0
+Lateral Right Pinky Bigram : 0
 Full Russor Bigram : -2.5
 Half Russor Bigram : -0.5
 Index Stretch Bigram : -2.5
@@ -165,4 +206,19 @@ Bad Right Index Skipgram : 0 0 0 0 0 0 0 0 0
 Bad Right Middle Skipgram : 0 0 0 0 0 0 0 0 0
 Bad Right Ring Skipgram : 0 0 0 0 0 0 0 0 0
 Bad Right Pinky Skipgram : 0 0 0 0 0 0 0 0 0
+Lateral Same Finger Skipgram : 0 0 0 0 0 0 0 0 0
+Lateral Left Pinky Skipgram : 0 0 0 0 0 0 0 0 0
+Lateral Left Index Skipgram : 0 0 0 0 0 0 0 0 0
+Lateral Right Index Skipgram : 0 0 0 0 0 0 0 0 0
+Lateral Right Pinky Skipgram : 0 0 0 0 0 0 0 0 0
 Hand Balance : -0.1
+RuSpeed : 0
+Left Pinky RuSpeed : 0
+Left Ring RuSpeed : 0
+Left Middle RuSpeed : 0
+Left Index RuSpeed : 0
+Right Index RuSpeed : 0
+Right Middle RuSpeed : 0
+Right Ring RuSpeed : 0
+Right Pinky RuSpeed : 0
+

@@ -1,27 +1,23 @@
 /*
- * stats/skip.c - Skipgram statistic definitions for the GULAG.
+ * stats/skip.c - Skipgram statistic definitions.
  *
- * Author: Rus Doomer
- *
- * Description: This file contains the implementation for initializing, cleaning,
- *              converting, and freeing skipgram statistics used in the GULAG.
- *              Skipgram statistics track the frequency and positioning of two
- *              character sequences on a keyboard layout with a certain number
- *              of characters (the skip) between them.
+ * This file contains the implementation for initializing, cleaning, converting,
+ * and freeing skipgram statistics used in the GULAG. Bigram statistics track
+ * the frequency and positioning of two character sequences with
+ * 1 to 9 skipped characters in the middle.
  *
  * Adding new stats:
- *     1. In initialize_skip_stats(), add a new skip_stat structure.
- *     2. Define its name, and set its weight to -INFINITY for each skip (it will be changed later in io.c).
- *     3. Make sure to add it to the linked list by setting it as the next element of the last stat.
- *     4. Define its length to 0, then loop through the DIM2 (1296) possible skipgrams on the
- *        layout.
- *     5. Use unflat_bi() to convert the 1D index to a 4D coordinate.
- *     6. Use an if statement and a stats_util.c function to check if the ngram falls under
- *        the stat.
- *     7. If it does, add it to the ngrams array and increment length.
- *     8. Add the statistic to the weights files in data/weights/.
+ *     1. Incease SKIP_LENGTH by as many stats as you are adding.
+ *     2. Define its name, keep it a reasonable length.
+ *     3. Set its weight to -INFINITY, and skip to 0 (to be changed later).
+ *     4. Set its length to 0, then loop through the DIM2 (36^2) sequences.
+ *       4a. Use unflat_bi() to convert the 1D index to a set of 2D coordinates.
+ *       4b. Check if the ngram falls under the stat.
+ *       4c. If it does, add it to the ngrams array and increment length.
+ *       4d. Otherwise set the ngram array element to -1.
+ *     5. Iterate the index.
+ *     6. Add the statistic to the weights files in data/weights/.
  */
-
 
 #include <string.h>
 #include <stdlib.h>
@@ -34,443 +30,502 @@
 #include "structs.h"
 
 /*
- * Initializes the linked list of skipgram statistics.
- * Each skipgram statistic tracks the usage of specific key sequences
- * with a certain skip. The function allocates memory for each stat
- * and sets default values, including a negative infinity weight which will be later updated.
- * Statistics are defined for various key sequences and combinations.
+ * Initializes the array of skipgram statistics. The function allocates memory
+ * for the stat array and sets default values, including a negative infinity
+ * weight which will be later overwritten.
  */
 void initialize_skip_stats()
 {
+    SKIP_LENGTH = 23;
+    stats_skip = (skip_stat *)malloc(sizeof(skip_stat) * SKIP_LENGTH);
     int row0, col0, row1, col1;
-    /* Allocate and initialize SFS. */
-    skip_stat *same_finger = (skip_stat *)malloc(sizeof(skip_stat));
-    add_skip_stat(same_finger);
-    strcpy(same_finger->name, "Same Finger Skipgram");
+    int index = 0;
+
+    /* Initialize SFS. */
+    strcpy(stats_skip[index].name, "Same Finger Skipgram");
     /* Set all skip weights to -INFINITY. */
-    for (int i = 0; i < 10; i++) {
-        same_finger->weight[i] = -INFINITY;
-    }
-    same_finger->length = 0;
+    for (int i = 0; i < 10; i++) {stats_skip[index].weight[i] = -INFINITY;}
+    stats_skip[index].length = 0;
+    stats_skip[index].skip = 0;
     for (int i = 0; i < DIM2; i++)
     {
-        /* util.c - convert a 1D index into a 4D matrix coordinate */
-        unflat_bi(i, &row0, &col0, &row1, &col1);
+        /* convert a 1D index into a 4D matrix coordinate */
+        unflat_bi(i, &row0, &col0, &row1, &col1); /* util.c */
         if (is_same_finger_bi(row0, col0, row1, col1))
         {
-            same_finger->ngrams[i] = i;
-            same_finger->length++;
+            stats_skip[index].ngrams[i] = i;
+            stats_skip[index].length++;
         }
         else
         {
-            same_finger->ngrams[i] = -1;
+            stats_skip[index].ngrams[i] = -1;
         }
     }
+    index++;
 
     /* per finger SFS */
-    skip_stat *left_pinky = (skip_stat *)malloc(sizeof(skip_stat));
-    add_skip_stat(left_pinky);
-    strcpy(left_pinky->name, "Left Pinky Skipgram");
-    for (int i = 0; i < 10; i++) {
-        left_pinky->weight[i] = -INFINITY;
-    }
-    left_pinky->length = 0;
+    strcpy(stats_skip[index].name, "Left Pinky Skipgram");
+    for (int i = 0; i < 10; i++) {stats_skip[index].weight[i] = -INFINITY;}
+    stats_skip[index].length = 0;
+    stats_skip[index].skip = 0;
     for (int i = 0; i < DIM2; i++)
     {
         unflat_bi(i, &row0, &col0, &row1, &col1);
         if (is_same_finger_bi(row0, col0, row1, col1) && finger(row0, col0) == 0)
         {
-            left_pinky->ngrams[i] = i;
-            left_pinky->length++;
+            stats_skip[index].ngrams[i] = i;
+            stats_skip[index].length++;
         }
         else
         {
-            left_pinky->ngrams[i] = -1;
+            stats_skip[index].ngrams[i] = -1;
         }
     }
+    index++;
 
-    skip_stat *left_ring = (skip_stat *)malloc(sizeof(skip_stat));
-    add_skip_stat(left_ring);
-    strcpy(left_ring->name, "Left Ring Skipgram");
-    for (int i = 0; i < 10; i++) {
-        left_ring->weight[i] = -INFINITY;
-    }
-    left_ring->length = 0;
+    strcpy(stats_skip[index].name, "Left Ring Skipgram");
+    for (int i = 0; i < 10; i++) {stats_skip[index].weight[i] = -INFINITY;}
+    stats_skip[index].length = 0;
+    stats_skip[index].skip = 0;
     for (int i = 0; i < DIM2; i++)
     {
         unflat_bi(i, &row0, &col0, &row1, &col1);
         if (is_same_finger_bi(row0, col0, row1, col1) && finger(row0, col0) == 1)
         {
-            left_ring->ngrams[i] = i;
-            left_ring->length++;
+            stats_skip[index].ngrams[i] = i;
+            stats_skip[index].length++;
         }
         else
         {
-            left_ring->ngrams[i] = -1;
+            stats_skip[index].ngrams[i] = -1;
         }
     }
+    index++;
 
-    skip_stat *left_middle = (skip_stat *)malloc(sizeof(skip_stat));
-    add_skip_stat(left_middle);
-    strcpy(left_middle->name, "Left Middle Skipgram");
-    for (int i = 0; i < 10; i++) {
-        left_middle->weight[i] = -INFINITY;
-    }
-    left_middle->length = 0;
+    strcpy(stats_skip[index].name, "Left Middle Skipgram");
+    for (int i = 0; i < 10; i++) {stats_skip[index].weight[i] = -INFINITY;}
+    stats_skip[index].length = 0;
+    stats_skip[index].skip = 0;
     for (int i = 0; i < DIM2; i++)
     {
         unflat_bi(i, &row0, &col0, &row1, &col1);
         if (is_same_finger_bi(row0, col0, row1, col1) && finger(row0, col0) == 2)
         {
-            left_middle->ngrams[i] = i;
-            left_middle->length++;
+            stats_skip[index].ngrams[i] = i;
+            stats_skip[index].length++;
         }
         else
         {
-            left_middle->ngrams[i] = -1;
+            stats_skip[index].ngrams[i] = -1;
         }
     }
+    index++;
 
-    skip_stat *left_index = (skip_stat *)malloc(sizeof(skip_stat));
-    add_skip_stat(left_index);
-    strcpy(left_index->name, "Left Index Skipgram");
-    for (int i = 0; i < 10; i++) {
-        left_index->weight[i] = -INFINITY;
-    }
-    left_index->length = 0;
+    strcpy(stats_skip[index].name, "Left Index Skipgram");
+    for (int i = 0; i < 10; i++) {stats_skip[index].weight[i] = -INFINITY;}
+    stats_skip[index].length = 0;
+    stats_skip[index].skip = 0;
     for (int i = 0; i < DIM2; i++)
     {
         unflat_bi(i, &row0, &col0, &row1, &col1);
         if (is_same_finger_bi(row0, col0, row1, col1) && finger(row0, col0) == 3)
         {
-            left_index->ngrams[i] = i;
-            left_index->length++;
+            stats_skip[index].ngrams[i] = i;
+            stats_skip[index].length++;
         }
         else
         {
-            left_index->ngrams[i] = -1;
+            stats_skip[index].ngrams[i] = -1;
         }
     }
+    index++;
 
-    skip_stat *right_index = (skip_stat *)malloc(sizeof(skip_stat));
-    add_skip_stat(right_index);
-    strcpy(right_index->name, "Right Index Skipgram");
-    for (int i = 0; i < 10; i++) {
-        right_index->weight[i] = -INFINITY;
-    }
-    right_index->length = 0;
+    strcpy(stats_skip[index].name, "Right Index Skipgram");
+    for (int i = 0; i < 10; i++) {stats_skip[index].weight[i] = -INFINITY;}
+    stats_skip[index].length = 0;
+    stats_skip[index].skip = 0;
     for (int i = 0; i < DIM2; i++)
     {
         unflat_bi(i, &row0, &col0, &row1, &col1);
         if (is_same_finger_bi(row0, col0, row1, col1) && finger(row0, col0) == 4)
         {
-            right_index->ngrams[i] = i;
-            right_index->length++;
+            stats_skip[index].ngrams[i] = i;
+            stats_skip[index].length++;
         }
         else
         {
-            right_index->ngrams[i] = -1;
+            stats_skip[index].ngrams[i] = -1;
         }
     }
+    index++;
 
-    skip_stat *right_middle = (skip_stat *)malloc(sizeof(skip_stat));
-    add_skip_stat(right_middle);
-    strcpy(right_middle->name, "Right Middle Skipgram");
-    for (int i = 0; i < 10; i++) {
-        right_middle->weight[i] = -INFINITY;
-    }
-    right_middle->length = 0;
+    strcpy(stats_skip[index].name, "Right Middle Skipgram");
+    for (int i = 0; i < 10; i++) {stats_skip[index].weight[i] = -INFINITY;}
+    stats_skip[index].length = 0;
+    stats_skip[index].skip = 0;
     for (int i = 0; i < DIM2; i++)
     {
         unflat_bi(i, &row0, &col0, &row1, &col1);
         if (is_same_finger_bi(row0, col0, row1, col1) && finger(row0, col0) == 5)
         {
-            right_middle->ngrams[i] = i;
-            right_middle->length++;
+            stats_skip[index].ngrams[i] = i;
+            stats_skip[index].length++;
         }
         else
         {
-            right_middle->ngrams[i] = -1;
+            stats_skip[index].ngrams[i] = -1;
         }
     }
+    index++;
 
-    skip_stat *right_ring = (skip_stat *)malloc(sizeof(skip_stat));
-    add_skip_stat(right_ring);
-    strcpy(right_ring->name, "Right Ring Skipgram");
-    for (int i = 0; i < 10; i++) {
-        right_ring->weight[i] = -INFINITY;
-    }
-    right_ring->length = 0;
+    strcpy(stats_skip[index].name, "Right Ring Skipgram");
+    for (int i = 0; i < 10; i++) {stats_skip[index].weight[i] = -INFINITY;}
+    stats_skip[index].length = 0;
+    stats_skip[index].skip = 0;
     for (int i = 0; i < DIM2; i++)
     {
         unflat_bi(i, &row0, &col0, &row1, &col1);
         if (is_same_finger_bi(row0, col0, row1, col1) && finger(row0, col0) == 6)
         {
-            right_ring->ngrams[i] = i;
-            right_ring->length++;
+            stats_skip[index].ngrams[i] = i;
+            stats_skip[index].length++;
         }
         else
         {
-            right_ring->ngrams[i] = -1;
+            stats_skip[index].ngrams[i] = -1;
         }
     }
+    index++;
 
-    skip_stat *right_pinky = (skip_stat *)malloc(sizeof(skip_stat));
-    add_skip_stat(right_pinky);
-    strcpy(right_pinky->name, "Right Pinky Skipgram");
-    for (int i = 0; i < 10; i++) {
-        right_pinky->weight[i] = -INFINITY;
-    }
-    right_pinky->length = 0;
+    strcpy(stats_skip[index].name, "Right Pinky Skipgram");
+    for (int i = 0; i < 10; i++) {stats_skip[index].weight[i] = -INFINITY;}
+    stats_skip[index].length = 0;
+    stats_skip[index].skip = 0;
     for (int i = 0; i < DIM2; i++)
     {
         unflat_bi(i, &row0, &col0, &row1, &col1);
         if (is_same_finger_bi(row0, col0, row1, col1) && finger(row0, col0) == 7)
         {
-            right_pinky->ngrams[i] = i;
-            right_pinky->length++;
+            stats_skip[index].ngrams[i] = i;
+            stats_skip[index].length++;
         }
         else
         {
-            right_pinky->ngrams[i] = -1;
+            stats_skip[index].ngrams[i] = -1;
         }
     }
+    index++;
 
     /* 2U SFS */
-    skip_stat *bad_same_finger = (skip_stat *)malloc(sizeof(skip_stat));
-    add_skip_stat(bad_same_finger);
-    strcpy(bad_same_finger->name, "Bad Same Finger Skipgram");
-    for (int i = 0; i < 10; i++) {
-        bad_same_finger->weight[i] = -INFINITY;
-    }
-    bad_same_finger->length = 0;
+    strcpy(stats_skip[index].name, "Bad Same Finger Skipgram");
+    for (int i = 0; i < 10; i++) {stats_skip[index].weight[i] = -INFINITY;}
+    stats_skip[index].length = 0;
+    stats_skip[index].skip = 0;
     for (int i = 0; i < DIM2; i++)
     {
         unflat_bi(i, &row0, &col0, &row1, &col1);
         if (is_bad_same_finger_bi(row0, col0, row1, col1))
         {
-            bad_same_finger->ngrams[i] = i;
-            bad_same_finger->length++;
+            stats_skip[index].ngrams[i] = i;
+            stats_skip[index].length++;
         }
         else
         {
-            bad_same_finger->ngrams[i] = -1;
+            stats_skip[index].ngrams[i] = -1;
         }
     }
+    index++;
 
     /* per finger 2U SFS */
-    skip_stat *bad_left_pinky = (skip_stat *)malloc(sizeof(skip_stat));
-    add_skip_stat(bad_left_pinky);
-    strcpy(bad_left_pinky->name, "Bad Left Pinky Skipgram");
-    for (int i = 0; i < 10; i++) {
-        bad_left_pinky->weight[i] = -INFINITY;
-    }
-    bad_left_pinky->length = 0;
+    strcpy(stats_skip[index].name, "Bad Left Pinky Skipgram");
+    for (int i = 0; i < 10; i++) {stats_skip[index].weight[i] = -INFINITY;}
+    stats_skip[index].length = 0;
+    stats_skip[index].skip = 0;
     for (int i = 0; i < DIM2; i++)
     {
         unflat_bi(i, &row0, &col0, &row1, &col1);
         if (is_bad_same_finger_bi(row0, col0, row1, col1) && finger(row0, col0) == 0)
         {
-            bad_left_pinky->ngrams[i] = i;
-            bad_left_pinky->length++;
+            stats_skip[index].ngrams[i] = i;
+            stats_skip[index].length++;
         }
         else
         {
-            bad_left_pinky->ngrams[i] = -1;
+            stats_skip[index].ngrams[i] = -1;
         }
     }
+    index++;
 
-    skip_stat *bad_left_ring = (skip_stat *)malloc(sizeof(skip_stat));
-    add_skip_stat(bad_left_ring);
-    strcpy(bad_left_ring->name, "Bad Left Ring Skipgram");
-    for (int i = 0; i < 10; i++) {
-        bad_left_ring->weight[i] = -INFINITY;
-    }
-    bad_left_ring->length = 0;
+    strcpy(stats_skip[index].name, "Bad Left Ring Skipgram");
+    for (int i = 0; i < 10; i++) {stats_skip[index].weight[i] = -INFINITY;}
+    stats_skip[index].length = 0;
+    stats_skip[index].skip = 0;
     for (int i = 0; i < DIM2; i++)
     {
         unflat_bi(i, &row0, &col0, &row1, &col1);
         if (is_bad_same_finger_bi(row0, col0, row1, col1) && finger(row0, col0) == 1)
         {
-            bad_left_ring->ngrams[i] = i;
-            bad_left_ring->length++;
+            stats_skip[index].ngrams[i] = i;
+            stats_skip[index].length++;
         }
         else
         {
-            bad_left_ring->ngrams[i] = -1;
+            stats_skip[index].ngrams[i] = -1;
         }
     }
+    index++;
 
-    skip_stat *bad_left_middle = (skip_stat *)malloc(sizeof(skip_stat));
-    add_skip_stat(bad_left_middle);
-    strcpy(bad_left_middle->name, "Bad Left Middle Skipgram");
-    for (int i = 0; i < 10; i++) {
-        bad_left_middle->weight[i] = -INFINITY;
-    }
-    bad_left_middle->length = 0;
+    strcpy(stats_skip[index].name, "Bad Left Middle Skipgram");
+    for (int i = 0; i < 10; i++) {stats_skip[index].weight[i] = -INFINITY;}
+    stats_skip[index].length = 0;
+    stats_skip[index].skip = 0;
     for (int i = 0; i < DIM2; i++)
     {
         unflat_bi(i, &row0, &col0, &row1, &col1);
         if (is_bad_same_finger_bi(row0, col0, row1, col1) && finger(row0, col0) == 2)
         {
-            bad_left_middle->ngrams[i] = i;
-            bad_left_middle->length++;
+            stats_skip[index].ngrams[i] = i;
+            stats_skip[index].length++;
         }
         else
         {
-            bad_left_middle->ngrams[i] = -1;
+            stats_skip[index].ngrams[i] = -1;
         }
     }
+    index++;
 
-    skip_stat *bad_left_index = (skip_stat *)malloc(sizeof(skip_stat));
-    add_skip_stat(bad_left_index);
-    strcpy(bad_left_index->name, "Bad Left Index Skipgram");
-    for (int i = 0; i < 10; i++) {
-        bad_left_index->weight[i] = -INFINITY;
-    }
-    bad_left_index->length = 0;
+    strcpy(stats_skip[index].name, "Bad Left Index Skipgram");
+    for (int i = 0; i < 10; i++) {stats_skip[index].weight[i] = -INFINITY;}
+    stats_skip[index].length = 0;
+    stats_skip[index].skip = 0;
     for (int i = 0; i < DIM2; i++)
     {
         unflat_bi(i, &row0, &col0, &row1, &col1);
         if (is_bad_same_finger_bi(row0, col0, row1, col1) && finger(row0, col0) == 3)
         {
-            bad_left_index->ngrams[i] = i;
-            bad_left_index->length++;
+            stats_skip[index].ngrams[i] = i;
+            stats_skip[index].length++;
         }
         else
         {
-            bad_left_index->ngrams[i] = -1;
+            stats_skip[index].ngrams[i] = -1;
         }
     }
+    index++;
 
-    skip_stat *bad_right_index = (skip_stat *)malloc(sizeof(skip_stat));
-    add_skip_stat(bad_right_index);
-    strcpy(bad_right_index->name, "Bad Right Index Skipgram");
-    for (int i = 0; i < 10; i++) {
-        bad_right_index->weight[i] = -INFINITY;
-    }
-    bad_right_index->length = 0;
+    strcpy(stats_skip[index].name, "Bad Right Index Skipgram");
+    for (int i = 0; i < 10; i++) {stats_skip[index].weight[i] = -INFINITY;}
+    stats_skip[index].length = 0;
+    stats_skip[index].skip = 0;
     for (int i = 0; i < DIM2; i++)
     {
         unflat_bi(i, &row0, &col0, &row1, &col1);
         if (is_bad_same_finger_bi(row0, col0, row1, col1) && finger(row0, col0) == 4)
         {
-            bad_right_index->ngrams[i] = i;
-            bad_right_index->length++;
+            stats_skip[index].ngrams[i] = i;
+            stats_skip[index].length++;
         }
         else
         {
-            bad_right_index->ngrams[i] = -1;
+            stats_skip[index].ngrams[i] = -1;
         }
     }
+    index++;
 
-    skip_stat *bad_right_middle = (skip_stat *)malloc(sizeof(skip_stat));
-    add_skip_stat(bad_right_middle);
-    strcpy(bad_right_middle->name, "Bad Right Middle Skipgram");
-    for (int i = 0; i < 10; i++) {
-        bad_right_middle->weight[i] = -INFINITY;
-    }
-    bad_right_middle->length = 0;
+    strcpy(stats_skip[index].name, "Bad Right Middle Skipgram");
+    for (int i = 0; i < 10; i++) {stats_skip[index].weight[i] = -INFINITY;}
+    stats_skip[index].length = 0;
+    stats_skip[index].skip = 0;
     for (int i = 0; i < DIM2; i++)
     {
         unflat_bi(i, &row0, &col0, &row1, &col1);
         if (is_bad_same_finger_bi(row0, col0, row1, col1) && finger(row0, col0) == 5)
         {
-            bad_right_middle->ngrams[i] = i;
-            bad_right_middle->length++;
+            stats_skip[index].ngrams[i] = i;
+            stats_skip[index].length++;
         }
         else
         {
-            bad_right_middle->ngrams[i] = -1;
+            stats_skip[index].ngrams[i] = -1;
         }
     }
+    index++;
 
-    skip_stat *bad_right_ring = (skip_stat *)malloc(sizeof(skip_stat));
-    add_skip_stat(bad_right_ring);
-    strcpy(bad_right_ring->name, "Bad Right Ring Skipgram");
-    for (int i = 0; i < 10; i++) {
-        bad_right_ring->weight[i] = -INFINITY;
-    }
-    bad_right_ring->length = 0;
+    strcpy(stats_skip[index].name, "Bad Right Ring Skipgram");
+    for (int i = 0; i < 10; i++) {stats_skip[index].weight[i] = -INFINITY;}
+    stats_skip[index].length = 0;
+    stats_skip[index].skip = 0;
     for (int i = 0; i < DIM2; i++)
     {
         unflat_bi(i, &row0, &col0, &row1, &col1);
         if (is_bad_same_finger_bi(row0, col0, row1, col1) && finger(row0, col0) == 6)
         {
-            bad_right_ring->ngrams[i] = i;
-            bad_right_ring->length++;
+            stats_skip[index].ngrams[i] = i;
+            stats_skip[index].length++;
         }
         else
         {
-            bad_right_ring->ngrams[i] = -1;
+            stats_skip[index].ngrams[i] = -1;
         }
     }
+    index++;
 
-    skip_stat *bad_right_pinky = (skip_stat *)malloc(sizeof(skip_stat));
-    add_skip_stat(bad_right_pinky);
-    strcpy(bad_right_pinky->name, "Bad Right Pinky Skipgram");
-    for (int i = 0; i < 10; i++) {
-        bad_right_pinky->weight[i] = -INFINITY;
-    }
-    bad_right_pinky->length = 0;
+    strcpy(stats_skip[index].name, "Bad Right Pinky Skipgram");
+    for (int i = 0; i < 10; i++) {stats_skip[index].weight[i] = -INFINITY;}
+    stats_skip[index].length = 0;
+    stats_skip[index].skip = 0;
     for (int i = 0; i < DIM2; i++)
     {
         unflat_bi(i, &row0, &col0, &row1, &col1);
         if (is_bad_same_finger_bi(row0, col0, row1, col1) && finger(row0, col0) == 7)
         {
-            bad_right_pinky->ngrams[i] = i;
-            bad_right_pinky->length++;
+            stats_skip[index].ngrams[i] = i;
+            stats_skip[index].length++;
         }
         else
         {
-            bad_right_pinky->ngrams[i] = -1;
+            stats_skip[index].ngrams[i] = -1;
         }
     }
+    index++;
+
+
+    /* initialize lateral SFS*/
+    strcpy(stats_skip[index].name, "Lateral Same Finger Skipgram");
+    for (int i = 0; i < 10; i++) {stats_skip[index].weight[i] = -INFINITY;}
+    stats_skip[index].length = 0;
+    stats_skip[index].skip = 0;
+    for (int i = 0; i < DIM2; i++)
+    {
+        unflat_bi(i, &row0, &col0, &row1, &col1);
+        if (is_lateral_same_finger_bi(row0, col0, row1, col1))
+        {
+            stats_skip[index].ngrams[i] = i;
+            stats_skip[index].length++;
+        }
+        else
+        {
+            stats_skip[index].ngrams[i] = -1;
+        }
+    }
+    index++;
+
+    /* initialize per finger lateral skipgram stats */
+    strcpy(stats_skip[index].name, "Lateral Left Pinky Skipgram");
+    for (int i = 0; i < 10; i++) {stats_skip[index].weight[i] = -INFINITY;}
+    stats_skip[index].length = 0;
+    stats_skip[index].skip = 0;
+    for (int i = 0; i < DIM2; i++)
+    {
+        unflat_bi(i, &row0, &col0, &row1, &col1);
+        if (is_lateral_same_finger_bi(row0, col0, row1, col1) && finger(row0, col0) == 0)
+        {
+            stats_skip[index].ngrams[i] = i;
+            stats_skip[index].length++;
+        }
+        else
+        {
+            stats_skip[index].ngrams[i] = -1;
+        }
+    }
+    index++;
+
+    strcpy(stats_skip[index].name, "Lateral Left Index Skipgram");
+    for (int i = 0; i < 10; i++) {stats_skip[index].weight[i] = -INFINITY;}
+    stats_skip[index].length = 0;
+    stats_skip[index].skip = 0;
+    for (int i = 0; i < DIM2; i++)
+    {
+        unflat_bi(i, &row0, &col0, &row1, &col1);
+        if (is_lateral_same_finger_bi(row0, col0, row1, col1) && finger(row0, col0) == 3)
+        {
+            stats_skip[index].ngrams[i] = i;
+            stats_skip[index].length++;
+        }
+        else
+        {
+            stats_skip[index].ngrams[i] = -1;
+        }
+    }
+    index++;
+
+    strcpy(stats_skip[index].name, "Lateral Right Index Skipgram");
+    for (int i = 0; i < 10; i++) {stats_skip[index].weight[i] = -INFINITY;}
+    stats_skip[index].length = 0;
+    stats_skip[index].skip = 0;
+    for (int i = 0; i < DIM2; i++)
+    {
+        unflat_bi(i, &row0, &col0, &row1, &col1);
+        if (is_lateral_same_finger_bi(row0, col0, row1, col1) && finger(row0, col0) == 4)
+        {
+            stats_skip[index].ngrams[i] = i;
+            stats_skip[index].length++;
+        }
+        else
+        {
+            stats_skip[index].ngrams[i] = -1;
+        }
+    }
+    index++;
+
+
+    strcpy(stats_skip[index].name, "Lateral Right Pinky Skipgram");
+    for (int i = 0; i < 10; i++) {stats_skip[index].weight[i] = -INFINITY;}
+    stats_skip[index].length = 0;
+    stats_skip[index].skip = 0;
+    for (int i = 0; i < DIM2; i++)
+    {
+        unflat_bi(i, &row0, &col0, &row1, &col1);
+        if (is_lateral_same_finger_bi(row0, col0, row1, col1) && finger(row0, col0) == 7)
+        {
+            stats_skip[index].ngrams[i] = i;
+            stats_skip[index].length++;
+        }
+        else
+        {
+            stats_skip[index].ngrams[i] = -1;
+        }
+    }
+    index++;
+
+    if (index != SKIP_LENGTH) {error("SKIP_LENGTH incorrect for number of skip stats");}
 }
 
 /*
- * Trims the statistics in the linked list to move unused entries to the end.
- * This is done by iterating through each statistic's ngrams array and
- * reordering elements to place all valid entries at the beginning
- * of the array. This process ensures memory efficiency by eliminating
- * gaps in the array.
+ * Trims the ngrams in the array to move unused entries to the end.
+ * This process ensures memory efficiency by eliminating gaps in the array.
  */
 void trim_skip_stats()
 {
-    skip_stat *current = skip_head;
-
-    while (current != NULL)
+    for (int i = 0; i < SKIP_LENGTH; i++)
     {
-        /* Copy valid ngram entries into earliest free index */
-        if (current->length != 0)
+        if (stats_skip[i].length != 0)
         {
             int left = 0;
             int right = DIM2 - 1;
 
-            /* Use two pointers to efficiently partition the array */
+            /* Use two pointers to partition the array */
             while (left < right) {
                 /* Find the next -1 from the left */
-                while (left < right && current->ngrams[left] != -1) {
+                while (left < right && stats_skip[i].ngrams[left] != -1) {
                     left++;
                 }
 
                 /* Find the next non -1 from the right */
-                while (left < right && current->ngrams[right] == -1) {
+                while (left < right && stats_skip[i].ngrams[right] == -1) {
                     right--;
                 }
 
-                /* Swap the elements to move -1 to the back and non -1 to the front */
+                 /* Swap the elements to move -1 to the back and non -1 to the front */
                 if (left < right) {
-                    int temp = current->ngrams[left];
-                    current->ngrams[left] = current->ngrams[right];
-                    current->ngrams[right] = temp;
+                    int temp = stats_skip[i].ngrams[left];
+                    stats_skip[i].ngrams[left] = stats_skip[i].ngrams[right];
+                    stats_skip[i].ngrams[right] = temp;
                     left++;
                     right--;
                 }
             }
         }
-
-        current = current->next;
     }
 }
 
@@ -492,69 +547,21 @@ int all_zeroes(skip_stat *stat)
 }
 
 /*
- * Cleans the skipgram statistics linked list by removing statistics with zero length or zero weight.
- * This function ensures that only relevant statistics are kept for analysis.
- * It updates the SKIP_END global variable to reflect the new count of valid statistics.
+ * Cleans the skipgram statistics array by removing statistics with zero length
+ * or weight. This ensures that only relevant statistics are considered in the
+ * analysis.
  */
 void clean_skip_stats()
 {
-    /* Remove statistics from the beginning of the list if they have zero length or all zero weights */
-    if (skip_head == NULL) {return;}
-    while (skip_head != NULL && (skip_head->length == 0 || all_zeroes(skip_head))) {
-        skip_stat *temp = skip_head;
-        skip_head = skip_head->next;
-        free(temp);
-    }
-
-    /* Iterate through the rest of the list and remove any node with zero length or all zero weights */
-    skip_stat *current = skip_head;
-    while (current != NULL && current->next != NULL) {
-        if (current->next->length == 0 || all_zeroes(current->next)) {
-            skip_stat *temp = current->next;
-            current->next = current->next->next;
-            free(temp);
-        } else {
-            current = current->next;
-        }
-    }
-
-    /* Recount the number of valid statistics */
-    current = skip_head;
-    while (current != NULL) {
-        SKIP_END++;
-        current = current->next;
+    /* Iterate through the array and remove those with zero length or weight */
+    for (int i = 0; i < SKIP_LENGTH; i++)
+    {
+        if (stats_skip[i].length == 0 || all_zeroes(&stats_skip[i])) {stats_skip[i].skip = 1;}
     }
 }
 
-/*
- * Converts the linked list of skipgram statistics to a contiguous array for easier access.
- * This function allocates memory for an array of skip_stat structures and copies
- * data from the linked list to the array.
- */
-void skip_to_array()
-{
-    stats_skip = (skip_stat *)malloc(sizeof(skip_stat) * SKIP_END);
-    skip_stat *current_skip = skip_head;
-    for (int i = 0; i < SKIP_END; i++) {
-        memcpy(&stats_skip[i], current_skip, sizeof(skip_stat));
-        /* Set next pointer to NULL */
-        stats_skip[i].next = NULL;
-        current_skip = current_skip->next;
-    }
-}
-
-/*
- * Frees the memory allocated for the skipgram statistics linked list.
- * This function iterates through the list, freeing each node's memory.
- */
+/* Frees the memory allocated for the skipgram statistics array. */
 void free_skip_stats()
 {
-    if (skip_head == NULL) {return;}
-    while (skip_head != NULL)
-    {
-        skip_stat *temp = skip_head;
-        skip_head = skip_head->next;
-        free(temp);
-    }
     free(stats_skip);
 }

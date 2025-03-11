@@ -1,11 +1,9 @@
 /*
- * io_util.c - Utility functions related to input/output operations for the GULAG.
+ * io_util.c - Utility functions related to I/O operations for the GULAG.
  *
- * Author: Rus Doomer
- *
- * Description: This file provides utility functions for handling character conversions,
- *              validating run and output modes, and other I/O related operations
- *              within the GULAG.
+ * This file provides utility functions for handling character conversions,
+ * validating run and output modes, and other I/O related operations within the
+ * GULAG.
  */
 
 #include <stdio.h>
@@ -45,11 +43,11 @@ wchar_t convert_back(int i)
 }
 
 /*
- * Shifts all elements in an integer array one position to the right, discarding the last element.
+ * Shifts all elements in an integer array one position to the right, discarding
+ * the last element.
  * Parameters:
  *   mem: Pointer to the integer array.
  *   size: The size of the array.
- * Returns: void.
  */
 void iterate(int *mem, int size)
 {
@@ -60,10 +58,12 @@ void iterate(int *mem, int size)
 }
 
 /*
- * Checks for duplicate characters in a wide character array, excluding adjacent duplicates.
+ * Checks for duplicate characters in a wide character array, excluding adjacent
+ * duplicates.
  * Parameters:
  *   arr: The wide character array to check.
- * Returns: The number of duplicate pairs found (excluding adjacent pairs), or -1 if no duplicates.
+ * Returns: The number of duplicate pairs found (excluding adjacent pairs), or
+ *          -1 if no duplicates.
  */
 int check_duplicates(wchar_t *arr)
 {
@@ -80,7 +80,8 @@ int check_duplicates(wchar_t *arr)
 
 
 /*
- * Validates and converts a run mode string to its corresponding character representation.
+ * Validates and converts a run mode string to its corresponding character
+ * representation.
  * Parameters:
  *   optarg: The string representing the run mode.
  * Returns: The character representing the validated run mode, or 'a' if invalid.
@@ -120,17 +121,18 @@ char check_run_mode(char *optarg)
         || strcmp(optarg, "information") == 0) {
         return 'f';
     } else {
-        /* util.c - error handling */
         error("Invalid run mode in arguments.");
         return 'a';
     }
 }
 
 /*
- * Validates and converts an output mode string to its corresponding character representation.
+ * Validates and converts an output mode string to its corresponding character
+ * representation.
  * Parameters:
  *   optarg: The string representing the output mode.
- * Returns: The character representing the validated output mode, or 'n' if invalid.
+ * Returns: The character representing the validated output mode, or 'n' if
+ *          invalid.
  */
 char check_output_mode(char *optarg)
 {
@@ -146,17 +148,18 @@ char check_output_mode(char *optarg)
         || strcmp(optarg, "verbose") == 0) {
         return 'v';
     } else {
-        /* util.c - error handling */
         error("Invalid output mode in arguments.");
         return 'n';
     }
 }
 
 /*
- * Validates and converts a backend mode string to its corresponding character representation.
+ * Validates and converts a backend mode string to its corresponding character
+ * representation.
  * Parameters:
  *   optarg: The string representing the backend mode.
- * Returns: The character representing the validated output mode, or 'c' if invalid.
+ * Returns: The character representing the validated output mode, or 'c' if
+ *          invalid.
  */
 char check_backend_mode(char *optarg)
 {
@@ -167,7 +170,6 @@ char check_backend_mode(char *optarg)
         || strcmp(optarg, "opencl") == 0) {
         return 'o';
     } else {
-        /* util.c - error handling */
         error("Invalid output mode in arguments.");
         return 'c';
     }

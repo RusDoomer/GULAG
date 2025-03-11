@@ -1,10 +1,8 @@
 /*
  * kernel.cl - CL implementation of improve and single_analyze functions for the GULAG.
  *
- * Author: Rus Doomer
- *
- * Description: Implements the simulated annealing loop and analysis from
- *              improve() in mode.c with opencl acceleration.
+ * Implements the simulated annealing loop and analysis from improve() in mode.c
+ * with opencl acceleration.
  */
 
 
@@ -20,7 +18,7 @@
 
 /*
  * Global variables accessible to the kernel, defined in mode.c: [0 - infinite]
- * MONO_END, BI_END, TRI_END, QUAD_END, SKIP_END, META_END:
+ * MONO_LENGTH, BI_LENGTH, TRI_LENGTH, QUAD_LENGTH, SKIP_LENGTH, META_LENGTH:
  *     Define the number of statistics for each ngram type.
  * THREADS: [1 - infinite]
  *     Number of threads to use for parallel processing.
@@ -28,25 +26,22 @@
  *     Total number of layouts to analyze during generation.
  * MAX_SWAPS: [1 - DIM1/2]
  *     Maximum number of key swaps to perform in each iteration.
- * WORKERS: [Max of X_ENDs]
+ * WORKERS: [Max of X_LENGTHs]
  *     Number of work items per work group.
- * LEFT_HAND, RIGHT_HAND:
- *     Indices for hand usage statistics.
  */
 
 /*
- * New layout struct specific for OpenCL.
- * It's a simplified version of the host-side layout struct,
- * containing only necessary information for computation.
+ * New layout struct specific for OpenCL. It's a simplified version of the
+ * host-side layout struct, containing only necessary information for analysis.
  */
 typedef struct {
     int matrix[ROW][COL];
-    float mono_score[MONO_END];
-    float bi_score[BI_END];
-    float tri_score[TRI_END];
-    float quad_score[QUAD_END];
-    float skip_score[10][SKIP_END];
-    float meta_score[META_END];
+    float mono_score[MONO_LENGTH];
+    float bi_score[BI_LENGTH];
+    float tri_score[TRI_LENGTH];
+    float quad_score[QUAD_LENGTH];
+    float skip_score[10][SKIP_LENGTH];
+    float meta_score[META_LENGTH];
     float score;
 } cl_layout;
 
@@ -55,7 +50,6 @@ typedef struct {
  * Parameters:
  *   lt_dest: Pointer to the destination cl_layout.
  *   lt_src:  Pointer to the source layout.
- * Returns: void.
  */
 inline void copy_host_to_cl(__local cl_layout *lt_dest, __global layout *lt_src)
 {
@@ -75,7 +69,6 @@ inline void copy_host_to_cl(__local cl_layout *lt_dest, __global layout *lt_src)
  * Parameters:
  *   lt_dest: Pointer to the destination layout.
  *   lt_src:  Pointer to the source cl_layout.
- * Returns: void.
  */
 inline void copy_cl_to_host(__global layout *lt_dest, __local cl_layout *lt_src)
 {
@@ -95,7 +88,6 @@ inline void copy_cl_to_host(__global layout *lt_dest, __local cl_layout *lt_src)
  * Parameters:
  *   lt_dest: Pointer to the destination cl_layout.
  *   lt_src:  Pointer to the source cl_layout.
- * Returns: void.
  */
 inline void copy_cl_to_cl(__local cl_layout *lt_dest, __local cl_layout *lt_src)
 {
@@ -108,85 +100,6 @@ inline void copy_cl_to_cl(__local cl_layout *lt_dest, __local cl_layout *lt_src)
     }
 
     lt_dest->score = lt_src->score;
-}
-
-/*
- * Unflattens a 1D index into an 8D matrix coordinate.
- * Parameters:
- *   i: The flattened index.
- *   row0, col0, row1, col1, row2, col2, row3, col3: Pointers to store the
- *                                                 row and column indices.
- * Returns: void.
- */
-inline void unflat_quad(int i, int *row0, int *col0, int *row1, int *col1,
-    int *row2, int *col2, int *row3, int *col3)
-{
-    *row3 = (i % (DIM1)) / COL;
-    *col3 = i % COL;
-    i /= (DIM1);
-
-    *row2 = (i % (DIM1)) / COL;
-    *col2 = i % COL;
-    i /= (DIM1);
-
-    *row1 = (i % (DIM1)) / COL;
-    *col1 = i % COL;
-    i /= (DIM1);
-
-    *row0 = i / COL;
-    *col0 = i % COL;
-}
-
-/*
- * Unflattens a 1D index into a 6D matrix coordinate.
- * Parameters:
- *   i: The flattened index.
- *   row0, col0, row1, col1, row2, col2: Pointers to store the row and column indices.
- * Returns: void.
- */
-inline void unflat_tri(int i, int *row0, int *col0, int *row1, int *col1,
-    int *row2, int *col2)
-{
-    *row2 = (i % (DIM1)) / COL;
-    *col2 = i % COL;
-    i /= (DIM1);
-
-    *row1 = (i % (DIM1)) / COL;
-    *col1 = i % COL;
-    i /= (DIM1);
-
-    *row0 = i / COL;
-    *col0 = i % COL;
-}
-
-/*
- * Unflattens a 1D index into a 4D matrix coordinate.
- * Parameters:
- *   i: The flattened index.
- *   row0, col0, row1, col1: Pointers to store the row and column indices.
- * Returns: void.
- */
-inline void unflat_bi(int i, int *row0, int *col0, int *row1, int *col1)
-{
-    *row1 = (i % (DIM1)) / COL;
-    *col1 = i % COL;
-    i /= (DIM1);
-
-    *row0 = i / COL;
-    *col0 = i % COL;
-}
-
-/*
- * Unflattens a 1D index into a 2D matrix coordinate.
- * Parameters:
- *   i: The flattened index.
- *   row0, col0: Pointers to store the row and column indices.
- * Returns: void.
- */
-inline void unflat_mono(int i, int *row0, int *col0)
-{
-    *row0 = i / COL;
-    *col0 = i % COL;
 }
 
 /*
@@ -241,28 +154,11 @@ size_t index_skip(int skip_index, int j, int k) {
 }
 
 /*
- * Performs meta-analysis on a layout.
- * Currently, only calculates hand balance.
- * Parameters:
- *   lt: Pointer to the cl_layout to analyze.
- * Returns: void.
- */
-inline void cl_meta_analysis(__local cl_layout *lt)
-{
-    lt->meta_score[0] = 0;
-    lt->meta_score[0] += lt->mono_score[LEFT_HAND];
-    lt->meta_score[0] -= lt->mono_score[RIGHT_HAND];
-    /* Take absolute value. */
-    if (lt->meta_score[0] < 0) {lt->meta_score[0] *= -1;}
-}
-
-/*
- * Calculates and assigns the overall score to a cl_layout based on its statistics.
+ * Calculates the overall score to a cl_layout based on its statistics.
  * Parameters:
  *   lt: Pointer to the cl_layout.
  *   stats_mono, stats_bi, stats_tri, stats_quad, stats_skip, stats_meta:
  *       Constant pointers to the respective statistic arrays.
- * Returns: void.
  */
 inline void cl_get_score(__local cl_layout *lt,
                   __constant mono_stat *stats_mono,
@@ -273,32 +169,35 @@ inline void cl_get_score(__local cl_layout *lt,
                   __constant meta_stat *stats_meta)
 {
     lt->score = 0;
-    for (int i = 0; i < MONO_END; i++)
+    for (int i = 0; i < MONO_LENGTH; i++)
     {
-        lt->score += lt->mono_score[i] * stats_mono[i].weight;
+        if(!stats_mono[i].skip) {lt->score += lt->mono_score[i] * stats_mono[i].weight;}
     }
-    for (int i = 0; i < BI_END; i++)
+    for (int i = 0; i < BI_LENGTH; i++)
     {
-        lt->score += lt->bi_score[i] * stats_bi[i].weight;
+        if(!stats_bi[i].skip) {lt->score += lt->bi_score[i] * stats_bi[i].weight;}
     }
-    for (int i = 0; i < TRI_END; i++)
+    for (int i = 0; i < TRI_LENGTH; i++)
     {
-        lt->score += lt->tri_score[i] * stats_tri[i].weight;
+        if(!stats_tri[i].skip) {lt->score += lt->tri_score[i] * stats_tri[i].weight;}
     }
-    for (int i = 0; i < QUAD_END; i++)
+    for (int i = 0; i < QUAD_LENGTH; i++)
     {
-        lt->score += lt->quad_score[i] * stats_quad[i].weight;
+        if(!stats_quad[i].skip) {lt->score += lt->quad_score[i] * stats_quad[i].weight;}
     }
     for (int i = 1; i <= 9; i++)
     {
-        for (int j = 0; j < SKIP_END; j++)
+        for (int j = 0; j < SKIP_LENGTH; j++)
         {
-            lt->score += lt->skip_score[i][j] * stats_skip[j].weight[i];
+            if(!stats_skip[j].skip)
+            {
+                lt->score += lt->skip_score[i][j] * stats_skip[j].weight[i];
+            }
         }
     }
-    for (int i = 0; i < META_END; i++)
+    for (int i = 0; i < META_LENGTH; i++)
     {
-        lt->score += lt->meta_score[i] * stats_meta[i].weight;
+        if(!stats_meta[i].skip) {lt->score += lt->meta_score[i] * stats_meta[i].weight;}
     }
 }
 
@@ -347,7 +246,6 @@ pcg32_state_t initialize_rng(int global_id, int seed, int offset) {
  *   lt: Pointer to the cl_layout.
  *   row1, col1: Row and column of the first key.
  *   row2, col2: Row and column of the second key.
- * Returns: void.
  */
 inline void swap_keys(__local cl_layout *lt, int row1, int col1, int row2, int col2) {
     int temp = lt->matrix[row1][col1];
@@ -362,21 +260,25 @@ inline void swap_keys(__local cl_layout *lt, int row1, int col1, int row2, int c
  *   local_id: The local ID of the work item.
  *   stats_mono: Constant pointer to the array of mono_stat structures.
  *   linear_mono: Constant pointer to the linearized monogram frequency data.
- * Returns: void.
  */
 inline void calculate_mono_stats(__local cl_layout *working,
                                  size_t local_id,
                                  __constant mono_stat *stats_mono,
                                  __constant float *linear_mono) {
     int row0, col0;
-    for (int i = local_id; i < MONO_END; i += WORKERS) {
-        working->mono_score[i] = 0;
-        int length = stats_mono[i].length;
-        for (int j = 0; j < length; j++) {
-            unflat_mono(stats_mono[i].ngrams[j], &row0, &col0);
-            if (working->matrix[row0][col0] != -1) {
-                size_t index = index_mono(working->matrix[row0][col0]);
-                working->mono_score[i] += linear_mono[index];
+    for (int i = local_id; i < MONO_LENGTH; i += WORKERS) {
+        if(!stats_mono[i].skip)
+        {
+            working->mono_score[i] = 0;
+            int length = stats_mono[i].length;
+            for (int j = 0; j < length; j++) {
+                int n = stats_mono[i].ngrams[j];
+                row0 = n / COL;
+                col0 = n % COL;
+                if (working->matrix[row0][col0] != -1) {
+                    size_t index = index_mono(working->matrix[row0][col0]);
+                    working->mono_score[i] += linear_mono[index];
+                }
             }
         }
     }
@@ -389,21 +291,28 @@ inline void calculate_mono_stats(__local cl_layout *working,
  *   local_id: The local ID of the work item.
  *   stats_bi: Constant pointer to the array of bi_stat structures.
  *   linear_bi: Constant pointer to the linearized bigram frequency data.
- * Returns: void.
  */
 inline void calculate_bi_stats(__local cl_layout *working,
                                size_t local_id,
                                __constant bi_stat *stats_bi,
                                __constant float *linear_bi) {
     int row0, col0, row1, col1;
-    for (int i = local_id; i < BI_END; i += WORKERS) {
-        working->bi_score[i] = 0;
-        int length = stats_bi[i].length;
-        for (int j = 0; j < length; j++) {
-            unflat_bi(stats_bi[i].ngrams[j], &row0, &col0, &row1, &col1);
-            if (working->matrix[row0][col0] != -1 && working->matrix[row1][col1] != -1) {
-                size_t index = index_bi(working->matrix[row0][col0], working->matrix[row1][col1]);
-                working->bi_score[i] += linear_bi[index];
+    for (int i = local_id; i < BI_LENGTH; i += WORKERS) {
+        if(!stats_bi[i].skip)
+        {
+            working->bi_score[i] = 0;
+            int length = stats_bi[i].length;
+            for (int j = 0; j < length; j++) {
+                int n = stats_bi[i].ngrams[j];
+                row1 = (n % (DIM1)) / COL;
+                col1 = n % COL;
+                n /= (DIM1);
+                row0 = n / COL;
+                col0 = n % COL;
+                if (working->matrix[row0][col0] != -1 && working->matrix[row1][col1] != -1) {
+                    size_t index = index_bi(working->matrix[row0][col0], working->matrix[row1][col1]);
+                    working->bi_score[i] += linear_bi[index];
+                }
             }
         }
     }
@@ -416,21 +325,31 @@ inline void calculate_bi_stats(__local cl_layout *working,
  *   local_id: The local ID of the work item.
  *   stats_tri: Constant pointer to the array of tri_stat structures.
  *   linear_tri: Constant pointer to the linearized trigram frequency data.
- * Returns: void.
  */
 inline void calculate_tri_stats(__local cl_layout *working,
                                 size_t local_id,
                                 __constant tri_stat *stats_tri,
                                 __constant float *linear_tri) {
     int row0, col0, row1, col1, row2, col2;
-    for (int i = local_id; i < TRI_END; i += WORKERS) {
-        working->tri_score[i] = 0;
-        int length = stats_tri[i].length;
-        for (int j = 0; j < length; j++) {
-            unflat_tri(stats_tri[i].ngrams[j], &row0, &col0, &row1, &col1, &row2, &col2);
-            if (working->matrix[row0][col0] != -1 && working->matrix[row1][col1] != -1 && working->matrix[row2][col2] != -1) {
-                size_t index = index_tri(working->matrix[row0][col0], working->matrix[row1][col1], working->matrix[row2][col2]);
-                working->tri_score[i] += linear_tri[index];
+    for (int i = local_id; i < TRI_LENGTH; i += WORKERS) {
+        if(!stats_tri[i].skip)
+        {
+            working->tri_score[i] = 0;
+            int length = stats_tri[i].length;
+            for (int j = 0; j < length; j++) {
+                int n = stats_tri[i].ngrams[j];
+                row2 = (n % (DIM1)) / COL;
+                col2 = n % COL;
+                n /= (DIM1);
+                row1 = (n % (DIM1)) / COL;
+                col1 = n % COL;
+                n /= (DIM1);
+                row0 = n / COL;
+                col0 = n % COL;
+                if (working->matrix[row0][col0] != -1 && working->matrix[row1][col1] != -1 && working->matrix[row2][col2] != -1) {
+                    size_t index = index_tri(working->matrix[row0][col0], working->matrix[row1][col1], working->matrix[row2][col2]);
+                    working->tri_score[i] += linear_tri[index];
+                }
             }
         }
     }
@@ -443,21 +362,34 @@ inline void calculate_tri_stats(__local cl_layout *working,
  *   local_id: The local ID of the work item.
  *   stats_quad: Constant pointer to the array of quad_stat structures.
  *   linear_quad: Constant pointer to the linearized quadgram frequency data.
- * Returns: void.
  */
 inline void calculate_quad_stats(__local cl_layout *working,
                                  size_t local_id,
                                  __constant quad_stat *stats_quad,
                                  __constant float *linear_quad) {
     int row0, col0, row1, col1, row2, col2, row3, col3;
-    for (int i = local_id; i < QUAD_END; i += WORKERS) {
-        working->quad_score[i] = 0;
-        int length = stats_quad[i].length;
-        for (int j = 0; j < length; j++) {
-            unflat_quad(stats_quad[i].ngrams[j], &row0, &col0, &row1, &col1, &row2, &col2, &row3, &col3);
-            if (working->matrix[row0][col0] != -1 && working->matrix[row1][col1] != -1 && working->matrix[row2][col2] != -1 && working->matrix[row3][col3] != -1) {
-                size_t index = index_quad(working->matrix[row0][col0], working->matrix[row1][col1], working->matrix[row2][col2], working->matrix[row3][col3]);
-                working->quad_score[i] += linear_quad[index];
+    for (int i = local_id; i < QUAD_LENGTH; i += WORKERS) {
+        if(!stats_quad[i].skip)
+        {
+            working->quad_score[i] = 0;
+            int length = stats_quad[i].length;
+            for (int j = 0; j < length; j++) {
+                int n = stats_quad[i].ngrams[j];
+                row3 = (n % (DIM1)) / COL;
+                col3 = n % COL;
+                n /= (DIM1);
+                row2 = (n % (DIM1)) / COL;
+                col2 = n % COL;
+                n /= (DIM1);
+                row1 = (n % (DIM1)) / COL;
+                col1 = n % COL;
+                n /= (DIM1);
+                row0 = n / COL;
+                col0 = n % COL;
+                if (working->matrix[row0][col0] != -1 && working->matrix[row1][col1] != -1 && working->matrix[row2][col2] != -1 && working->matrix[row3][col3] != -1) {
+                    size_t index = index_quad(working->matrix[row0][col0], working->matrix[row1][col1], working->matrix[row2][col2], working->matrix[row3][col3]);
+                    working->quad_score[i] += linear_quad[index];
+                }
             }
         }
     }
@@ -470,22 +402,29 @@ inline void calculate_quad_stats(__local cl_layout *working,
  *   local_id: The local ID of the work item.
  *   stats_skip: Constant pointer to the array of skip_stat structures.
  *   linear_skip: Constant pointer to the linearized skipgram frequency data.
- * Returns: void.
  */
 inline void calculate_skip_stats(__local cl_layout *working,
                                  size_t local_id,
                                  __constant skip_stat *stats_skip,
                                  __constant float *linear_skip) {
     int row0, col0, row1, col1;
-    for (int i = local_id; i < SKIP_END; i += WORKERS) {
-        int length = stats_skip[i].length;
-        for (int k = 1; k <= 9; k++) {
-            working->skip_score[k][i] = 0;
-            for (int j = 0; j < length; j++) {
-                unflat_bi(stats_skip[i].ngrams[j], &row0, &col0, &row1, &col1);
-                if (working->matrix[row0][col0] != -1 && working->matrix[row1][col1] != -1) {
-                    size_t index = index_skip(k, working->matrix[row0][col0], working->matrix[row1][col1]);
-                    working->skip_score[k][i] += linear_skip[index];
+    for (int i = local_id; i < SKIP_LENGTH; i += WORKERS) {
+        if(!stats_skip[i].skip)
+        {
+            int length = stats_skip[i].length;
+            for (int k = 1; k <= 9; k++) {
+                working->skip_score[k][i] = 0;
+                for (int j = 0; j < length; j++) {
+                    int n = stats_skip[i].ngrams[j];
+                    row1 = (n % (DIM1)) / COL;
+                    col1 = n % COL;
+                    n /= (DIM1);
+                    row0 = n / COL;
+                    col0 = n % COL;
+                    if (working->matrix[row0][col0] != -1 && working->matrix[row1][col1] != -1) {
+                        size_t index = index_skip(k, working->matrix[row0][col0], working->matrix[row1][col1]);
+                        working->skip_score[k][i] += linear_skip[index];
+                    }
                 }
             }
         }
@@ -493,8 +432,72 @@ inline void calculate_skip_stats(__local cl_layout *working,
 }
 
 /*
- * Main kernel for layout improvement using simulated annealing.
+ * Performs meta-analysis on a layout.
+ * Parameters:
+ *   lt: Pointer to the cl_layout to analyze.
+ *   local_id: The local ID of the work item.
+ *   stats_meta: Constant pointer to the array of meta_stat structures.
  */
+inline void cl_meta_analysis(__local cl_layout *working,
+                             size_t local_id,
+                             __constant meta_stat *stats_meta) {
+    for (int i = local_id; i < META_LENGTH; i += WORKERS) {
+        if(!stats_meta[i].skip)
+        {
+            working->meta_score[i] = 0;
+            int j = 0;
+            while (stats_meta[i].stat_types[j] != 'x')
+            {
+                switch(stats_meta[i].stat_types[j]) {
+                default:
+                case 'm':
+                    working->meta_score[i] += working->mono_score[stats_meta[i].stat_indices[j]] * stats_meta[i].stat_weights[j];
+                    break;
+                case 'b':
+                    working->meta_score[i] += working->bi_score[stats_meta[i].stat_indices[j]] * stats_meta[i].stat_weights[j];
+                    break;
+                case 't':
+                    working->meta_score[i] += working->tri_score[stats_meta[i].stat_indices[j]] * stats_meta[i].stat_weights[j];
+                    break;
+                case 'q':
+                    working->meta_score[i] += working->quad_score[stats_meta[i].stat_indices[j]] * stats_meta[i].stat_weights[j];
+                    break;
+                case '1':
+                    working->meta_score[i] += working->skip_score[1][stats_meta[i].stat_indices[j]] * stats_meta[i].stat_weights[j];
+                    break;
+                case '2':
+                    working->meta_score[i] += working->skip_score[2][stats_meta[i].stat_indices[j]] * stats_meta[i].stat_weights[j];
+                    break;
+                case '3':
+                    working->meta_score[i] += working->skip_score[3][stats_meta[i].stat_indices[j]] * stats_meta[i].stat_weights[j];
+                    break;
+                case '4':
+                    working->meta_score[i] += working->skip_score[4][stats_meta[i].stat_indices[j]] * stats_meta[i].stat_weights[j];
+                    break;
+                case '5':
+                    working->meta_score[i] += working->skip_score[5][stats_meta[i].stat_indices[j]] * stats_meta[i].stat_weights[j];
+                    break;
+                case '6':
+                    working->meta_score[i] += working->skip_score[6][stats_meta[i].stat_indices[j]] * stats_meta[i].stat_weights[j];
+                    break;
+                case '7':
+                    working->meta_score[i] += working->skip_score[7][stats_meta[i].stat_indices[j]] * stats_meta[i].stat_weights[j];
+                    break;
+                case '8':
+                    working->meta_score[i] += working->skip_score[8][stats_meta[i].stat_indices[j]] * stats_meta[i].stat_weights[j];
+                    break;
+                case '9':
+                    working->meta_score[i] += working->skip_score[9][stats_meta[i].stat_indices[j]] * stats_meta[i].stat_weights[j];
+                    break;
+                }
+                j++;
+            }
+            if (stats_meta[i].absv && working->meta_score[i] < 0) {working->meta_score[i] *= -1;}
+        }
+    }
+}
+
+/* Main kernel for layout improvement using simulated annealing. */
 __kernel void improve_kernel(__constant float *linear_mono,
                              __constant float *linear_bi,
                              __constant float *linear_tri,
@@ -583,10 +586,11 @@ __kernel void improve_kernel(__constant float *linear_mono,
         calculate_skip_stats(&working, local_id, stats_skip, linear_skip);
 
         barrier(CLK_LOCAL_MEM_FENCE);
+        cl_meta_analysis(&working, local_id, stats_meta);
+        barrier(CLK_LOCAL_MEM_FENCE);
 
         /* Only the first worker runs meta_analysis and get_score */
         if (local_id == 0) {
-            cl_meta_analysis(&working);
             cl_get_score(&working, stats_mono, stats_bi, stats_tri, stats_quad, stats_skip, stats_meta);
 
             /* Exponentiate the score difference for acceptance probability */
