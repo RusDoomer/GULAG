@@ -135,7 +135,7 @@ void single_analyze(layout *lt)
     {
         if (!stats_meta[i].skip)
         {
-            lt->meta_score[0] = 0;
+            lt->meta_score[i] = 0;
             int j = 0;
             while (stats_meta[i].stat_types[j] != 'x')
             {

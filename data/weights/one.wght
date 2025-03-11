@@ -206,4 +206,19 @@ Bad Right Index Skipgram : 0 0 0 0 0 0 0 0 0
 Bad Right Middle Skipgram : 0 0 0 0 0 0 0 0 0
 Bad Right Ring Skipgram : 0 0 0 0 0 0 0 0 0
 Bad Right Pinky Skipgram : 0 0 0 0 0 0 0 0 0
+Lateral Same Finger Skipgram : 0 0 0 0 0 0 0 0 0
+Lateral Left Pinky Skipgram : 0 0 0 0 0 0 0 0 0
+Lateral Left Index Skipgram : 0 0 0 0 0 0 0 0 0
+Lateral Right Index Skipgram : 0 0 0 0 0 0 0 0 0
+Lateral Right Pinky Skipgram : 0 0 0 0 0 0 0 0 0
 Hand Balance : -0.1
+RuSpeed : 0
+Left Pinky RuSpeed : 0
+Left Ring RuSpeed : 0
+Left Middle RuSpeed : 0
+Left Index RuSpeed : 0
+Right Index RuSpeed : 0
+Right Middle RuSpeed : 0
+Right Ring RuSpeed : 0
+Right Pinky RuSpeed : 0
+

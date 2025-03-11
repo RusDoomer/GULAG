@@ -103,7 +103,7 @@ void clean_stats()
 
     log_print('v',L"     Cleaning meta stats... ");
     clean_meta_stats(); /* stats/meta.c */
-    log_print('v',L"defining meta stats...     ");
+    log_print('v',L"defining meta stats... ");
     define_meta_stats(); /* stats/meta.c */
     log_print('v',L"Done\n");
 }

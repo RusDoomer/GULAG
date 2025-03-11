@@ -34,6 +34,7 @@ int find_stat_index(char *stat_name, char type) {
                     return i;
                 }
             }
+            error("MONO stat index not found");
             break;
         case 'b':
             for (i = 0; i < BI_LENGTH; i++) {
@@ -41,6 +42,7 @@ int find_stat_index(char *stat_name, char type) {
                     return i;
                 }
             }
+            error("BI stat index not found");
             break;
         case 't':
             for (i = 0; i < TRI_LENGTH; i++) {
@@ -48,6 +50,7 @@ int find_stat_index(char *stat_name, char type) {
                     return i;
                 }
             }
+            error("TRI stat index not found");
             break;
         case 'q':
             for (i = 0; i < QUAD_LENGTH; i++) {
@@ -55,6 +58,7 @@ int find_stat_index(char *stat_name, char type) {
                     return i;
                 }
             }
+            error("QUAD stat index not found");
             break;
         case '1':
         case '2':
@@ -70,6 +74,7 @@ int find_stat_index(char *stat_name, char type) {
                     return i;
                 }
             }
+            error("SKIP stat index not found");
             break;
         /* Meta stats */
         case 'e':
@@ -78,6 +83,7 @@ int find_stat_index(char *stat_name, char type) {
                     return i;
                 }
             }
+            error("META stat index not found");
             break;
         default:
             error("Invalid type specified in find_stat_score");

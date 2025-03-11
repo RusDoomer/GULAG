@@ -36,7 +36,7 @@
  */
 void initialize_skip_stats()
 {
-    SKIP_LENGTH = 18;
+    SKIP_LENGTH = 23;
     stats_skip = (skip_stat *)malloc(sizeof(skip_stat) * SKIP_LENGTH);
     int row0, col0, row1, col1;
     int index = 0;
@@ -378,6 +378,105 @@ void initialize_skip_stats()
     {
         unflat_bi(i, &row0, &col0, &row1, &col1);
         if (is_bad_same_finger_bi(row0, col0, row1, col1) && finger(row0, col0) == 7)
+        {
+            stats_skip[index].ngrams[i] = i;
+            stats_skip[index].length++;
+        }
+        else
+        {
+            stats_skip[index].ngrams[i] = -1;
+        }
+    }
+    index++;
+
+
+    /* initialize lateral SFS*/
+    strcpy(stats_skip[index].name, "Lateral Same Finger Skipgram");
+    for (int i = 0; i < 10; i++) {stats_skip[index].weight[i] = -INFINITY;}
+    stats_skip[index].length = 0;
+    stats_skip[index].skip = 0;
+    for (int i = 0; i < DIM2; i++)
+    {
+        unflat_bi(i, &row0, &col0, &row1, &col1);
+        if (is_lateral_same_finger_bi(row0, col0, row1, col1))
+        {
+            stats_skip[index].ngrams[i] = i;
+            stats_skip[index].length++;
+        }
+        else
+        {
+            stats_skip[index].ngrams[i] = -1;
+        }
+    }
+    index++;
+
+    /* initialize per finger lateral skipgram stats */
+    strcpy(stats_skip[index].name, "Lateral Left Pinky Skipgram");
+    for (int i = 0; i < 10; i++) {stats_skip[index].weight[i] = -INFINITY;}
+    stats_skip[index].length = 0;
+    stats_skip[index].skip = 0;
+    for (int i = 0; i < DIM2; i++)
+    {
+        unflat_bi(i, &row0, &col0, &row1, &col1);
+        if (is_lateral_same_finger_bi(row0, col0, row1, col1) && finger(row0, col0) == 0)
+        {
+            stats_skip[index].ngrams[i] = i;
+            stats_skip[index].length++;
+        }
+        else
+        {
+            stats_skip[index].ngrams[i] = -1;
+        }
+    }
+    index++;
+
+    strcpy(stats_skip[index].name, "Lateral Left Index Skipgram");
+    for (int i = 0; i < 10; i++) {stats_skip[index].weight[i] = -INFINITY;}
+    stats_skip[index].length = 0;
+    stats_skip[index].skip = 0;
+    for (int i = 0; i < DIM2; i++)
+    {
+        unflat_bi(i, &row0, &col0, &row1, &col1);
+        if (is_lateral_same_finger_bi(row0, col0, row1, col1) && finger(row0, col0) == 3)
+        {
+            stats_skip[index].ngrams[i] = i;
+            stats_skip[index].length++;
+        }
+        else
+        {
+            stats_skip[index].ngrams[i] = -1;
+        }
+    }
+    index++;
+
+    strcpy(stats_skip[index].name, "Lateral Right Index Skipgram");
+    for (int i = 0; i < 10; i++) {stats_skip[index].weight[i] = -INFINITY;}
+    stats_skip[index].length = 0;
+    stats_skip[index].skip = 0;
+    for (int i = 0; i < DIM2; i++)
+    {
+        unflat_bi(i, &row0, &col0, &row1, &col1);
+        if (is_lateral_same_finger_bi(row0, col0, row1, col1) && finger(row0, col0) == 4)
+        {
+            stats_skip[index].ngrams[i] = i;
+            stats_skip[index].length++;
+        }
+        else
+        {
+            stats_skip[index].ngrams[i] = -1;
+        }
+    }
+    index++;
+
+
+    strcpy(stats_skip[index].name, "Lateral Right Pinky Skipgram");
+    for (int i = 0; i < 10; i++) {stats_skip[index].weight[i] = -INFINITY;}
+    stats_skip[index].length = 0;
+    stats_skip[index].skip = 0;
+    for (int i = 0; i < DIM2; i++)
+    {
+        unflat_bi(i, &row0, &col0, &row1, &col1);
+        if (is_lateral_same_finger_bi(row0, col0, row1, col1) && finger(row0, col0) == 7)
         {
             stats_skip[index].ngrams[i] = i;
             stats_skip[index].length++;
