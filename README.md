@@ -1,4 +1,4 @@
-# GULAG V1.0: GPU Utilizing Layout Analyzer and Generator
+# GULAG V1.1: GPU Utilizing Layout Analyzer and Generator
 
 ## Overview
 
@@ -24,10 +24,7 @@ GULAG is a GPU-accelerated keyboard layout optimizer designed to analyze and gen
     -   [Corpora](#corpora)
     -   [Layouts](#layouts)
     -   [Weights](#weights)
--   [Contributing](#contributing)
--   [License](#license)
 -   [FAQ](#faq)
--   [Contact](#contact)
 
 ## Features
 
