@@ -500,9 +500,14 @@ void improve(int shuffle) {
     struct tm *tm_info;
     time(&rawtime);
     tm_info = localtime(&rawtime);
-    char filename[64];
-    strftime(filename, 64, "annealing_log_%Y%m%d_%H%M%S.log", tm_info);
 
+    // Step 1: Generate the timestamp part
+    char timestamp[16];
+    strftime(timestamp, sizeof(timestamp), "%Y%m%d_%H%M%S", tm_info);
+
+    // Step 2: Combine with weight_name into the filename
+    char filename[64];
+    snprintf(filename, sizeof(filename), "optimization_log_%s_%s.log", weight_name, timestamp);
     // Open log file in append mode with UTF-8 encoding
     FILE *logfile = fopen(filename, "a"); // Text mode for UTF-8 compatibility
     if (!logfile) {

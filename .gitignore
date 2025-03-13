@@ -60,3 +60,7 @@ dkms.conf
 
 # geany project file
 *.geany
+
+# logging files
+*.log
+*.png
