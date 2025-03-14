@@ -49,8 +49,11 @@ def plot_progress(log_file):
     new_base = base_without_ext.replace('_log_', '_plot_')
     output_filename = f"{new_base}.png"
 
-    # LARGER FIGURE WITH HIGHER RESOLUTION (CHANGED HERE)
-    plt.figure(figsize=(40, 12), dpi=600)  # Now 40" wide × 12" tall, 600 DPI
+    # Consistent font size
+    font_size = 24  # Choose a base font size
+
+    # LARGER FIGURE WITH HIGHER RESOLUTION
+    plt.figure(figsize=(40, 12), dpi=600)
     plt.subplots_adjust(left=0.05, right=0.98, top=0.92, bottom=0.15)
 
     # Plot non-best threads with thinner lines (unchanged)
@@ -76,20 +79,20 @@ def plot_progress(log_file):
         label=None
     )
 
-    # Main plot formatting (unchanged)
+    # Main plot formatting
     plt.title(
         f"Simulated Annealing Progress\n"
         f"Algorithm: {algorithm_part}\n"
         f"Weights: {weight_name}",
         pad=10,  
-        fontsize=16,
+        fontsize=font_size * 1.5,  # Larger title
         weight='bold'
     )
 
-    plt.xlabel('Iteration', fontsize=16)
-    plt.ylabel('Max Score', fontsize=16)  
-    plt.xticks(fontsize=12)
-    plt.yticks(fontsize=12)
+    plt.xlabel('Iteration', fontsize=font_size)
+    plt.ylabel('Max Score', fontsize=font_size)
+    plt.xticks(fontsize=font_size)
+    plt.yticks(fontsize=font_size)
 
     # Grid formatting (unchanged)
     plt.grid(linestyle='--', alpha=0.6)
@@ -102,17 +105,17 @@ def plot_progress(log_file):
         transform=plt.gca().transAxes,
         ha='right',
         va='bottom',
-        fontsize=14,  
+        fontsize=font_size * 1.2,  # Larger text box
         bbox=props
     )
 
-    # Save main plot (CHANGED HERE)
-    plt.savefig(output_filename, dpi=600, bbox_inches='tight')  # Match DPI here
+    # Save main plot
+    plt.savefig(output_filename, dpi=600, bbox_inches='tight')
     print(f"Main plot saved to {output_filename}")
 
-    # Generate per-thread plots (CHANGED HERE)
+    # Generate per-thread plots
     for thread in threads:
-        fig, ax1 = plt.subplots(figsize=(40, 12), dpi=600)  # Larger and higher resolution
+        fig, ax1 = plt.subplots(figsize=(40, 12), dpi=600)
         plt.subplots_adjust(left=0.05, right=0.98, top=0.92, bottom=0.15)
 
         thread_data = df[df['thread_id'] == thread]
@@ -130,8 +133,10 @@ def plot_progress(log_file):
             global_T_min - buffer_T,
             global_T_max + buffer_T
         )
-        ax1.set_ylabel('Temperature (K)', color='#0000FF')
-        ax1.tick_params(axis='y', labelcolor='#0000FF')
+        ax1.set_ylabel('Temperature (K)', color='#0000FF', fontsize=font_size)
+        ax1.tick_params(axis='y', labelcolor='#0000FF', labelsize=font_size)
+        ax1.tick_params(axis='x', labelsize=font_size) # x axis ticks too
+
 
         # Max score plot with buffer (unchanged except no legend)
         ax2.plot(
@@ -144,23 +149,24 @@ def plot_progress(log_file):
             global_score_min - buffer_score,
             global_score_max + buffer_score
         )
-        ax2.set_ylabel('Max Score', color='#8B0000')
-        ax2.tick_params(axis='y', labelcolor='#8B0000')
+        ax2.set_ylabel('Max Score', color='#8B0000', fontsize=font_size)
+        ax2.tick_params(axis='y', labelcolor='#8B0000', labelsize=font_size)
 
-        # Formatting (unchanged)
+
+        # Formatting
         plt.title(
             f"Thread {thread} Details\n"
             f"Algorithm: {algorithm_part}\n"
             f"Weights: {weight_name}",
             pad=10,
-            fontsize=16,
+            fontsize=font_size * 1.5,  # Larger title
             weight='bold'
         )
-        
-        ax1.set_xlabel('Iteration', fontsize=14)
+
+        ax1.set_xlabel('Iteration', fontsize=font_size)
         ax1.grid(linestyle='--', alpha=0.5, which='major')
 
-        # Save plot (CHANGED HERE)
+        # Save plot
         per_thread_filename = f"{new_base}_thread_{thread}.png"
         plt.savefig(per_thread_filename, dpi=600, bbox_inches='tight', pad_inches=0.2)
         print(f"Thread {thread} plot saved to {per_thread_filename}")
