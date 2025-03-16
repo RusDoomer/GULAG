@@ -64,3 +64,4 @@ dkms.conf
 # logging files
 *.log
 *.png
+*.csv
