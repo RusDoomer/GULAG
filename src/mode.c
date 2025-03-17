@@ -351,17 +351,28 @@ void *thread_function(void *arg) {
         clock_gettime(CLOCK_REALTIME, &ts);
         double timestamp = ts.tv_sec + ts.tv_nsec / 1e9;
 
+        char layout_state[39];
+        layout_state[0] = '\"';
+        for (int r = 0; r < 3; r++) {
+            for (int c = 0; c < 12; c++) {
+                layout_state[r * 12 + c + 1] = convert_back(max_lt->matrix[r][c]);
+            }
+        }
+        layout_state[37] = '\"';
+        layout_state[38] = '\0';
+
         // Log data with timestamp (thread-safe)
         pthread_mutex_lock(data->mutex);
         fwprintf(data->logfile,
-            L"%d,%d,%.2f,%.2f,%.2f,%d,%lf\n",
+            L"%d,%d,%.2f,%.2f,%.2f,%d,%lf,%s\n",
             data->thread_id,                  // Thread
             i,                                // Iteration
             T,                                // Temperature
             new_score,                        // Score of new layout
             max_lt->score,                    // Score of the current max layout
             accepted ? 1 : 0,                 // Whether the layout was accepted
-            timestamp                         // Timestamp of this iteration
+            timestamp,                        // Timestamp of this iteration
+            layout_state
         );
         pthread_mutex_unlock(data->mutex);
 
