@@ -35,8 +35,7 @@ for weight, thread, rep in itertools.product(weights, threads, repetitions):
             "-m", "g",
             "-w", weight,
             "-t", thread,
-            "-r", rep,
-            "-o n"
+            "-r", rep
         ]
         
         print(f"[{completed}/{total_combinations}] Running: {' '.join(command)}")
@@ -55,8 +54,7 @@ for weight, thread, rep, layout in itertools.product(weights, threads, repetitio
             "-1", layout,
             "-w", weight,
             "-t", thread,
-            "-r", rep,
-            "-o n"
+            "-r", rep
         ]
         
         print(f"[{completed}/{total_combinations}] Running: {' '.join(command)}")
