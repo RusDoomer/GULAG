@@ -518,7 +518,7 @@ void improve(int shuffle) {
 
     // Step 2: Combine with weight_name into the filename
     char filename[256];
-    snprintf(filename, sizeof(filename), "optimization_log_%s_%d_%d_%s.log", weight_name, threads, repetitions, timestamp);
+    snprintf(filename, sizeof(filename), "optimization_log_%s_%c_%s_%d_%d_%s.log", weight_name, run_mode, layout_name, threads, repetitions, timestamp);
     // Open log file in append mode with UTF-8 encoding
     FILE *logfile = fopen(filename, "a"); // Text mode for UTF-8 compatibility
     if (!logfile) {
