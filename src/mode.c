@@ -513,12 +513,12 @@ void improve(int shuffle) {
     tm_info = localtime(&rawtime);
 
     // Step 1: Generate the timestamp part
-    char timestamp[16];
-    strftime(timestamp, sizeof(timestamp), "%Y%m%d_%H%M%S", tm_info);
+    char timestamp[18];
+    strftime(timestamp, sizeof(timestamp), "D%Y%m%d_T%H%M%S", tm_info);
 
     // Step 2: Combine with weight_name into the filename
-    char filename[64];
-    snprintf(filename, sizeof(filename), "optimization_log_%s_%s.log", weight_name, timestamp);
+    char filename[256];
+    snprintf(filename, sizeof(filename), "optimization_log_%s_%d_%d_%s.log", weight_name, threads, repetitions, timestamp);
     // Open log file in append mode with UTF-8 encoding
     FILE *logfile = fopen(filename, "a"); // Text mode for UTF-8 compatibility
     if (!logfile) {
