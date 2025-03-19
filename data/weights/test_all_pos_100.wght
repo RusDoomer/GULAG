@@ -1,0 +1,229 @@
+Heatmap 0 00  : 100
+Heatmap 0 01  : 100
+Heatmap 0 02  : 100
+Heatmap 0 03  : 100
+Heatmap 0 04  : 100
+Heatmap 0 05  : 100
+Heatmap 0 06  : 100
+Heatmap 0 07  : 100
+Heatmap 0 08  : 100
+Heatmap 0 09  : 100
+Heatmap 0 10  : 100
+Heatmap 0 11  : 100
+Heatmap 1 00  : 100
+Heatmap 1 01  : 100
+Heatmap 1 02  : 100
+Heatmap 1 03  : 100
+Heatmap 1 04  : 100
+Heatmap 1 05  : 100
+Heatmap 1 06  : 100
+Heatmap 1 07  : 100
+Heatmap 1 08  : 100
+Heatmap 1 09  : 100
+Heatmap 1 10  : 100
+Heatmap 1 11  : 100
+Heatmap 2 00  : 100
+Heatmap 2 01  : 100
+Heatmap 2 02  : 100
+Heatmap 2 03  : 100
+Heatmap 2 04  : 100
+Heatmap 2 05  : 100
+Heatmap 2 06  : 100
+Heatmap 2 07  : 100
+Heatmap 2 08  : 100
+Heatmap 2 09  : 100
+Heatmap 2 10  : 100
+Heatmap 2 11  : 100
+Left Outer Usage  : 100
+Left Pinky Usage  : 100
+Left Ring Usage  : 100
+Left Middle Usage  : 100
+Left Index Usage  : 100
+Left Inner Usage  : 100
+Right Inner Usage  : 100
+Right Index Usage  : 100
+Right Middle Usage  : 100
+Right Ring Usage  : 100
+Right Pinky Usage  : 100
+Right Outer Usage  : 100
+Left Hand Usage  : 100
+Right Hand Usage  : 100
+Top Row Usage  : 100
+Home Row Usage  : 100
+Bottom Row Usage  : 100
+
+Same Finger Bigram  : 100
+Left Pinky Bigram  : 100
+Left Ring Bigram  : 100
+Left Middle Bigram  : 100
+Left Index Bigram  : 100
+Right Index Bigram  : 100
+Right Middle Bigram  : 100
+Right Ring Bigram  : 100
+Right Pinky Bigram  : 100
+Bad Same Finger Bigram  : 100
+Bad Left Pinky Bigram  : 100
+Bad Left Ring Bigram  : 100
+Bad Left Middle Bigram  : 100
+Bad Left Index Bigram  : 100
+Bad Right Index Bigram  : 100
+Bad Right Middle Bigram  : 100
+Bad Right Ring Bigram  : 100
+Bad Right Pinky Bigram  : 100
+Lateral Same Finger Bigram  : 100
+Lateral Left Pinky Bigram  : 100
+Lateral Left Index Bigram  : 100
+Lateral Right Index Bigram  : 100
+Lateral Right Pinky Bigram  : 100
+Full Russor Bigram  : 100
+Half Russor Bigram  : 100
+Index Stretch Bigram  : 100
+Pinky Stretch Bigram  : 100
+
+Same Finger Trigram  : 100
+Redirect  : 100
+Bad Redirect  : 100
+Alternation  : 100
+Alternation In  : 100
+Alternation Out  : 100
+Same Row Alternation  : 100
+Same Row Alternation In  : 100
+Same Row Alternation Out  : 100
+Adjacent Finger Alternation  : 100
+Adjacent Finger Alternation In  : 100
+Adjacent Finger Alternation Out  : 100
+Same Row Adjacent Finger Alternation  : 100
+Same Row Adjacent Finger Alternation In  : 100
+Same Row Adjacent Finger Alternation Out  : 100
+One Hand  : 100
+One Hand In  : 100
+One Hand Out  : 100
+Same Row One Hand  : 100
+Same Row One Hand In  : 100
+Same Row One Hand Out  : 100
+Adjacent Finger One Hand  : 100
+Adjacent Finger One Hand In  : 100
+Adjacent Finger One Hand Out  : 100
+Same Row Adjacent Finger One Hand  : 100
+Same Row Adjacent Finger One Hand In  : 100
+Same Row Adjacent Finger One Hand Out  : 100
+Roll  : 100
+Roll In  : 100
+Roll Out  : 100
+Same Row Roll  : 100
+Same Row Roll In  : 100
+Same Row Roll Out  : 100
+Adjacent Finger Roll  : 100
+Adjacent Finger Roll In  : 100
+Adjacent Finger Roll Out  : 100
+Same Row Adjacent Finger Roll  : 100
+Same Row Adjacent Finger Roll In  : 100
+Same Row Adjacent Finger Roll Out  : 100
+
+Same Finger Quadgram  : 100
+Chained Redirect  : 100
+Bad Chained Redirect  : 100
+Chained Alternation  : 100
+Chained Alternation In  : 100
+Chained Alternation Out  : 100
+Chained Alternation Mix  : 100
+Same Row Chained Alternation  : 100
+Same Row Chained Alternation In  : 100
+Same Row Chained Alternation Out  : 100
+Same Row Chained Alternation Mix  : 100
+Adjacent Finger Chained Alternation  : 100
+Adjacent Finger Chained Alternation In  : 100
+Adjacent Finger Chained Alternation Out  : 100
+Adjacent Finger Chained Alternation Mix  : 100
+Same Row Adjacent Finger Chained Alternation  : 100
+Same Row Adjacent Finger Chained Alternation In  : 100
+Same Row Adjacent Finger Chained Alternation Out  : 100
+Same Row Adjacent Finger Chained Alternation Mix  : 100
+Quad One Hand  : 100
+Quad One Hand In  : 100
+Quad One Hand Out  : 100
+Quad Same Row One Hand  : 100
+Quad Same Row One Hand In  : 100
+Quad Same Row One Hand Out  : 100
+Quad Adjacent Finger One Hand  : 100
+Quad Adjacent Finger One Hand In  : 100
+Quad Adjacent Finger One Hand Out  : 100
+Quad Same Row Adjacent Finger One Hand  : 100
+Quad Same Row Adjacent Finger One Hand In  : 100
+Quad Same Row Adjacent Finger One Hand Out  : 100
+Quad Roll  : 100
+Quad Roll In  : 100
+Quad Roll Out  : 100
+Quad Same Row Roll  : 100
+Quad Same Row Roll In  : 100
+Quad Same Row Roll Out  : 100
+Quad Adjacent Finger Roll  : 100
+Quad Adjacent Finger Roll In  : 100
+Quad Adjacent Finger Roll Out  : 100
+Quad Same Row Adjacent Finger Roll  : 100
+Quad Same Row Adjacent Finger Roll In  : 100
+Quad Same Row Adjacent Finger Roll Out  : 100
+True Roll  : 100
+True Roll In  : 100
+True Roll Out  : 100
+Same Row True Roll  : 100
+Same Row True Roll In  : 100
+Same Row True Roll Out  : 100
+Adjacent Finger True Roll  : 100
+Adjacent Finger True Roll In  : 100
+Adjacent Finger True Roll Out  : 100
+Same Row Adjacent Finger True Roll  : 100
+Same Row Adjacent Finger True Roll In  : 100
+Same Row Adjacent Finger True Roll Out  : 100
+Chained Roll  : 100
+Chained Roll In  : 100
+Chained Roll Out  : 100
+Chained Roll Mix  : 100
+Same Row Chained Roll  : 100
+Same Row Chained Roll In  : 100
+Same Row Chained Roll Out  : 100
+Same Row Chained Roll Mix  : 100
+Adjacent Finger Chained Roll  : 100
+Adjacent Finger Chained Roll In  : 100
+Adjacent Finger Chained Roll Out  : 100
+Adjacent Finger Chained Roll Mix  : 100
+Same Row Adjacent Finger Chained Roll  : 100
+Same Row Adjacent Finger Chained Roll In  : 100
+Same Row Adjacent Finger Chained Roll Out  : 100
+Same Row Adjacent Finger Chained Roll Mix  : 100
+
+Same Finger Skipgram  : 100 100 100 100 100 100 100 100 100
+Left Pinky Skipgram  : 100 100 100 100 100 100 100 100 100
+Left Ring Skipgram  : 100 100 100 100 100 100 100 100 100
+Left Middle Skipgram  : 100 100 100 100 100 100 100 100 100
+Left Index Skipgram  : 100 100 100 100 100 100 100 100 100
+Right Index Skipgram  : 100 100 100 100 100 100 100 100 100
+Right Middle Skipgram  : 100 100 100 100 100 100 100 100 100
+Right Ring Skipgram  : 100 100 100 100 100 100 100 100 100
+Right Pinky Skipgram  : 100 100 100 100 100 100 100 100 100
+Bad Same Finger Skipgram  : 100 100 100 100 100 100 100 100 100
+Bad Left Pinky Skipgram  : 100 100 100 100 100 100 100 100 100
+Bad Left Ring Skipgram  : 100 100 100 100 100 100 100 100 100
+Bad Left Middle Skipgram  : 100 100 100 100 100 100 100 100 100
+Bad Left Index Skipgram  : 100 100 100 100 100 100 100 100 100
+Bad Right Index Skipgram  : 100 100 100 100 100 100 100 100 100
+Bad Right Middle Skipgram  : 100 100 100 100 100 100 100 100 100
+Bad Right Ring Skipgram  : 100 100 100 100 100 100 100 100 100
+Bad Right Pinky Skipgram  : 100 100 100 100 100 100 100 100 100
+Lateral Same Finger Skipgram  : 100 100 100 100 100 100 100 100 100
+Lateral Left Pinky Skipgram  : 100 100 100 100 100 100 100 100 100
+Lateral Left Index Skipgram  : 100 100 100 100 100 100 100 100 100
+Lateral Right Index Skipgram  : 100 100 100 100 100 100 100 100 100
+Lateral Right Pinky Skipgram  : 100 100 100 100 100 100 100 100 100
+
+Hand Balance  : 100
+RuSpeed  : 100
+Left Pinky RuSpeed  : 100
+Left Ring RuSpeed  : 100
+Left Middle RuSpeed  : 100
+Left Index RuSpeed  : 100
+Right Index RuSpeed  : 100
+Right Middle RuSpeed  : 100
+Right Ring RuSpeed  : 100
+Right Pinky RuSpeed  : 100
+
