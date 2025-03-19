@@ -46,8 +46,8 @@ Right Middle Usage : 0
 Right Ring Usage : 0
 Right Pinky Usage : 0
 Right Outer Usage : 0
-Left Hand Usage : 1
-Right Hand Usage : 1
+Left Hand Usage : 0
+Right Hand Usage : 0
 Top Row Usage : 0
 Home Row Usage : 0
 Bottom Row Usage : 0
@@ -188,7 +188,7 @@ Same Row Adjacent Finger Chained Roll : 0
 Same Row Adjacent Finger Chained Roll In : 0
 Same Row Adjacent Finger Chained Roll Out : 0
 Same Row Adjacent Finger Chained Roll Mix : 0
-Same Finger Skipgram : 0 0 0 0 0 0 0 0 0
+Same Finger Skipgram : -1 1 -1 1 -1 1 -1 1 -1
 Left Pinky Skipgram : 0 0 0 0 0 0 0 0 0
 Left Ring Skipgram : 0 0 0 0 0 0 0 0 0
 Left Middle Skipgram : 0 0 0 0 0 0 0 0 0
@@ -211,7 +211,7 @@ Lateral Left Pinky Skipgram : 0 0 0 0 0 0 0 0 0
 Lateral Left Index Skipgram : 0 0 0 0 0 0 0 0 0
 Lateral Right Index Skipgram : 0 0 0 0 0 0 0 0 0
 Lateral Right Pinky Skipgram : 0 0 0 0 0 0 0 0 0
-Hand Balance : -0.1
+Hand Balance : 0
 RuSpeed : 0
 Left Pinky RuSpeed : 0
 Left Ring RuSpeed : 0
@@ -221,4 +221,3 @@ Right Index RuSpeed : 0
 Right Middle RuSpeed : 0
 Right Ring RuSpeed : 0
 Right Pinky RuSpeed : 0
-

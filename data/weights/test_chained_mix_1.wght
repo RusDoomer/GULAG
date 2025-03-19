@@ -118,9 +118,9 @@ Same Row Adjacent Finger Roll : 0
 Same Row Adjacent Finger Roll In : 0
 Same Row Adjacent Finger Roll Out : 0
 Same Finger Quadgram : 0
-Chained Redirect : 0
-Bad Chained Redirect : 0
-Chained Alternation : 0
+Chained Redirect : -1
+Bad Chained Redirect : -5
+Chained Alternation : 2
 Chained Alternation In : 0
 Chained Alternation Out : 0
 Chained Alternation Mix : 0
@@ -211,7 +211,7 @@ Lateral Left Pinky Skipgram : 0 0 0 0 0 0 0 0 0
 Lateral Left Index Skipgram : 0 0 0 0 0 0 0 0 0
 Lateral Right Index Skipgram : 0 0 0 0 0 0 0 0 0
 Lateral Right Pinky Skipgram : 0 0 0 0 0 0 0 0 0
-Hand Balance : 1
+Hand Balance : 0
 RuSpeed : 0
 Left Pinky RuSpeed : 0
 Left Ring RuSpeed : 0
@@ -221,4 +221,3 @@ Right Index RuSpeed : 0
 Right Middle RuSpeed : 0
 Right Ring RuSpeed : 0
 Right Pinky RuSpeed : 0
-
