@@ -262,6 +262,8 @@ void *thread_function(void *arg) {
     int iterations = data->iterations;
     int thread_id = data->thread_id;
 
+    int swap_count = 1;
+
     /* Allocate max and working layouts */
     layout *max_lt, *working_lt;
     /* Allocate memory for layouts */
@@ -285,26 +287,10 @@ void *thread_function(void *arg) {
     struct timespec start, current;
     clock_gettime(CLOCK_MONOTONIC, &start);
 
-    /* Initial temperature */
-    float T = 1000.0;
-    int reheating_count = 0;
-    /* Starting number of swaps */
-    int initial_swap_count = MAX_SWAPS;
-    int swap_count;
-    /* Store the initial temperature for scaling */
-    float max_T = T;
-
-    /* For adaptive cooling */
-    int improvement_counter = 0;
-
     if (thread_id == 0) {log_print('n',L"Done\n\n");}
     if (thread_id == 0) {log_print('n',L"6/9: Waiting for threads to complete... \n");}
 
     for (int i = 0; i < iterations; i++) {
-        /* Temperature-dependent swap count */
-        swap_count = (int)(initial_swap_count * (T / max_T));
-        swap_count = swap_count < 1 ? 1 : swap_count;
-        swap_count = swap_count > initial_swap_count ? initial_swap_count : swap_count;
 
         /* Store the swaps for potential reversal */
         int swap_rows1[swap_count];
@@ -339,12 +325,10 @@ void *thread_function(void *arg) {
         /* calculates the new score */
         get_score(working_lt); /* util.c */
 
-
+        float T = 0;
         float new_score = working_lt->score;
-        float delta_score = new_score - max_lt->score;
-        float probability = 1.0 / (1.0 + exp(-10.0 * delta_score / T));
-        float random_val = random_float();
-        int accepted = (delta_score > 0) || (probability > random_val);
+        float current_score = max_lt->score;
+        int accepted = (new_score > current_score);
 
         // Get Unix timestamp with nanosecond precision
         struct timespec ts;
@@ -380,8 +364,6 @@ void *thread_function(void *arg) {
         if (accepted) {
             /* copy the new layout if it passes */
             copy(max_lt, working_lt); /* util.c */
-            /* Increment improvement counter */
-            improvement_counter++;
         } else {
             /* Revert the swaps in reverse order if it fails */
             for (int j = swap_count - 1; j >= 0; j--) {
@@ -396,50 +378,6 @@ void *thread_function(void *arg) {
                 working_lt->matrix[row2][col2] = temp;
             }
         }
-
-        /* Adaptive cooling - Modified to adjust reheating temperature */
-        if (i > 0 && i % (iterations / 20) == 0) {
-            double improvement_rate = (double)improvement_counter / (iterations / 20);
-            if (improvement_rate > 0.2) {
-                /* Cool faster if improving rapidly */
-                max_T *= 0.95;
-            } else {
-                /* Cool slower if not improving much */
-                max_T *= 1.05;
-            }
-            /* Limit max_T to a reasonable upper bound */
-            max_T = max_T > 1500.0 ? 1500.0 : max_T;
-            /* Don't let max_T be less than the current T */
-            max_T = max_T < T ? T : max_T;
-            /* Reset counter */
-            improvement_counter = 0;
-        }
-
-        /* Reheating with temperature clamp */
-        if (i > 0 && i % (iterations / 10) == 0) {
-            float old_T = T;
-            /* Reheat to the potentially adjusted max_T */
-            T = max_T;
-            reheating_count++;
-            if (thread_id == 0) {log_print('v', L"\nReheating (%d) | Old Temp: %f - New Temp: %f\n", reheating_count, old_T, T);}
-        }
-
-        /* Non-monotonic "jolt" */
-        if (i > 0 && i % (iterations / 50) == 0) {
-            T *= (1.0 + random_float() * 0.3);
-            if (T > max_T) {
-                T = max_T;
-            }
-        }
-
-        /* Temperature cooling tied to iteration count */
-        float progress = (float)i / iterations;
-        /* Linear decrease */
-        T = max_T * (1.0 - progress);
-        /* Exponential decrease - You can try this too (seems worse) */
-        /* T = max_T * exp(-5.0 * progress); */
-        /* Prevent T from going below 1.0 */
-        T = T < 1.0 ? 1.0 : T;
 
         /* Percentage completion and estimated time for the first thread */
         if (thread_id == 0 && i % 100 == 0) {
@@ -518,7 +456,7 @@ void improve(int shuffle) {
 
     // Step 2: Combine with weight_name into the filename
     char filename[256];
-    snprintf(filename, sizeof(filename), "optimization_log_%s_%c_%s_%d_%d_%s.log", weight_name, run_mode, layout_name, threads, repetitions, timestamp);
+    snprintf(filename, sizeof(filename), "greedy1swap_log_%s_%c_%s_%d_%d_%s.log", weight_name, run_mode, layout_name, threads, repetitions, timestamp);
     // Open log file in append mode with UTF-8 encoding
     FILE *logfile = fopen(filename, "a"); // Text mode for UTF-8 compatibility
     if (!logfile) {
