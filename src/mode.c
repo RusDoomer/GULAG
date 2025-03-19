@@ -540,7 +540,7 @@ void improve(int shuffle) {
     struct timespec compute_start, compute_end;
     clock_gettime(CLOCK_MONOTONIC, &compute_start);
 
-    layout *lt;
+    layout **lt = malloc(sizeof(layout *) * threads);
 
     /* prints the current pins */
     log_print('v',L"Pins: \n");
@@ -549,19 +549,25 @@ void improve(int shuffle) {
 
     /* allocate memory for layout */
     log_print('n',L"1/9: Allocating layout... ");
-    alloc_layout(&lt); /* util.c */
+    for (int i = 0; i < threads; i++) {
+        alloc_layout(&lt[i]); /* util.c */
+    }
     log_print('n',L"Done\n\n");
 
     /* read the starting keyboard layout */
     log_print('n',L"2/9: Reading layout... ");
-    read_layout(lt, 1); /* io.c */
+    for (int i = 0; i < threads; i++) {
+        read_layout(lt[i], 1); /* io.c */
+    }
     log_print('n',L"Done\n\n");
 
     if (shuffle) {
         /* shuffles the matrix */
         log_print('n',L"3/9: Shuffling layout... ");
-        shuffle_layout(lt); /* util.c */
-        strcpy(lt->name, "random shuffle");
+        for (int i = 0; i < threads; i++) {
+            shuffle_layout(lt[i]); /* util.c */
+            strcpy(lt[i]->name, "random shuffle");
+        }
         log_print('n',L"Done\n\n");
     } else {
         log_print('n',L"3/8: Skipping shuffle... ");
@@ -570,13 +576,23 @@ void improve(int shuffle) {
 
     /* perform a single layout analysis */
     log_print('n',L"4/9: Analyzing starting point... ");
-    single_analyze(lt); /* analyze.c */
+    for (int i = 0; i < threads; i++) {
+        single_analyze(lt[i]); /* analyze.c */
+    }
     /* calculate the overall score */
-    get_score(lt); /* util.c */
+    for (int i = 0; i < threads; i++) {
+        get_score(lt[i]); /* util.c */
+    }
     log_print('n',L"Done\n\n");
 
     /* prints the starting layout */
-    print_layout(lt); /* io.c */
+    if (shuffle) {
+        for (int i = 0; i < threads; i++) {
+            print_layout(lt[i]);
+        }
+    } else {
+        print_layout(lt[0]); /* io.c */
+    }
     log_print('n',L"\n");
 
     int iterations = repetitions / threads;
@@ -593,7 +609,7 @@ void improve(int shuffle) {
         thread_data_array[i].mutex = &mutex;
 
         best_layouts[i] = NULL;
-        thread_data_array[i].lt = lt;
+        thread_data_array[i].lt = lt[i];
         thread_data_array[i].best_lt = &best_layouts[i];
         thread_data_array[i].iterations = iterations;
         thread_data_array[i].thread_id = i;
@@ -625,12 +641,12 @@ void improve(int shuffle) {
 
     /* Compare with the original layout and print the better one */
     log_print('n',L"9/9: Printing layout...\n\n");
-    if (best_layout->score > lt->score) {
+    if (best_layout->score > lt[0]->score) {
         /* prints the best layout */
         print_layout(best_layout); /* io.c */
     } else {
         /* prints the starting layout */
-        print_layout(lt); /* io.c */
+        print_layout(lt[0]); /* io.c */
     }
     log_print('n',L"Done\n\n");
 
@@ -644,8 +660,9 @@ void improve(int shuffle) {
     // Cleanup
     pthread_mutex_destroy(&mutex);
     fclose(logfile);
-
-    free_layout(lt);
+    for (int i = 0; i < threads; i++) {
+        free_layout(lt[i]);
+    }
     free(thread_data_array);
     free(thread_ids);
     free(best_layouts);
