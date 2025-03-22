@@ -262,7 +262,7 @@ void *thread_function(void *arg) {
     int iterations = data->iterations;
     int thread_id = data->thread_id;
 
-    int swap_count = 4;
+    int swap_count = 18;
 
     /* Allocate max and working layouts */
     layout *max_lt, *working_lt;
@@ -457,9 +457,9 @@ void improve(int shuffle) {
     // Step 2: Combine with weight_name into the filename
     char filename[256];
     if (shuffle) {
-        snprintf(filename, sizeof(filename), "greedy4swap_log_%s_shuffle_%d_%d_%s.log", weight_name, threads, repetitions, timestamp);
+        snprintf(filename, sizeof(filename), "greedy18swap_log_%s_shuffle_%d_%d_%s.log", weight_name, threads, repetitions, timestamp);
     } else {
-        snprintf(filename, sizeof(filename), "greedy4swap_log_%s_%s_%d_%d_%s.log", weight_name, layout_name, threads, repetitions, timestamp);
+        snprintf(filename, sizeof(filename), "greedy18swap_log_%s_%s_%d_%d_%s.log", weight_name, layout_name, threads, repetitions, timestamp);
     }
     // Open log file in append mode with UTF-8 encoding
     FILE *logfile = fopen(filename, "a"); // Text mode for UTF-8 compatibility
