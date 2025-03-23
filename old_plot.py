@@ -124,11 +124,8 @@ def create_plots(logfile):
     # Get initial and final *accepted* layouts for best thread:
     initial_layout = format_layout(best_thread_data['Layout'].iloc[0].strip('\"')) # remove " characters
     # Find the last accepted layout
-    accepted_best = best_thread_data[best_thread_data['Accepted'] == 1]
-    if not accepted_best.empty:
-        final_accepted_layout = format_layout(accepted_best['Layout'].iloc[-1].strip('\"'))
-    else:
-        final_accepted_layout = "No accepted layouts"
+    final_accepted_layout = best_thread_data[best_thread_data['Accepted'] == 1]['Layout'].iloc[-1].strip('\"')
+    final_accepted_layout = format_layout(final_accepted_layout)
 
 
     # Legend and title
@@ -215,11 +212,9 @@ def create_plots(logfile):
     # Get initial and final *accepted* layouts for worst thread:
     worst_initial_layout = format_layout(worst_thread_data['Layout'].iloc[0].strip('\"'))
     # Find the last accepted layout
-    accepted_worst = worst_thread_data[worst_thread_data['Accepted']==1]
-    if not accepted_worst.empty:
-        worst_final_accepted_layout = format_layout(accepted_worst['Layout'].iloc[-1].strip('\"'))
-    else:
-        worst_final_accepted_layout = "No accepted layouts"
+    worst_final_accepted_layout = worst_thread_data[worst_thread_data['Accepted']==1]['Layout'].iloc[-1].strip('\"')
+    worst_final_accepted_layout = format_layout(worst_final_accepted_layout)
+
      # Legend and title
     ax_worst.set_title(f'Max Score and Temperature vs. Iteration (Worst Thread: {worst_thread})\nFile: {logfile}', fontsize=16)
     worst_subtitle = (f"Thread Start Score: {worst_initial_score:.2f}, End Score: {worst_final_score:.2f}, Runtime: {worst_thread_runtime_str}\n"
