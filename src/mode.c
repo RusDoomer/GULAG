@@ -247,6 +247,15 @@ typedef struct thread_data {
     pthread_mutex_t *mutex;
 } thread_data;
 
+int same_matrix(layout *l1, layout *l2) {
+    for (int i = 0; i < ROW; i++) {
+        for (int j = 0; j < COL; j++) {
+            if (l1->matrix[i][j] != l2->matrix[i][j]) {return 0;}
+        }
+    }
+    return 1;
+}
+
 /*
  * Function executed by each thread to improve a layout. It performs simulated
  * annealing to find a layout with a better score.
@@ -262,13 +271,12 @@ void *thread_function(void *arg) {
     int iterations = data->iterations;
     int thread_id = data->thread_id;
 
-    int swap_count = 0;
-
     /* Allocate max and working layouts */
-    layout *max_lt, *working_lt;
+    layout *max_lt, *working_lt, *temp_lt;
     /* Allocate memory for layouts */
     alloc_layout(&max_lt);     /* util.c */
     alloc_layout(&working_lt); /* util.c */
+    alloc_layout(&temp_lt); /* util.c */
 
     /* copy initial layout to working and max */
     copy(working_lt, lt); /* util.c */
@@ -291,122 +299,94 @@ void *thread_function(void *arg) {
     if (thread_id == 0) {log_print('n',L"6/9: Waiting for threads to complete... \n");}
 
     for (int i = 0; i < iterations; i++) {
+        copy(max_lt, working_lt);
+        for (int p1 = 0; p1 < ROW * COL; p1++) {
+            for (int p2 = p1 + 1; p2 < ROW * COL; p2++) {
+                int r1,c1,r2,c2;
+                r1 = p1 / COL;
+                c1 = p1 % COL;
 
-        if (i % 3 == 0) {
-            swap_count = 1;
-        } else if (i % 3 == 1) {
-            swap_count = 4;
-        } else {
-            swap_count = 18;
-        }
-        /* Store the swaps for potential reversal */
-        int swap_rows1[swap_count];
-        int swap_cols1[swap_count];
-        int swap_rows2[swap_count];
-        int swap_cols2[swap_count];
+                r2 = p2 / COL;
+                c2 = p2 % COL;
+                if (pins[r1][c1] || pins[r2][c2]) {continue;}
 
-        /* Perform the swaps */
-        for (int j = 0; j < swap_count; j++) {
-            int row1, col1, row2, col2;
-            do {
-                row1 = rand() % ROW;
-                col1 = rand() % COL;
-                row2 = rand() % ROW;
-                col2 = rand() % COL;
-            } while (pins[row1][col1] || pins[row2][col2] || (row1 == row2 && col1 == col2));
+                copy(temp_lt, working_lt);
+                int temp = temp_lt->matrix[r1][c1];
+                temp_lt->matrix[r1][c1] = temp_lt->matrix[r2][c2];
+                temp_lt->matrix[r2][c2] = temp;
 
-            /* Store swap locations for BOTH positions */
-            swap_rows1[j] = row1;
-            swap_cols1[j] = col1;
-            swap_rows2[j] = row2;
-            swap_cols2[j] = col2;
+                single_analyze(temp_lt);
+                get_score(temp_lt);
+                i++;
 
-            /* Perform the swap */
-            int temp = working_lt->matrix[row1][col1];
-            working_lt->matrix[row1][col1] = working_lt->matrix[row2][col2];
-            working_lt->matrix[row2][col2] = temp;
-        }
 
-        /* analyze the new layout */
-        single_analyze(working_lt); /* analyze.c */
-        /* calculates the new score */
-        get_score(working_lt); /* util.c */
 
-        float T = 0;
-        float new_score = working_lt->score;
-        float current_score = max_lt->score;
-        int accepted = (new_score > current_score);
+                float T = 0;
+                float new_score = temp_lt->score;
+                float current_score = max_lt->score;
+                int accepted = (new_score >= current_score);
 
-        // Get Unix timestamp with nanosecond precision
-        struct timespec ts;
-        clock_gettime(CLOCK_REALTIME, &ts);
-        double timestamp = ts.tv_sec + ts.tv_nsec / 1e9;
+                // Get Unix timestamp with nanosecond precision
+                struct timespec ts;
+                clock_gettime(CLOCK_REALTIME, &ts);
+                double timestamp = ts.tv_sec + ts.tv_nsec / 1e9;
 
-        char layout_state[39];
-        layout_state[0] = '\"';
-        for (int r = 0; r < 3; r++) {
-            for (int c = 0; c < 12; c++) {
-                layout_state[r * 12 + c + 1] = convert_back(max_lt->matrix[r][c]);
+                char layout_state[39];
+                layout_state[0] = '\"';
+                for (int r = 0; r < 3; r++) {
+                    for (int c = 0; c < 12; c++) {
+                        layout_state[r * 12 + c + 1] = convert_back(max_lt->matrix[r][c]);
+                    }
+                }
+                layout_state[37] = '\"';
+                layout_state[38] = '\0';
+
+                // Log data with timestamp (thread-safe)
+                pthread_mutex_lock(data->mutex);
+                fwprintf(data->logfile,
+                    L"%d,%d,%.2f,%.2f,%.2f,%d,%lf,%s\n",
+                    data->thread_id,                  // Thread
+                    i,                                // Iteration
+                    T,                                // Temperature
+                    new_score,                        // Score of new layout
+                    max_lt->score,                    // Score of the current max layout
+                    accepted ? 1 : 0,                 // Whether the layout was accepted
+                    timestamp,                        // Timestamp of this iteration
+                    layout_state
+                );
+                pthread_mutex_unlock(data->mutex);
+
+                if(accepted) {copy(max_lt, temp_lt);}
+
+
+                /* Percentage completion and estimated time for the first thread */
+                if (thread_id == 0 && i % 100 == 0) {
+                    clock_gettime(CLOCK_MONOTONIC, &current);
+                    double elapsed = (current.tv_sec - start.tv_sec) + (current.tv_nsec - start.tv_nsec) / 1e9;
+                    double progress_percent = (double)i / iterations;
+                    double iterationsPerSecond = i / elapsed;
+                    double totalIterationsPerSecond = iterationsPerSecond * threads;
+                    int estimatedRemaining = (int)((iterations - i) / iterationsPerSecond);
+
+                    /* Calculate hours, minutes, and seconds */
+                    int hours = estimatedRemaining / 3600;
+                    int minutes = (estimatedRemaining % 3600) / 60;
+                    int seconds = estimatedRemaining % 60;
+
+                    /* Print the result (with correct pluralization) */
+                    log_print('n', L"\r%3d%%  ETA: %02dh %02dm %02ds, %8.0lf layout%s/sec                 ",
+                        (int)(progress_percent * 100), hours, minutes, seconds, totalIterationsPerSecond,
+                        totalIterationsPerSecond == 1 ? "" : "s");
+                    fflush(stdout);
+                }
+
             }
         }
-        layout_state[37] = '\"';
-        layout_state[38] = '\0';
-
-        // Log data with timestamp (thread-safe)
-        pthread_mutex_lock(data->mutex);
-        fwprintf(data->logfile,
-            L"%d,%d,%.2f,%.2f,%.2f,%d,%lf,%s\n",
-            data->thread_id,                  // Thread
-            i,                                // Iteration
-            T,                                // Temperature
-            new_score,                        // Score of new layout
-            max_lt->score,                    // Score of the current max layout
-            accepted ? 1 : 0,                 // Whether the layout was accepted
-            timestamp,                        // Timestamp of this iteration
-            layout_state
-        );
-        pthread_mutex_unlock(data->mutex);
-
-
-        if (accepted) {
-            /* copy the new layout if it passes */
-            copy(max_lt, working_lt); /* util.c */
-        } else {
-            /* Revert the swaps in reverse order if it fails */
-            for (int j = swap_count - 1; j >= 0; j--) {
-                int row1 = swap_rows1[j];
-                int col1 = swap_cols1[j];
-                int row2 = swap_rows2[j];
-                int col2 = swap_cols2[j];
-
-                /* Perform the reverse swap */
-                int temp = working_lt->matrix[row1][col1];
-                working_lt->matrix[row1][col1] = working_lt->matrix[row2][col2];
-                working_lt->matrix[row2][col2] = temp;
-            }
-        }
-
-        /* Percentage completion and estimated time for the first thread */
-        if (thread_id == 0 && i % 100 == 0) {
-            clock_gettime(CLOCK_MONOTONIC, &current);
-            double elapsed = (current.tv_sec - start.tv_sec) + (current.tv_nsec - start.tv_nsec) / 1e9;
-            double progress_percent = (double)i / iterations;
-            double iterationsPerSecond = i / elapsed;
-            double totalIterationsPerSecond = iterationsPerSecond * threads;
-            int estimatedRemaining = (int)((iterations - i) / iterationsPerSecond);
-
-            /* Calculate hours, minutes, and seconds */
-            int hours = estimatedRemaining / 3600;
-            int minutes = (estimatedRemaining % 3600) / 60;
-            int seconds = estimatedRemaining % 60;
-
-            /* Print the result (with correct pluralization) */
-            log_print('n', L"\r%3d%%  ETA: %02dh %02dm %02ds, %8.0lf layout%s/sec                 ",
-                (int)(progress_percent * 100), hours, minutes, seconds, totalIterationsPerSecond,
-                totalIterationsPerSecond == 1 ? "" : "s");
-            fflush(stdout);
-        }
+        if (!same_matrix(max_lt, working_lt)) {
+            copy(working_lt, max_lt);
+        } else {break;}
     }
+
     if (thread_id == 0) {
         /* Newline after percentage reaches 100% */
         log_print('q', L"\n");
@@ -464,9 +444,9 @@ void improve(int shuffle) {
     // Step 2: Combine with weight_name into the filename
     char filename[256];
     if (shuffle) {
-        snprintf(filename, sizeof(filename), "greedy1_4_18swap_log_%s_shuffle_%d_%d_%s.log", weight_name, threads, repetitions, timestamp);
+        snprintf(filename, sizeof(filename), "true_greedy_log_%s_shuffle_%d_%d_%s.log", weight_name, threads, repetitions, timestamp);
     } else {
-        snprintf(filename, sizeof(filename), "greedy1_4_18swap_log_%s_%s_%d_%d_%s.log", weight_name, layout_name, threads, repetitions, timestamp);
+        snprintf(filename, sizeof(filename), "true_greedy_log_%s_%s_%d_%d_%s.log", weight_name, layout_name, threads, repetitions, timestamp);
     }
     // Open log file in append mode with UTF-8 encoding
     FILE *logfile = fopen(filename, "a"); // Text mode for UTF-8 compatibility
