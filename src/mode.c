@@ -243,18 +243,10 @@ typedef struct thread_data {
     layout **best_lt;
     int iterations;
     int thread_id;
+    unsigned int seed;
     FILE *logfile;
     pthread_mutex_t *mutex;
 } thread_data;
-
-int same_matrix(layout *l1, layout *l2) {
-    for (int i = 0; i < ROW; i++) {
-        for (int j = 0; j < COL; j++) {
-            if (l1->matrix[i][j] != l2->matrix[i][j]) {return 0;}
-        }
-    }
-    return 1;
-}
 
 /*
  * Function executed by each thread to improve a layout. It performs simulated
@@ -266,23 +258,96 @@ int same_matrix(layout *l1, layout *l2) {
  * Returns: A pointer to the best layout found by the thread.
  */
 void *thread_function(void *arg) {
+
+    /*
+     * algorithms tried
+     * 1 greedy random walk - 1 swap
+     * 2 greedy random walk - 4 swaps
+     * 3 greedy random walk - 18 swaps
+     * 4 greedy random walk - 1/4/18 swaps
+     * 5 true greedy algorithm
+     */
+
+    /*
+     * current algorithm: 6
+     *
+     * simulated annealing
+     */
+
+    /*
+     * parameters to modify:
+     *
+     * acceptance probability function:
+     * past:
+     * current: metropolis
+     * future: sigmoid
+     *
+     * swap count:
+     * past:
+     * current: 1
+     * future: 2, 4, *slowly decreasing
+     *
+     * initial temperature:
+     * past:
+     * current: 100
+     * future: 1, 10, 1000, 10000
+     *
+     * cooling function:
+     * past:
+     * current: linear
+     * future: exponential,  *logarithmic
+     *
+     * cooling rate:
+     * past:
+     * current: based on iterations
+     * future: based on cooling function
+     *
+     * minimum temperature:
+     * past:
+     * current: 1.0
+     * future: 0.01, *100
+     *
+     * how neighbors are chosen:
+     * past:
+     * current: random swap
+     * future: only adjacent swap, swap rows + swap columns rarely
+     *
+     */
+
+    /*
+     * algorithms to try
+     * ?-? simulated annealing
+     * ?-? genetic algorithm
+     * ?-? memetic algorithm (GA + local search)
+     * ?-? memetic algorithm (GA + SA)
+     * ?-? hybrid algorithm (GA + SA + greedy local search)
+     * ?-? parallel tempering (replica exchange MCMC)
+     * ?-? tabu search
+     * ?-? ant colony optimization maybe?
+     * ?-? quantum annealing??
+     */
+
     thread_data *data = (thread_data *)arg;
     layout *lt = data->lt;
     int iterations = data->iterations;
     int thread_id = data->thread_id;
+    unsigned int *seedptr = &(data->seed);
 
     /* Allocate max and working layouts */
-    layout *max_lt, *working_lt, *temp_lt;
+    layout *max_lt, *working_lt, *candidate_lt;
     /* Allocate memory for layouts */
     alloc_layout(&max_lt);     /* util.c */
     alloc_layout(&working_lt); /* util.c */
-    alloc_layout(&temp_lt); /* util.c */
+    alloc_layout(&candidate_lt); /* util.c */
 
     /* copy initial layout to working and max */
     copy(working_lt, lt); /* util.c */
 
     /* Set name so we can see if we improved */
-    strcat(working_lt->name, " improved");
+    char base_name[50]; // Reserve space for " improved" + null
+    strncpy(base_name, lt->name, sizeof(base_name) - 1);
+    base_name[sizeof(base_name) - 1] = '\0'; // Ensure null termination
+    snprintf(working_lt->name, sizeof(working_lt->name), "%s improved", base_name);
 
     /* analyze and score the initial layout */
     single_analyze(working_lt); /* analyze.c */
@@ -290,101 +355,123 @@ void *thread_function(void *arg) {
     get_score(working_lt); /* util.c */
     /* copies the layout */
     copy(max_lt, working_lt); /* util.c */
+    copy(candidate_lt, working_lt); /* util.c */
 
     /* Simulated annealing with enhancements */
     struct timespec start, current;
     clock_gettime(CLOCK_MONOTONIC, &start);
 
+    /* Initial temperature */
+    float T = 100.0;
+    /* Max temp */
+    const float max_T = T;
+    /* Number of swaps */
+    int swap_count = 1;
+
     if (thread_id == 0) {log_print('n',L"Done\n\n");}
     if (thread_id == 0) {log_print('n',L"6/9: Waiting for threads to complete... \n");}
 
     for (int i = 0; i < iterations; i++) {
-        copy(max_lt, working_lt);
-        for (int p1 = 0; p1 < ROW * COL; p1++) {
-            for (int p2 = p1 + 1; p2 < ROW * COL; p2++) {
-                int r1,c1,r2,c2;
-                r1 = p1 / COL;
-                c1 = p1 % COL;
+        copy(candidate_lt, working_lt);
 
-                r2 = p2 / COL;
-                c2 = p2 % COL;
-                if (pins[r1][c1] || pins[r2][c2]) {continue;}
+        /* Perform the swaps */
+        for (int j = 0; j < swap_count; j++) {
+            int row1, col1, row2, col2;
+            do {
+                row1 = rand_r(seedptr) % ROW;
+                col1 = rand_r(seedptr) % COL;
+                row2 = rand_r(seedptr) % ROW;
+                col2 = rand_r(seedptr) % COL;
+            } while (pins[row1][col1] || pins[row2][col2] || (row1 == row2 && col1 == col2));
 
-                copy(temp_lt, working_lt);
-                int temp = temp_lt->matrix[r1][c1];
-                temp_lt->matrix[r1][c1] = temp_lt->matrix[r2][c2];
-                temp_lt->matrix[r2][c2] = temp;
+            /* Perform the swap */
+            int temp = candidate_lt->matrix[row1][col1];
+            candidate_lt->matrix[row1][col1] = candidate_lt->matrix[row2][col2];
+            candidate_lt->matrix[row2][col2] = temp;
+        }
 
-                single_analyze(temp_lt);
-                get_score(temp_lt);
-                i++;
+        /* analyze the new layout */
+        single_analyze(candidate_lt); /* analyze.c */
+        /* calculates the new score */
+        get_score(candidate_lt); /* util.c */
 
+        float new_score = candidate_lt->score;
+        float delta_score = new_score - working_lt->score;
+        float probability = expf(delta_score / T);
+        float random_val = (float)rand_r(seedptr) / RAND_MAX;
+        int accepted = (delta_score > 0) || (probability > random_val);
+        int new_max = new_score - max_lt->score > 0;
 
+        // Get Unix timestamp with nanosecond precision
+        struct timespec ts;
+        clock_gettime(CLOCK_REALTIME, &ts);
+        double timestamp = ts.tv_sec + ts.tv_nsec / 1e9;
 
-                float T = 0;
-                float new_score = temp_lt->score;
-                float current_score = max_lt->score;
-                int accepted = (new_score >= current_score);
-
-                // Get Unix timestamp with nanosecond precision
-                struct timespec ts;
-                clock_gettime(CLOCK_REALTIME, &ts);
-                double timestamp = ts.tv_sec + ts.tv_nsec / 1e9;
-
-                char layout_state[39];
-                layout_state[0] = '\"';
-                for (int r = 0; r < 3; r++) {
-                    for (int c = 0; c < 12; c++) {
-                        layout_state[r * 12 + c + 1] = convert_back(max_lt->matrix[r][c]);
-                    }
-                }
-                layout_state[37] = '\"';
-                layout_state[38] = '\0';
-
-                // Log data with timestamp (thread-safe)
-                pthread_mutex_lock(data->mutex);
-                fwprintf(data->logfile,
-                    L"%d,%d,%.2f,%.2f,%.2f,%d,%lf,%s\n",
-                    data->thread_id,                  // Thread
-                    i,                                // Iteration
-                    T,                                // Temperature
-                    new_score,                        // Score of new layout
-                    max_lt->score,                    // Score of the current max layout
-                    accepted ? 1 : 0,                 // Whether the layout was accepted
-                    timestamp,                        // Timestamp of this iteration
-                    layout_state
-                );
-                pthread_mutex_unlock(data->mutex);
-
-                if(accepted) {copy(max_lt, temp_lt);}
-
-
-                /* Percentage completion and estimated time for the first thread */
-                if (thread_id == 0 && i % 100 == 0) {
-                    clock_gettime(CLOCK_MONOTONIC, &current);
-                    double elapsed = (current.tv_sec - start.tv_sec) + (current.tv_nsec - start.tv_nsec) / 1e9;
-                    double progress_percent = (double)i / iterations;
-                    double iterationsPerSecond = i / elapsed;
-                    double totalIterationsPerSecond = iterationsPerSecond * threads;
-                    int estimatedRemaining = (int)((iterations - i) / iterationsPerSecond);
-
-                    /* Calculate hours, minutes, and seconds */
-                    int hours = estimatedRemaining / 3600;
-                    int minutes = (estimatedRemaining % 3600) / 60;
-                    int seconds = estimatedRemaining % 60;
-
-                    /* Print the result (with correct pluralization) */
-                    log_print('n', L"\r%3d%%  ETA: %02dh %02dm %02ds, %8.0lf layout%s/sec                 ",
-                        (int)(progress_percent * 100), hours, minutes, seconds, totalIterationsPerSecond,
-                        totalIterationsPerSecond == 1 ? "" : "s");
-                    fflush(stdout);
-                }
-
+        char layout_state[39];
+        layout_state[0] = '\"';
+        for (int r = 0; r < 3; r++) {
+            for (int c = 0; c < 12; c++) {
+                layout_state[r * 12 + c + 1] = convert_back(working_lt->matrix[r][c]);
             }
         }
-        if (!same_matrix(max_lt, working_lt)) {
-            copy(working_lt, max_lt);
-        } else {break;}
+        layout_state[37] = '\"';
+        layout_state[38] = '\0';
+
+        // Log data with timestamp (thread-safe)
+        pthread_mutex_lock(data->mutex);
+        fwprintf(data->logfile,
+            L"%d,%d,%.2f,%.2f,%.2f,%d,%lf,%s\n",
+            data->thread_id,      // Thread
+            i,                    // Iteration
+            T,                    // Temperature
+            new_score,            // Score of new layout
+            working_lt->score,    // Score of the current working layout
+            accepted ? 1 : 0,     // Whether the layout was accepted
+            timestamp,            // Timestamp of this iteration
+            layout_state          // current layout state
+        );
+        pthread_mutex_unlock(data->mutex);
+
+        if (accepted) {
+            /* copy the new layout if it passes */
+            copy(working_lt, candidate_lt); /* util.c */
+        }
+
+        if (new_max) {
+            /* copy the new layout if it passes */
+            copy(max_lt, candidate_lt); /* util.c */
+        }
+
+        /* Temperature cooling tied to iteration count */
+        float progress = (float)i / iterations;
+        /* Linear decrease */
+        T = max_T * (1.0 - progress);
+        /* Exponential decrease - You can try this too (seems worse) */
+        /* T = max_T * exp(-5.0 * progress); */
+        /* Prevent T from going below 1.0 */
+        T = T < 1.0 ? 1.0 : T;
+
+
+        /* Percentage completion and estimated time for the first thread */
+        if (thread_id == 0 && i % 100 == 0) {
+            clock_gettime(CLOCK_MONOTONIC, &current);
+            double elapsed = (current.tv_sec - start.tv_sec) + (current.tv_nsec - start.tv_nsec) / 1e9;
+            double progress_percent = (double)i / iterations;
+            double iterationsPerSecond = i / elapsed;
+            double totalIterationsPerSecond = iterationsPerSecond * threads;
+            int estimatedRemaining = (int)((iterations - i) / iterationsPerSecond);
+
+            /* Calculate hours, minutes, and seconds */
+            int hours = estimatedRemaining / 3600;
+            int minutes = (estimatedRemaining % 3600) / 60;
+            int seconds = estimatedRemaining % 60;
+
+            /* Print the result (with correct pluralization) */
+            log_print('n', L"\r%3d%%  ETA: %02dh %02dm %02ds, %8.0lf layout%s/sec                 ",
+                (int)(progress_percent * 100), hours, minutes, seconds, totalIterationsPerSecond,
+                totalIterationsPerSecond == 1 ? "" : "s");
+            fflush(stdout);
+        }
     }
 
     if (thread_id == 0) {
@@ -403,6 +490,7 @@ void *thread_function(void *arg) {
     /* free layouts */
     free_layout(max_lt);     /* util.c */
     free_layout(working_lt); /* util.c */
+    free_layout(candidate_lt); /* util.c */
 
     pthread_exit(NULL);
 }
@@ -443,10 +531,10 @@ void improve(int shuffle) {
 
     // Step 2: Combine with weight_name into the filename
     char filename[256];
-    if (shuffle) {
-        snprintf(filename, sizeof(filename), "true_greedy_log_%s_shuffle_%d_%d_%s.log", weight_name, threads, repetitions, timestamp);
+    if (shuffle) {             //prob function, swaps + type of swaps, cooling func, temp start-end
+        snprintf(filename, sizeof(filename), "simulated_annealing_M_1R_L_100-1_log_%s_shuffle_%d_%d_%s.log", weight_name, threads, repetitions, timestamp);
     } else {
-        snprintf(filename, sizeof(filename), "true_greedy_log_%s_%s_%d_%d_%s.log", weight_name, layout_name, threads, repetitions, timestamp);
+        snprintf(filename, sizeof(filename), "simulated_annealing_M_1R_L_100-1_log_%s_%s_%d_%d_%s.log", weight_name, layout_name, threads, repetitions, timestamp);
     }
     // Open log file in append mode with UTF-8 encoding
     FILE *logfile = fopen(filename, "a"); // Text mode for UTF-8 compatibility
@@ -542,6 +630,7 @@ void improve(int shuffle) {
         thread_data_array[i].best_lt = &best_layouts[i];
         thread_data_array[i].iterations = iterations;
         thread_data_array[i].thread_id = i;
+        thread_data_array[i].seed = ((unsigned int)time(NULL) ^ (unsigned int)getpid()) ^ (i << 16 | i);
         pthread_create(&thread_ids[i], NULL, thread_function, (void *)&thread_data_array[i]);
     }
 
