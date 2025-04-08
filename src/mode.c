@@ -287,22 +287,22 @@ void *thread_function(void *arg) {
      * current: 1
      * future: 2, 4, *slowly decreasing
      *
-     * initial temperature:
-     * past: 100, 10
-     * current: 1000
-     * future:
+     * initial temperature (T):
+     * past:
+     * current: 100
+     * future: 10, 1000
      *
      * cooling function:
-     * past:
-     * current: linear
-     * future: exponential,  *logarithmic
+     * past: linear
+     * current: exponential
+     * future: *logarithmic
      *
-     * cooling rate:
+     * cooling rate (alpha):
      * past:
-     * current: based on iterations
-     * future: based on cooling function
+     * current: 5.0
+     * future: 3.0, 8.0
      *
-     * minimum temperature:
+     * minimum temperature (min_T):
      * past:
      * current: 1.0
      * future: 0.01, *100
@@ -362,9 +362,13 @@ void *thread_function(void *arg) {
     clock_gettime(CLOCK_MONOTONIC, &start);
 
     /* Initial temperature */
-    float T = 1000.0;
+    float T = 100.0;
     /* Max temp */
     const float max_T = T;
+    /* Min temp */
+    const float min_T = 1.0;
+    /* Cooling rate */
+    const float alpha = 5.0;
     /* Number of swaps */
     int swap_count = 1;
 
@@ -445,11 +449,11 @@ void *thread_function(void *arg) {
         /* Temperature cooling tied to iteration count */
         float progress = (float)i / iterations;
         /* Linear decrease */
-        T = max_T * (1.0 - progress);
+        /* T = max_T * (1.0 - progress); */
         /* Exponential decrease - You can try this too (seems worse) */
-        /* T = max_T * exp(-5.0 * progress); */
+        T = max_T * exp(-alpha * progress);
         /* Prevent T from going below 1.0 */
-        T = T < 1.0 ? 1.0 : T;
+        T = T < min_T ? min_T : T;
 
 
         /* Percentage completion and estimated time for the first thread */
@@ -531,10 +535,10 @@ void improve(int shuffle) {
 
     // Step 2: Combine with weight_name into the filename
     char filename[256];
-    if (shuffle) {             //prob function, swaps + type of swaps, cooling func, temp start-end
-        snprintf(filename, sizeof(filename), "simulated_annealing_M_1R_L_1000-1_log_%s_shuffle_%d_%d_%s.log", weight_name, threads, repetitions, timestamp);
-    } else {
-        snprintf(filename, sizeof(filename), "simulated_annealing_M_1R_L_1000-1_log_%s_%s_%d_%d_%s.log", weight_name, layout_name, threads, repetitions, timestamp);
+    if (shuffle) {             //prob function, swaps + type of swaps, cooling func,        temp start-end
+        snprintf(filename, sizeof(filename), "simulated_annealing_M_1R_E5_100-1_log_%s_shuffle_%d_%d_%s.log", weight_name, threads, repetitions, timestamp);
+    } else {                   //metroid,       1 random swap,         exponential alpha=5, T=100 min_T=1
+        snprintf(filename, sizeof(filename), "simulated_annealing_M_1R_E5_100-1_log_%s_%s_%d_%d_%s.log", weight_name, layout_name, threads, repetitions, timestamp);
     }
     // Open log file in append mode with UTF-8 encoding
     FILE *logfile = fopen(filename, "a"); // Text mode for UTF-8 compatibility

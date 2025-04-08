@@ -65,3 +65,4 @@ dkms.conf
 *.log
 *.png
 *.csv
+*.tar.xz
