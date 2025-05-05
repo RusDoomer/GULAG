@@ -288,9 +288,9 @@ void *thread_function(void *arg) {
      * future: 2, 4, *slowly decreasing
      *
      * initial temperature (T):
-     * past: 100
-     * current: 10
-     * future: 1000
+     * past: 100, 10
+     * current: 1000
+     * future:
      *
      * cooling function:
      * past: linear
@@ -362,7 +362,7 @@ void *thread_function(void *arg) {
     clock_gettime(CLOCK_MONOTONIC, &start);
 
     /* Initial temperature */
-    float T = 10.0;
+    float T = 1000.0;
     /* Max temp */
     const float max_T = T;
     /* Min temp */
@@ -536,9 +536,9 @@ void improve(int shuffle) {
     // Step 2: Combine with weight_name into the filename
     char filename[256];
     if (shuffle) {             //prob function, swaps + type of swaps, cooling func,        temp start-end
-        snprintf(filename, sizeof(filename), "simulated_annealing_M_1R_E8_10-1_log_%s_shuffle_%d_%d_%s.log", weight_name, threads, repetitions, timestamp);
-    } else {                   //metroid,       1 random swap,         exponential alpha=8, T=10 min_T=1
-        snprintf(filename, sizeof(filename), "simulated_annealing_M_1R_E8_10-1_log_%s_%s_%d_%d_%s.log", weight_name, layout_name, threads, repetitions, timestamp);
+        snprintf(filename, sizeof(filename), "simulated_annealing_M_1R_E8_1000-1_log_%s_shuffle_%d_%d_%s.log", weight_name, threads, repetitions, timestamp);
+    } else {                   //metroid,       1 random swap,         exponential alpha=8, T=1000 min_T=1
+        snprintf(filename, sizeof(filename), "simulated_annealing_M_1R_E8_1000-1_log_%s_%s_%d_%d_%s.log", weight_name, layout_name, threads, repetitions, timestamp);
     }
     // Open log file in append mode with UTF-8 encoding
     FILE *logfile = fopen(filename, "a"); // Text mode for UTF-8 compatibility
