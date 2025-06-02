@@ -278,9 +278,9 @@ void *thread_function(void *arg) {
      * parameters to modify:
      *
      * acceptance probability function:
-     * past:
-     * current: metropolis
-     * future: sigmoid
+     * past: metropolis
+     * current: sigmoid
+     * future:
      *
      * swap count:
      * past:
@@ -303,9 +303,9 @@ void *thread_function(void *arg) {
      * future:
      *
      * minimum temperature (min_T):
-     * past: 1.0
-     * current: 0.01
-     * future: *100
+     * past:
+     * current: 1.0
+     * future: 0.01, *100
      *
      * how neighbors are chosen:
      * past:
@@ -366,7 +366,7 @@ void *thread_function(void *arg) {
     /* Max temp */
     const float max_T = T;
     /* Min temp */
-    const float min_T = 0.01;
+    const float min_T = 1.0;
     /* Cooling rate */
     const float alpha = 5.0;
     /* Number of swaps */
@@ -401,7 +401,8 @@ void *thread_function(void *arg) {
 
         float new_score = candidate_lt->score;
         float delta_score = new_score - working_lt->score;
-        float probability = expf(delta_score / T);
+        // float probability = expf(delta_score / T);
+        float probability = 1.0f / (1.0f + expf(-delta_score / T));
         float random_val = (float)rand_r(seedptr) / RAND_MAX;
         int accepted = (delta_score > 0) || (probability > random_val);
         int new_max = new_score - max_lt->score > 0;
@@ -536,9 +537,9 @@ void improve(int shuffle) {
     // Step 2: Combine with weight_name into the filename
     char filename[256];
     if (shuffle) {             //prob function, swaps + type of swaps, cooling func,        temp start-end
-        snprintf(filename, sizeof(filename), "simulated_annealing_M_1R_E5_10-001_log_%s_shuffle_%d_%d_%s.log", weight_name, threads, repetitions, timestamp);
-    } else {                   //metroid,       1 random swap,         exponential alpha=5, T=10 min_T=0.01
-        snprintf(filename, sizeof(filename), "simulated_annealing_M_1R_E5_10-001_log_%s_%s_%d_%d_%s.log", weight_name, layout_name, threads, repetitions, timestamp);
+        snprintf(filename, sizeof(filename), "simulated_annealing_S_1R_E5_10-1_log_%s_shuffle_%d_%d_%s.log", weight_name, threads, repetitions, timestamp);
+    } else {                   //sigmoid,       1 random swap,         exponential alpha=5, T=10 min_T=1.0
+        snprintf(filename, sizeof(filename), "simulated_annealing_S_1R_E5_10-1_log_%s_%s_%d_%d_%s.log", weight_name, layout_name, threads, repetitions, timestamp);
     }
     // Open log file in append mode with UTF-8 encoding
     FILE *logfile = fopen(filename, "a"); // Text mode for UTF-8 compatibility
