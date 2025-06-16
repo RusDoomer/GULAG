@@ -288,9 +288,9 @@ void *thread_function(void *arg) {
      * future: 2, 4, *slowly decreasing
      *
      * initial temperature (T):
-     * past:
-     * current: 10
-     * future: 1000, 100
+     * past: 10
+     * current: 100
+     * future: 1000
      *
      * cooling function:
      * past: linear
@@ -303,9 +303,9 @@ void *thread_function(void *arg) {
      * future:
      *
      * minimum temperature (min_T):
-     * past:
-     * current: 1.0
-     * future: 0.01, *100
+     * past: 1.0
+     * current: 0.01
+     * future: *100
      *
      * how neighbors are chosen:
      * past:
@@ -362,11 +362,11 @@ void *thread_function(void *arg) {
     clock_gettime(CLOCK_MONOTONIC, &start);
 
     /* Initial temperature */
-    float T = 10.0;
+    float T = 100.0;
     /* Max temp */
     const float max_T = T;
     /* Min temp */
-    const float min_T = 1.0;
+    const float min_T = 0.01;
     /* Cooling rate */
     const float alpha = 5.0;
     /* Number of swaps */
@@ -537,9 +537,9 @@ void improve(int shuffle) {
     // Step 2: Combine with weight_name into the filename
     char filename[256];
     if (shuffle) {             //prob function, swaps + type of swaps, cooling func,        temp start-end
-        snprintf(filename, sizeof(filename), "simulated_annealing_S_1R_E5_10-1_log_%s_shuffle_%d_%d_%s.log", weight_name, threads, repetitions, timestamp);
-    } else {                   //sigmoid,       1 random swap,         exponential alpha=5, T=10 min_T=1.0
-        snprintf(filename, sizeof(filename), "simulated_annealing_S_1R_E5_10-1_log_%s_%s_%d_%d_%s.log", weight_name, layout_name, threads, repetitions, timestamp);
+        snprintf(filename, sizeof(filename), "simulated_annealing_S_1R_E5_100-001_log_%s_shuffle_%d_%d_%s.log", weight_name, threads, repetitions, timestamp);
+    } else {                   //sigmoid,       1 random swap,         exponential alpha=5, T=100 min_T=0.01
+        snprintf(filename, sizeof(filename), "simulated_annealing_S_1R_E5_100-001_log_%s_%s_%d_%d_%s.log", weight_name, layout_name, threads, repetitions, timestamp);
     }
     // Open log file in append mode with UTF-8 encoding
     FILE *logfile = fopen(filename, "a"); // Text mode for UTF-8 compatibility
