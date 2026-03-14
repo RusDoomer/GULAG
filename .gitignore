@@ -1,5 +1,5 @@
-# the executable
-gulag
+# the build direcotry
+build/*
 
 # Prerequisites
 *.d
@@ -25,7 +25,7 @@ gulag
 *.la
 *.lo
 
-# Shared objects (inc. Windows DLLs)
+# Shared objects
 *.dll
 *.so
 *.so.*
