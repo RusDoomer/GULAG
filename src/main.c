@@ -296,7 +296,7 @@ int main(int argc, char **argv) {
 
     /* read language file and fill array */
     log_print('n',L"1/4: Reading language... ");
-    read_lang(lang_name); /* io.c */
+    read_lang(); /* io.c */
     log_print('n',L"Done\n\n");
 
     /* read from cache if it exists */
