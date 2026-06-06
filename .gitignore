@@ -55,8 +55,8 @@ Mkfile.old
 dkms.conf
 
 # ignoring corpora files
-*.cache
-*.txt
+data/*.cache
+data/*.txt
 
 # geany project file
 *.geany
