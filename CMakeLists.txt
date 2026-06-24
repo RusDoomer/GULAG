@@ -14,4 +14,9 @@ add_executable(test_lang
     src/utils/lang.cpp
 )
 
+add_executable(test_config
+    src/test/test_config.cpp
+    src/utils/config.cpp
+)
+
 target_compile_options(test_lang PRIVATE -Wall -Wextra -Wpedantic -Werror)

@@ -1,0 +1,34 @@
+config:
+rng seed
+"as simple and flexible as possible"
+changing gpu back end, data type (int float), precision should be trivial at compile time
+no global variables or states everything should be modular
+configs should be split to the bare minimum, not one large monolith
+configs should be setup in a way that respects the idea of an API later
+
+items that should definitely be in the config and command line arguments
+rng seed
+language
+corpus
+layouts (primary and secondary)
+weights file
+output mode
+run mode
+run mode arguments
+	-> threads (compute vs analysis)
+	-> repetitions
+	-> time limit
+	-> precision?
+compute backend
+pins
+
+configs should independently:
+	-> open the config file
+	-> search for the key they are looking for
+	-> read the value
+this allows the config to be flexibly laid out and more "standard"
+
+command line arguments are part of the config code
+should allow for normally expected commands "help" "version" etc.
+roll it myself cause fuck it we ball
+all values should be optional so configs can be made smaller for testing, will set my preferences as default screw everyone else
