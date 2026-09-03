@@ -32,3 +32,12 @@ command line arguments are part of the config code
 should allow for normally expected commands "help" "version" etc.
 roll it myself cause fuck it we ball
 all values should be optional so configs can be made smaller for testing, will set my preferences as default screw everyone else
+
+
+
+fuck it, go back to C
+threads.h
+_Generic macros from type decision
+char16_t and char32_t
+constexpr
+_BitInt(N) - look into but performance probably not great
