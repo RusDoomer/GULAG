@@ -259,6 +259,9 @@ void *thread_function(void *arg) {
     int iterations = data->iterations;
     int thread_id = data->thread_id;
 
+	/* Create a unique seed for this specific thread */
+	unsigned int local_seed = (unsigned int)time(NULL) ^ thread_id;
+
     /* Allocate max and working layouts */
     layout *max_lt, *working_lt;
     /* Allocate memory for layouts */
@@ -313,10 +316,10 @@ void *thread_function(void *arg) {
         for (int j = 0; j < swap_count; j++) {
             int row1, col1, row2, col2;
             do {
-                row1 = rand() % ROW;
-                col1 = rand() % COL;
-                row2 = rand() % ROW;
-                col2 = rand() % COL;
+                row1 = rand_r(&local_seed) % ROW;
+                col1 = rand_r(&local_seed) % COL;
+                row2 = rand_r(&local_seed) % ROW;
+                col2 = rand_r(&local_seed) % COL;
             } while (pins[row1][col1] || pins[row2][col2] || (row1 == row2 && col1 == col2));
 
             /* Store swap locations for BOTH positions */
@@ -338,7 +341,7 @@ void *thread_function(void *arg) {
 
         /* Exponentiate the score difference for acceptance probability (using sigmoid) */
         float delta_score = working_lt->score - max_lt->score;
-        if (delta_score > 0 || (1.0 / (1.0 + exp(-10 * delta_score / T))) > random_float()) {
+        if (delta_score > 0 || (1.0 / (1.0 + exp(-10 * delta_score / T))) > random_float(&local_seed)) {
             /* copy the new layout if it passes */
             copy(max_lt, working_lt); /* util.c */
             /* Increment improvement counter */
@@ -387,7 +390,7 @@ void *thread_function(void *arg) {
 
         /* Non-monotonic "jolt" */
         if (i > 0 && i % (iterations / 50) == 0) {
-            T *= (1.0 + random_float() * 0.3);
+            T *= (1.0 + random_float(&local_seed) * 0.3);
             if (T > max_T) {
                 T = max_T;
             }

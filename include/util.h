@@ -189,6 +189,6 @@ void copy(layout *lt_dest, layout *lt_src);
 void skeleton_copy(layout *lt_dest, layout *lt_src);
 
 /* Returns a random float between 0 and 1. */
-float random_float();
+float random_float(unsigned int *seed);
 
 #endif

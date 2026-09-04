@@ -567,8 +567,7 @@ void skeleton_copy(layout *lt_dest, layout *lt_src)
     lt_dest->score = lt_src->score;
 }
 
-/* Returns a random float between 0 and 1. */
-float random_float() {
-    return (float)rand() / RAND_MAX;
+float random_float(unsigned int *seed) {
+    return (float)rand_r(seed) / RAND_MAX;
 }
 
